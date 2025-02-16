@@ -1,8 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <style name="CustomToolbarTitleTextAppearance" parent="TextAppearance.Widget.AppCompat.Toolbar.Title">
-        <item name="android:textSize">20sp</item> <!-- Adjust the text size as needed -->
-        <item name="android:textColor">@color/black</item> <!-- Optional: Set text color -->
-        <item name="fontFamily">sans-serif</item> <!-- Optional: Set font family -->
+        <item name="fontFamily">@font/asset_regular</item>
+        <item name="android:textSize">15sp</item>
+        <item name="android:textColor">@color/bluey</item>
+        <item name="android:lineSpacingExtra">4sp</item>
     </style>
 </resources>
