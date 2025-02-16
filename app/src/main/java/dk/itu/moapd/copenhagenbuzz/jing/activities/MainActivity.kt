@@ -91,7 +91,13 @@ class MainActivity : AppCompatActivity() {
 
         with(mainBinding.contentMain) {
 
+            // Top app bar handling______________________________________//
+
             setSupportActionBar(topAppBar)
+
+            //___________________________________________________________//
+
+            // Date picker handling______________________________________//
 
             editTextEventDateRange.setOnClickListener {
                 val datePicker = MaterialDatePicker.Builder.datePicker()
@@ -120,6 +126,8 @@ class MainActivity : AppCompatActivity() {
                 }
             }
 
+            //______________________________________________________________//
+
             // Event type drop down handling________________________________//
 
             val eventTypes = resources.getStringArray(R.array.event_types)
@@ -142,6 +150,8 @@ class MainActivity : AppCompatActivity() {
 
             //______________________________________________________________//
 
+            // Add event handling___________________________________________//
+
             addEventButton.setOnClickListener {
                 if (editTextEventName.text.toString().isNotEmpty() &&
                     editTextEventLocation.text.toString().isNotEmpty() &&
@@ -158,6 +168,8 @@ class MainActivity : AppCompatActivity() {
                     showMessage()
                 }
             }
+
+            //______________________________________________________________//
         }
     }
 
