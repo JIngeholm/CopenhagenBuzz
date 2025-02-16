@@ -28,7 +28,11 @@ import android.content.Intent
 import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
+import android.view.View
+import android.view.ViewGroup
 import android.widget.ArrayAdapter
+import android.widget.TextView
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.WindowCompat
 import com.google.android.material.datepicker.MaterialDatePicker
@@ -174,18 +178,46 @@ class MainActivity : AppCompatActivity() {
     }
 
     /**
-     * Displays a Snackbar with the event parameters
+     * Displays a fun Snackbar with the event parameters.
      */
     private fun showMessage() {
+        val eventDetails = """
+        🎉 *New Event Created!* 🎊
+        📛 Name: ${event.eventName}
+        📍 Location: ${event.eventLocation}
+        📅 Date: ${event.eventDate}
+        🔖 Type: ${event.eventType}
+        📝 Description: ${event.eventDescription}
+    """.trimIndent()
+
         val snack = Snackbar.make(
             mainBinding.root,
-            "Event added using \n${event}",
+            eventDetails,
             Snackbar.LENGTH_LONG
         )
 
-        snack.setDuration(10000)
+        // Increase duration
+        snack.setDuration(15000)
+
+        // Access and customize the Snackbar's TextView
+        val snackView = snack.view
+        val textView = snackView.findViewById<TextView>(com.google.android.material.R.id.snackbar_text)
+
+        // Customize text appearance
+        textView.textSize = 16f
+        textView.maxLines = 10 // Allow up to 10 lines (adjust as needed)
+        textView.setTextColor(resources.getColor(R.color.white)) // Set text color
+        textView.setPadding(32, 16, 32, 16) // Optional padding for better visuals
+
+        snack.setAction("🎟️ Share") {
+            Toast.makeText(this, "Event shared! 🎉", Toast.LENGTH_SHORT).show()
+        }
+
         snack.show()
     }
+
+
+
 
     /**
      * Prepares the options menu by inflating the menu layout and updating
