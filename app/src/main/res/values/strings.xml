@@ -7,4 +7,15 @@
     <string name="event_date_range_format">%1$s to %2$s</string>
     <string name="event_description">Event description</string>
     <string name="button_description">button which adds events</string>
+    <string name="guest">Guest</string>
+    <string name="login">Login</string>
+    <string name="logout">Logout</string>
+
+    <string-array name="event_types">
+        <item>Music</item>
+        <item>Sport</item>
+        <item>Party</item>
+        <item>Art</item>
+        <item>Toilet</item>
+    </string-array>
 </resources>

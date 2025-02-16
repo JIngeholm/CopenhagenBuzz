@@ -24,9 +24,11 @@ SOFTWARE.
 
 package dk.itu.moapd.copenhagenbuzz.jing.activities
 
+import android.content.Intent
 import android.os.Bundle
-import android.util.Log
-import android.widget.Toast
+import android.view.Menu
+import android.view.MenuItem
+import android.widget.ArrayAdapter
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.WindowCompat
 import com.google.android.material.datepicker.MaterialDatePicker
@@ -51,6 +53,8 @@ class MainActivity : AppCompatActivity() {
      */
     private lateinit var mainBinding: ActivityMainBinding
 
+    private var isLoggedIn: Boolean = false
+
     /**
      * Companion object to store a static tag for logging.
      */
@@ -73,6 +77,9 @@ class MainActivity : AppCompatActivity() {
         WindowCompat.setDecorFitsSystemWindows(window, false)
         super.onCreate(savedInstanceState)
         initializeViews()
+
+        isLoggedIn = intent.getBooleanExtra("isLoggedIn", false)
+        invalidateOptionsMenu()
     }
 
     /**
@@ -83,6 +90,8 @@ class MainActivity : AppCompatActivity() {
         setContentView(mainBinding.root)
 
         with(mainBinding.contentMain) {
+
+            setSupportActionBar(topAppBar)
 
             editTextEventDateRange.setOnClickListener {
                 val datePicker = MaterialDatePicker.Builder.datePicker()
@@ -111,17 +120,39 @@ class MainActivity : AppCompatActivity() {
                 }
             }
 
+            // Event type drop down handling________________________________//
+
+            val eventTypes = resources.getStringArray(R.array.event_types)
+
+            val adapter = ArrayAdapter(
+                this@MainActivity,
+                android.R.layout.simple_dropdown_item_1line,
+                eventTypes
+            )
+
+            mainBinding.contentMain.spinnerEventType.apply {
+                setAdapter(adapter)
+                isFocusable = false
+                isFocusableInTouchMode = false
+            }
+
+            mainBinding.contentMain.spinnerEventType.setOnClickListener {
+                mainBinding.contentMain.spinnerEventType.showDropDown()
+            }
+
+            //______________________________________________________________//
+
             addEventButton.setOnClickListener {
                 if (editTextEventName.text.toString().isNotEmpty() &&
                     editTextEventLocation.text.toString().isNotEmpty() &&
                     editTextEventDateRange.text.toString().isNotEmpty() &&
-                    editTextEventType.text.toString().isNotEmpty() &&
+                    spinnerEventType.text.toString().isNotEmpty() &&
                     editTextEventDescription.text.toString().isNotEmpty()
                 ) {
                     event.eventName = editTextEventName.text.toString().trim()
                     event.eventLocation = editTextEventLocation.text.toString().trim()
                     event.eventDate = editTextEventDateRange.text.toString().trim()
-                    event.eventType = editTextEventType.text.toString().trim()
+                    event.eventType = spinnerEventType.text.toString().trim()
                     event.eventDescription = editTextEventDescription.text.toString().trim()
 
                     showMessage()
@@ -136,11 +167,56 @@ class MainActivity : AppCompatActivity() {
     private fun showMessage() {
         val snack = Snackbar.make(
             mainBinding.root,
-            "Event added using \n${event.toString()}",
+            "Event added using \n${event}",
             Snackbar.LENGTH_LONG
         )
 
         snack.setDuration(10000)
         snack.show()
+    }
+
+    /**
+     * Prepares the options menu by inflating the menu layout and updating
+     * the visibility of login and logout menu items based on the user's login status.
+     *
+     * @param menu The options menu in which items are placed.
+     * @return Boolean value indicating whether the menu should be displayed.
+     */
+    override fun onPrepareOptionsMenu(menu: Menu): Boolean {
+        menuInflater.inflate(R.menu.top_app_bar_menu, menu)
+
+        menu.findItem(R.id.action_login).isVisible = !isLoggedIn
+        menu.findItem(R.id.action_logout).isVisible = isLoggedIn
+        return super.onPrepareOptionsMenu(menu)
+    }
+
+    /**
+     * Handles menu item selections. Navigates to the login activity if the login
+     * or logout action is selected. Clears the back stack on logout to prevent
+     * navigation back to the main activity.
+     *
+     * @param item The menu item that was selected.
+     * @return Boolean value indicating whether the item selection was handled.
+     */
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        return when (item.itemId) {
+            R.id.action_login -> {
+                val intent = Intent(this, LoginActivity::class.java)
+                startActivity(intent)
+                finish()
+                true
+            }
+            R.id.action_logout -> {
+                isLoggedIn = false
+                invalidateOptionsMenu()
+                val intent = Intent(this, LoginActivity::class.java)
+                intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+                startActivity(intent)
+                finish()
+
+                true
+            }
+            else -> super.onOptionsItemSelected(item)
+        }
     }
 }
