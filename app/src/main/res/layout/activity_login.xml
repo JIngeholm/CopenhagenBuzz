@@ -26,7 +26,7 @@
             android:layout_height="wrap_content"
             android:layout_marginBottom="32dp"
             android:text="@string/app_name"
-            android:textSize="20sp"
+            android:textSize="40sp"
             android:textStyle="bold"
             android:autoSizeTextType="uniform"
             android:autoSizeMinTextSize="12sp"
@@ -62,4 +62,16 @@
 
         </LinearLayout>
     </LinearLayout>
+
+    <!-- Dark mode overlay -->
+    <View
+        android:id="@+id/dark_mode_overlay"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:background="@color/semi_transparent_black"
+        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 </androidx.constraintlayout.widget.ConstraintLayout>

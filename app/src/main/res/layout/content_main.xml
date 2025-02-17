@@ -37,7 +37,9 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/top_app_bar"
         app:boxStrokeColor="@color/bluey"
-        app:hintTextColor="@color/bluey">
+        app:hintTextColor="@color/bluey"
+        app:cursorColor="@color/bluey"
+        >
 
         <com.google.android.material.textfield.TextInputEditText
             android:id="@+id/edit_text_event_name"
@@ -46,8 +48,7 @@
             android:inputType="text"
             android:paddingStart="48dp"
             android:paddingEnd="0dp"
-            android:textColorHint="@color/bluey"
-            android:textCursorDrawable="@drawable/custom_cursor"/>
+            android:textColorHint="@color/bluey" />
     </com.google.android.material.textfield.TextInputLayout>
 
     <com.google.android.material.textfield.TextInputLayout
@@ -64,7 +65,9 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/text_field_event_name"
         app:boxStrokeColor="@color/bluey"
-        app:hintTextColor="@color/bluey">
+        app:hintTextColor="@color/bluey"
+        app:cursorColor="@color/bluey"
+        >
 
         <com.google.android.material.textfield.TextInputEditText
             android:id="@+id/edit_text_event_location"
@@ -74,7 +77,7 @@
             android:paddingStart="48dp"
             android:paddingEnd="0dp"
             android:textColorHint="@color/bluey"
-            android:textCursorDrawable="@drawable/custom_cursor"/>
+            />
     </com.google.android.material.textfield.TextInputLayout>
 
     <com.google.android.material.textfield.TextInputLayout
@@ -91,7 +94,9 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/text_field_event_location"
         app:boxStrokeColor="@color/bluey"
-        app:hintTextColor="@color/bluey">
+        app:hintTextColor="@color/bluey"
+        app:cursorColor="@color/bluey"
+        >
 
         <com.google.android.material.textfield.TextInputEditText
             android:id="@+id/edit_text_event_date_range"
@@ -102,7 +107,7 @@
             android:paddingStart="48dp"
             android:paddingEnd="0dp"
             android:textColorHint="@color/bluey"
-            android:textCursorDrawable="@drawable/custom_cursor"/>
+            />
     </com.google.android.material.textfield.TextInputLayout>
 
 
@@ -122,6 +127,7 @@
         app:layout_constraintTop_toBottomOf="@id/text_field_event_date_range"
         app:boxStrokeColor="@color/bluey"
         app:hintTextColor="@color/bluey"
+        app:cursorColor="@color/bluey"
         >
 
         <com.google.android.material.textfield.MaterialAutoCompleteTextView
@@ -135,7 +141,7 @@
             android:focusable="true"
             android:focusableInTouchMode="true"
             android:textColorHint="@color/bluey"
-            android:textCursorDrawable="@drawable/custom_cursor"/>
+            />
     </com.google.android.material.textfield.TextInputLayout>
 
 
@@ -154,7 +160,9 @@
         app:layout_constraintTop_toBottomOf="@id/text_field_event_type"
         app:layout_constraintHeight_percent="0.8"
         app:boxStrokeColor="@color/bluey"
-        app:hintTextColor="@color/bluey">
+        app:hintTextColor="@color/bluey"
+        app:cursorColor="@color/bluey"
+        >
 
         <com.google.android.material.textfield.TextInputEditText
             android:id="@+id/edit_text_event_description"
@@ -167,8 +175,8 @@
             android:maxLines="5"
             android:lineSpacingExtra="4dp"
             android:textColorHint="@color/bluey"
-            android:textCursorDrawable="@drawable/custom_cursor"
             android:textColor="@color/bluey"
+            app:cursorColor="@color/bluey"
             />
     </com.google.android.material.textfield.TextInputLayout>
 
@@ -185,5 +193,17 @@
         app:tint="@android:color/black"
         android:contentDescription="@string/button_description"
         />
+
+    <!-- Dark mode overlay -->
+    <View
+        android:id="@+id/dark_mode_overlay"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:background="@color/semi_transparent_black"
+        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -25,11 +25,11 @@ SOFTWARE.
 package dk.itu.moapd.copenhagenbuzz.jing.activities
 
 import android.content.Intent
+import android.content.res.Configuration
 import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
-import android.view.ViewGroup
 import android.widget.ArrayAdapter
 import android.widget.TextView
 import android.widget.Toast
@@ -37,12 +37,13 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.WindowCompat
 import com.google.android.material.datepicker.MaterialDatePicker
 import com.google.android.material.snackbar.Snackbar
-import dk.itu.moapd.copenhagenbuzz.jing.data.Event
 import dk.itu.moapd.copenhagenbuzz.jing.R
+import dk.itu.moapd.copenhagenbuzz.jing.data.Event
 import dk.itu.moapd.copenhagenbuzz.jing.databinding.ActivityMainBinding
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
+
 
 /**
  * Main activity for the CopenhagenBuzz application.
@@ -95,6 +96,18 @@ class MainActivity : AppCompatActivity() {
 
         with(mainBinding.contentMain) {
 
+            // Background handling_______________________________________//
+
+            val isDarkMode = (resources.configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK) == Configuration.UI_MODE_NIGHT_YES
+            // Set the overlay visibility based on dark mode
+            if (isDarkMode) {
+                darkModeOverlay.visibility = View.VISIBLE
+            } else {
+                darkModeOverlay.visibility = View.GONE
+            }
+
+            //___________________________________________________________//
+
             // Top app bar handling______________________________________//
 
             setSupportActionBar(topAppBar)
@@ -123,7 +136,6 @@ class MainActivity : AppCompatActivity() {
 
                     endDatePicker.addOnPositiveButtonClickListener { endDateMillis ->
                         val endDate = SimpleDateFormat("MM-dd-yyyy", Locale.getDefault()).format(Date(endDateMillis))
-
                         val formattedDateRange = getString(R.string.event_date_range_format, startDate, endDate)
                         editTextEventDateRange.setText(formattedDateRange)
                     }

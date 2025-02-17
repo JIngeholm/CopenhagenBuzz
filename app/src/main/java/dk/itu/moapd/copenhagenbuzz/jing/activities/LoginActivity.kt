@@ -25,7 +25,9 @@ SOFTWARE.
 package dk.itu.moapd.copenhagenbuzz.jing.activities
 
 import android.content.Intent
+import android.content.res.Configuration
 import android.os.Bundle
+import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.WindowCompat
 import dk.itu.moapd.copenhagenbuzz.jing.databinding.ActivityLoginBinding
@@ -67,6 +69,14 @@ class LoginActivity : AppCompatActivity() {
     private fun initializeViews(){
         mainBinding = ActivityLoginBinding.inflate(layoutInflater)
         setContentView(mainBinding.root)
+
+        val isDarkMode = (resources.configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK) == Configuration.UI_MODE_NIGHT_YES
+        // Set the overlay visibility based on dark mode
+        if (isDarkMode) {
+            mainBinding.darkModeOverlay.visibility = View.VISIBLE
+        } else {
+            mainBinding.darkModeOverlay.visibility = View.GONE
+        }
 
         mainBinding.loginButton.setOnClickListener {
             val intent = Intent(this, MainActivity::class.java).apply {
