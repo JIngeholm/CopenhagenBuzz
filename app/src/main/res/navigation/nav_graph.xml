@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/nav_graph"
+    app:startDestination="@id/fragment_timeline">
+
+    <fragment
+        android:id="@+id/fragment_timeline"
+        android:name="dk.itu.moapd.copenhagenbuzz.jing.fragments.TimelineFragment"
+        android:label="@string/fragment_timeline"
+        tools:layout="@layout/fragment_timeline">
+        <action
+            android:id="@+id/action_timeline_to_favorites"
+            app:destination="@+id/fragment_favorites" />
+        <action
+            android:id="@+id/action_timeline_to_add_event"
+            app:destination="@+id/fragment_add_event" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/fragment_favorites"
+        android:name="dk.itu.moapd.copenhagenbuzz.jing.fragments.TimelineFragment"
+        android:label="@string/fragment_favorites"
+        tools:layout="@layout/fragment_timeline">
+        <action
+            android:id="@+id/action_favorites_to_maps"
+            app:destination="@+id/fragment_maps" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/fragment_maps"
+        android:name="dk.itu.moapd.copenhagenbuzz.jing.fragments.MapsFragment"
+        android:label="@string/fragment_maps"
+        tools:layout="@layout/fragment_maps">
+        <action
+            android:id="@+id/action_maps_to_calendar"
+            app:destination="@+id/fragment_calendar" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/fragment_calendar"
+        android:name="dk.itu.moapd.copenhagenbuzz.jing.fragments.CalendarFragment"
+        android:label="@string/fragment_calendar"
+        tools:layout="@layout/fragment_calendar">
+        <action
+            android:id="@+id/action_calendar_to_timeline"
+            app:destination="@+id/fragment_timeline" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/fragment_add_event"
+        android:name="dk.itu.moapd.copenhagenbuzz.jing.fragments.AddEventFragment"
+        android:label="@string/fragment_add_event"
+        tools:layout="@layout/fragment_add_event">
+        <action
+            android:id="@+id/action_add_event_to_timeline"
+            app:destination="@+id/fragment_timeline" />
+    </fragment>
+
+</navigation>
