@@ -83,6 +83,7 @@ class LoginActivity : AppCompatActivity() {
                 putExtra("isLoggedIn", true)
             }
             startActivity(intent)
+            finish()
         }
 
         mainBinding.guestButton.setOnClickListener {
@@ -90,6 +91,7 @@ class LoginActivity : AppCompatActivity() {
                 putExtra("isLoggedIn", false)
             }
             startActivity(intent)
+            finish()
         }
     }
 }
