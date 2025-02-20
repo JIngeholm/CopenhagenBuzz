@@ -10,6 +10,7 @@
     <string name="guest">Guest</string>
     <string name="login">Login</string>
     <string name="logout">Logout</string>
+
     <string name="fragment_timeline">Timeline</string>
     <string name="fragment_favorites">Favorites</string>
     <string name="fragment_maps">Maps</string>

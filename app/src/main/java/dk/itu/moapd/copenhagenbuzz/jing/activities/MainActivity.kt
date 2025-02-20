@@ -24,10 +24,13 @@ SOFTWARE.
 
 package dk.itu.moapd.copenhagenbuzz.jing.activities
 
-import android.content.res.Configuration
+import android.content.Intent
 import android.os.Bundle
+import android.view.Menu
+import android.view.MenuItem
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.WindowCompat
+import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.findNavController
 import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.ui.AppBarConfiguration
@@ -35,8 +38,8 @@ import androidx.navigation.ui.navigateUp
 import androidx.navigation.ui.setupActionBarWithNavController
 import androidx.navigation.ui.setupWithNavController
 import dk.itu.moapd.copenhagenbuzz.jing.R
-import dk.itu.moapd.copenhagenbuzz.jing.data.Event
 import dk.itu.moapd.copenhagenbuzz.jing.databinding.ActivityMainBinding
+import dk.itu.moapd.copenhagenbuzz.jing.models.SharedViewModel
 
 /**
  * Main activity for the CopenhagenBuzz application.
@@ -63,14 +66,9 @@ class MainActivity : AppCompatActivity() {
     }
 
     /**
-     * Instance of [Event] used to store event details entered by the user.
-     */
-    private val event: Event = Event("", "", "", "", "")
-
-
-    /**
      * Called when the activity is first created.
      * Initializes the UI and sets up event listeners.
+     * Shares the boolean isLoggedIn with a shared ViewModel class.
      *
      * @param savedInstanceState A [Bundle] containing the activity's previously saved state.
      */
@@ -78,18 +76,22 @@ class MainActivity : AppCompatActivity() {
         WindowCompat.setDecorFitsSystemWindows(window, false)
         super.onCreate(savedInstanceState)
 
-        initializeViews()
-
         isLoggedIn = intent.getBooleanExtra("isLoggedIn", false)
+        val sharedViewModel = ViewModelProvider(this).get(SharedViewModel::class.java)
+        sharedViewModel.isLoggedIn.value = isLoggedIn
+
+        initializeViews()
     }
 
     /**
      * Initializes the UI components and sets up event listeners for user interactions.
+     *
+     * This includes setting up the fragment container, navigation, app bar, and bottom navigation.
+     * The app bar configuration is also set up for navigating within the app.
      */
     private fun initializeViews() {
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
-
 
         // Fragment container handling_______________________________//
 
@@ -99,24 +101,79 @@ class MainActivity : AppCompatActivity() {
             ) as NavHostFragment
         val navController = navHostFragment.navController
 
-
         //___________________________________________________________//
 
         // App bar handling__________________________________________//
 
-        if (resources.configuration.orientation == Configuration.ORIENTATION_PORTRAIT) {
-            setSupportActionBar(binding.topAppBar)
-            appBarConfiguration = AppBarConfiguration(navController.graph)
-            setupActionBarWithNavController(navController, appBarConfiguration)
-        }
-
-        binding.bottomNavigation.setupWithNavController(navController)
+        setSupportActionBar(binding.contentMain.topAppBar)
+        appBarConfiguration = AppBarConfiguration(navController.graph)
+        setupActionBarWithNavController(navController, appBarConfiguration)
+        binding.contentMain.bottomNavigation.setupWithNavController(navController)
 
         //___________________________________________________________//
     }
 
+    /**
+     * Handles the Up navigation action in the app bar.
+     *
+     * This method allows the user to navigate up in the app's navigation hierarchy.
+     * If the navigation action cannot be performed, the method falls back to the default behavior.
+     *
+     * @return Boolean value indicating whether the navigation action was handled.
+     */
     override fun onSupportNavigateUp(): Boolean {
         val navController = findNavController(R.id.fragment_container_view)
         return navController.navigateUp(appBarConfiguration) || super.onSupportNavigateUp()
     }
+
+    /**
+     * Called to create the options menu for the activity.
+     *
+     * This method inflates the top app bar menu and adjusts visibility of menu items
+     * based on the user's login state.
+     *
+     * @param menu The menu to be inflated.
+     * @return Boolean value indicating whether the menu was successfully created.
+     */
+    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
+        menuInflater.inflate(R.menu.bottom_navigation_menu, menu)
+        menuInflater.inflate(R.menu.top_app_bar_menu, menu)
+
+        menu?.findItem(R.id.action_login)?.isVisible = !isLoggedIn
+        menu?.findItem(R.id.action_logout)?.isVisible = isLoggedIn
+        return true
+    }
+
+    /**
+     * Handles menu item selections for login and logout actions.
+     *
+     * When the login action is selected, the LoginActivity is started. When the logout action
+     * is selected, the user is logged out, and the app navigates to the login screen.
+     * The back stack is cleared to prevent navigating back to the main activity after logout.
+     *
+     * @param item The menu item that was selected.
+     * @return Boolean value indicating whether the item selection was handled.
+     */
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        return when (item.itemId) {
+            R.id.action_login -> {
+                val intent = Intent(this, LoginActivity::class.java)
+                startActivity(intent)
+                finish()
+                true
+            }
+            R.id.action_logout -> {
+                isLoggedIn = false
+                invalidateOptionsMenu()
+                val intent = Intent(this, LoginActivity::class.java)
+                intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+                startActivity(intent)
+                finish()
+
+                true
+            }
+            else -> super.onOptionsItemSelected(item)
+        }
+    }
 }
+

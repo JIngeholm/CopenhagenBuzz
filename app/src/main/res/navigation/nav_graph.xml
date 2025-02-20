@@ -27,6 +27,9 @@
         <action
             android:id="@+id/action_favorites_to_maps"
             app:destination="@+id/fragment_maps" />
+        <action
+            android:id="@+id/action_favorites_to_add_event"
+            app:destination="@+id/fragment_add_event" />
     </fragment>
 
     <fragment

@@ -1,3 +1,27 @@
+/*
+MIT License
+
+Copyright (c) [2025] [Johan Ingeholm]
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+ */
+
 package dk.itu.moapd.copenhagenbuzz.jing.fragments
 
 import android.graphics.Color
@@ -35,7 +59,6 @@ class AddEventFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-
         initializeViews()
     }
 
@@ -48,20 +71,12 @@ class AddEventFragment : Fragment() {
      * Initializes the UI components and sets up event listeners for user interactions.
      */
     private fun initializeViews() {
-
-        // Background handling_______________________________________//
-
         val isDarkMode = (resources.configuration.uiMode and android.content.res.Configuration.UI_MODE_NIGHT_MASK) == android.content.res.Configuration.UI_MODE_NIGHT_YES
-        // Set the overlay visibility based on dark mode
         if (isDarkMode) {
             binding.darkModeOverlay.visibility = android.view.View.VISIBLE
         } else {
             binding.darkModeOverlay.visibility = android.view.View.GONE
         }
-
-        //___________________________________________________________//
-
-        // Date picker handling______________________________________//
 
         binding.editTextEventDateRange.setOnClickListener {
             val datePicker = com.google.android.material.datepicker.MaterialDatePicker.Builder.datePicker()
@@ -93,12 +108,7 @@ class AddEventFragment : Fragment() {
             }
         }
 
-        //______________________________________________________________//
-
-        // Event type drop down handling________________________________//
-
         val eventTypes = resources.getStringArray(dk.itu.moapd.copenhagenbuzz.jing.R.array.event_types)
-
         val adapter = ArrayAdapter(
             requireContext(),
             android.R.layout.simple_dropdown_item_1line,
@@ -114,10 +124,6 @@ class AddEventFragment : Fragment() {
         binding.spinnerEventType.setOnClickListener {
             binding.spinnerEventType.showDropDown()
         }
-
-        //______________________________________________________________//
-
-        // Add event handling___________________________________________//
 
         binding.addEventButton.setOnClickListener {
             if (binding.editTextEventName.text.toString().isNotEmpty() &&
@@ -135,10 +141,7 @@ class AddEventFragment : Fragment() {
                 showMessage()
             }
         }
-
-        //______________________________________________________________//
     }
-
 
     /**
      * Displays a fun Snackbar with the event parameters.
@@ -159,18 +162,16 @@ class AddEventFragment : Fragment() {
             Snackbar.LENGTH_LONG
         )
 
-        // Increase duration
         snack.setDuration(15000)
 
-        // Access and customize the Snackbar's TextView
         val snackView = snack.view
         val textView = snackView.findViewById<TextView>(com.google.android.material.R.id.snackbar_text)
 
-        // Customize text appearance
+
         textView.textSize = 16f
-        textView.maxLines = 10 // Allow up to 10 lines (adjust as needed)
-        textView.setTextColor(Color.WHITE) // Set text color
-        textView.setPadding(32, 16, 32, 16) // Optional padding for better visuals
+        textView.maxLines = 10
+        textView.setTextColor(Color.WHITE)
+        textView.setPadding(32, 16, 32, 16)
 
         snack.setAction("🎟️ Share") {
             Toast.makeText(requireContext(), "Event shared! 🎉", Toast.LENGTH_SHORT).show()
