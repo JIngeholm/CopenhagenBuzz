@@ -33,9 +33,14 @@ import android.view.ViewGroup
 import android.widget.ArrayAdapter
 import android.widget.TextView
 import android.widget.Toast
+import androidx.lifecycle.ViewModelProvider
+import androidx.navigation.fragment.findNavController
+import com.github.javafaker.Faker
 import com.google.android.material.snackbar.Snackbar
+import dk.itu.moapd.copenhagenbuzz.jing.R
 import dk.itu.moapd.copenhagenbuzz.jing.data.Event
 import dk.itu.moapd.copenhagenbuzz.jing.databinding.FragmentAddEventBinding
+import dk.itu.moapd.copenhagenbuzz.jing.models.DataViewModel
 import java.text.SimpleDateFormat
 import java.util.Date
 
@@ -43,7 +48,11 @@ class AddEventFragment : Fragment() {
 
     private var _binding: FragmentAddEventBinding? = null
 
-    private val event: Event = Event("", "", "", "", "")
+    val faker = Faker()
+
+    private val event: Event = Event("", "", "", "", "", faker.internet().image())
+
+    private lateinit var dataViewModel: DataViewModel  // Declare the DataViewModel
 
     private val binding
         get() = requireNotNull(_binding) {
@@ -59,6 +68,10 @@ class AddEventFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
+        // Get the DataViewModel from the ViewModelProvider
+        dataViewModel = ViewModelProvider(requireActivity()).get(DataViewModel::class.java)
+
         initializeViews()
     }
 
@@ -71,12 +84,6 @@ class AddEventFragment : Fragment() {
      * Initializes the UI components and sets up event listeners for user interactions.
      */
     private fun initializeViews() {
-        val isDarkMode = (resources.configuration.uiMode and android.content.res.Configuration.UI_MODE_NIGHT_MASK) == android.content.res.Configuration.UI_MODE_NIGHT_YES
-        if (isDarkMode) {
-            binding.darkModeOverlay.visibility = android.view.View.VISIBLE
-        } else {
-            binding.darkModeOverlay.visibility = android.view.View.GONE
-        }
 
         binding.editTextEventDateRange.setOnClickListener {
             val datePicker = com.google.android.material.datepicker.MaterialDatePicker.Builder.datePicker()
@@ -138,45 +145,15 @@ class AddEventFragment : Fragment() {
                 event.eventType = binding.spinnerEventType.text.toString().trim()
                 event.eventDescription = binding.editTextEventDescription.text.toString().trim()
 
-                showMessage()
+                Toast.makeText(requireContext(), "Event shared! 🎉", Toast.LENGTH_SHORT).show()
+
+                dataViewModel.addEvent(event)
+
+                findNavController().navigate(R.id.action_add_event_to_timeline)
+            } else {
+                Toast.makeText(requireContext(), "Please fill all fields!", Toast.LENGTH_SHORT).show()
             }
         }
     }
 
-    /**
-     * Displays a fun Snackbar with the event parameters.
-     */
-    fun showMessage() {
-        val eventDetails = """
-            🎉 *New Event Created!* 🎊
-            📛 Name: ${event.eventName}
-            📍 Location: ${event.eventLocation}
-            📅 Date: ${event.eventDate}
-            🔖 Type: ${event.eventType}
-            📝 Description: ${event.eventDescription}
-        """.trimIndent()
-
-        val snack = Snackbar.make(
-            binding.root,
-            eventDetails,
-            Snackbar.LENGTH_LONG
-        )
-
-        snack.setDuration(15000)
-
-        val snackView = snack.view
-        val textView = snackView.findViewById<TextView>(com.google.android.material.R.id.snackbar_text)
-
-
-        textView.textSize = 16f
-        textView.maxLines = 10
-        textView.setTextColor(Color.WHITE)
-        textView.setPadding(32, 16, 32, 16)
-
-        snack.setAction("🎟️ Share") {
-            Toast.makeText(requireContext(), "Event shared! 🎉", Toast.LENGTH_SHORT).show()
-        }
-
-        snack.show()
-    }
 }

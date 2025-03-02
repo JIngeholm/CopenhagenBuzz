@@ -25,6 +25,7 @@ SOFTWARE.
 package dk.itu.moapd.copenhagenbuzz.jing.activities
 
 import android.content.Intent
+import android.content.res.Configuration
 import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
@@ -39,7 +40,7 @@ import androidx.navigation.ui.setupActionBarWithNavController
 import androidx.navigation.ui.setupWithNavController
 import dk.itu.moapd.copenhagenbuzz.jing.R
 import dk.itu.moapd.copenhagenbuzz.jing.databinding.ActivityMainBinding
-import dk.itu.moapd.copenhagenbuzz.jing.models.SharedViewModel
+import dk.itu.moapd.copenhagenbuzz.jing.models.DataViewModel
 
 /**
  * Main activity for the CopenhagenBuzz application.
@@ -77,19 +78,10 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
 
         isLoggedIn = intent.getBooleanExtra("isLoggedIn", false)
-        val sharedViewModel = ViewModelProvider(this).get(SharedViewModel::class.java)
-        sharedViewModel.isLoggedIn.value = isLoggedIn
+        val dataViewModel = ViewModelProvider(this).get(DataViewModel::class.java)
+        dataViewModel.setContext(this@MainActivity)
+        dataViewModel.isLoggedIn.value = isLoggedIn
 
-        initializeViews()
-    }
-
-    /**
-     * Initializes the UI components and sets up event listeners for user interactions.
-     *
-     * This includes setting up the fragment container, navigation, app bar, and bottom navigation.
-     * The app bar configuration is also set up for navigating within the app.
-     */
-    private fun initializeViews() {
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
@@ -105,10 +97,13 @@ class MainActivity : AppCompatActivity() {
 
         // App bar handling__________________________________________//
 
-        setSupportActionBar(binding.contentMain.topAppBar)
-        appBarConfiguration = AppBarConfiguration(navController.graph)
-        setupActionBarWithNavController(navController, appBarConfiguration)
-        binding.contentMain.bottomNavigation.setupWithNavController(navController)
+        if(resources.configuration.orientation == Configuration.ORIENTATION_PORTRAIT){
+            setSupportActionBar(binding.topAppBar)
+            appBarConfiguration = AppBarConfiguration(navController.graph)
+            setupActionBarWithNavController(navController, appBarConfiguration)
+        }
+
+        binding.bottomNavigation?.setupWithNavController(navController)
 
         //___________________________________________________________//
     }

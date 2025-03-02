@@ -1,0 +1,192 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView
+    android:id="@+id/top_guideline"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:fillViewport="true"
+    tools:context=".fragments.AddEventFragment">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        tools:context=".fragments.AddEventFragment">
+
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/text_field_event_name"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="16dp"
+            android:layout_marginStart="16dp"
+            android:layout_marginTop="24dp"
+            android:hint="@string/event_name"
+            app:startIconDrawable="@drawable/baseline_festival_24"
+            app:endIconMode="clear_text"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:boxStrokeColor="@color/bluey"
+            app:hintTextColor="@color/bluey"
+            app:cursorColor="@color/bluey"
+            >
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/edit_text_event_name"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:inputType="text"
+                android:paddingStart="48dp"
+                android:paddingEnd="0dp"
+                android:textColorHint="@color/bluey" />
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/text_field_event_location"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="16dp"
+            android:layout_marginStart="16dp"
+            android:layout_marginTop="8dp"
+            android:hint="@string/event_location"
+            app:startIconDrawable="@drawable/baseline_add_location_alt_24"
+            app:endIconMode="clear_text"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/text_field_event_name"
+            app:boxStrokeColor="@color/bluey"
+            app:hintTextColor="@color/bluey"
+            app:cursorColor="@color/bluey"
+            >
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/edit_text_event_location"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:inputType="text"
+                android:paddingStart="48dp"
+                android:paddingEnd="0dp"
+                android:textColorHint="@color/bluey"
+                />
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/text_field_event_date_range"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="16dp"
+            android:layout_marginStart="16dp"
+            android:layout_marginTop="8dp"
+            android:hint="@string/event_date"
+            app:startIconDrawable="@drawable/baseline_calendar_24"
+            app:endIconMode="clear_text"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/text_field_event_location"
+            app:boxStrokeColor="@color/bluey"
+            app:hintTextColor="@color/bluey"
+            app:cursorColor="@color/bluey"
+            >
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/edit_text_event_date_range"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:focusable="false"
+                android:inputType="none"
+                android:paddingStart="48dp"
+                android:paddingEnd="0dp"
+                android:textColorHint="@color/bluey"
+                />
+        </com.google.android.material.textfield.TextInputLayout>
+
+
+
+
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/text_field_event_type"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="16dp"
+            android:layout_marginStart="16dp"
+            android:layout_marginTop="8dp"
+            android:hint="@string/event_type"
+            app:startIconDrawable="@drawable/baseline_celebration_24"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/text_field_event_date_range"
+            app:boxStrokeColor="@color/bluey"
+            app:hintTextColor="@color/bluey"
+            app:cursorColor="@color/bluey"
+            >
+
+            <com.google.android.material.textfield.MaterialAutoCompleteTextView
+                android:id="@+id/spinner_event_type"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:paddingStart="48dp"
+                android:paddingEnd="0dp"
+                android:textSize="16sp"
+                android:inputType="none"
+                android:focusable="true"
+                android:focusableInTouchMode="true"
+                android:textColorHint="@color/bluey"
+                />
+        </com.google.android.material.textfield.TextInputLayout>
+
+
+
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/text_field_event_description"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="16dp"
+            android:layout_marginStart="16dp"
+            android:layout_marginTop="8dp"
+            android:hint="@string/event_description"
+            app:endIconMode="clear_text"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/text_field_event_type"
+            app:layout_constraintHeight_percent="0.8"
+            app:boxStrokeColor="@color/bluey"
+            app:hintTextColor="@color/bluey"
+            app:cursorColor="@color/bluey"
+            >
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/edit_text_event_description"
+                android:layout_width="match_parent"
+                android:layout_height="130dp"
+                android:minHeight="80dp"
+                android:inputType="text"
+                android:gravity="top|start"
+                android:scrollbars="vertical"
+                android:maxLines="5"
+                android:lineSpacingExtra="4dp"
+                android:textColorHint="@color/bluey"
+                android:textColor="@color/bluey"
+                app:cursorColor="@color/bluey"
+                />
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <com.google.android.material.floatingactionbutton.FloatingActionButton
+            android:id="@+id/addEventButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="16dp"
+            android:clickable="true"
+            app:backgroundTint="@color/daGreyMan"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:srcCompat="@drawable/baseline_add_24"
+            app:tint="@android:color/black"
+            android:contentDescription="@string/button_description"
+            />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+</ScrollView>
+
+

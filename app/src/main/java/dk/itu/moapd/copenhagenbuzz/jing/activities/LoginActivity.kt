@@ -70,14 +70,6 @@ class LoginActivity : AppCompatActivity() {
         mainBinding = ActivityLoginBinding.inflate(layoutInflater)
         setContentView(mainBinding.root)
 
-        val isDarkMode = (resources.configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK) == Configuration.UI_MODE_NIGHT_YES
-        // Set the overlay visibility based on dark mode
-        if (isDarkMode) {
-            mainBinding.darkModeOverlay.visibility = View.VISIBLE
-        } else {
-            mainBinding.darkModeOverlay.visibility = View.GONE
-        }
-
         mainBinding.loginButton.setOnClickListener {
             val intent = Intent(this, MainActivity::class.java).apply {
                 putExtra("isLoggedIn", true)

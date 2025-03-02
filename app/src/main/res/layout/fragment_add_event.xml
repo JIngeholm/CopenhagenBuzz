@@ -165,6 +165,7 @@
             />
     </com.google.android.material.textfield.TextInputLayout>
 
+
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/addEventButton"
         android:layout_width="wrap_content"
@@ -178,17 +179,5 @@
         app:tint="@android:color/black"
         android:contentDescription="@string/button_description"
         />
-
-    <!-- Dark mode overlay -->
-    <View
-        android:id="@+id/dark_mode_overlay"
-        android:layout_width="0dp"
-        android:layout_height="0dp"
-        android:background="@color/semi_transparent_black"
-        android:visibility="gone"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

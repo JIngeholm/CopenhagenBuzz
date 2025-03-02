@@ -29,20 +29,24 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.NavOptions
 import androidx.navigation.fragment.findNavController
 import dk.itu.moapd.copenhagenbuzz.jing.R
+import dk.itu.moapd.copenhagenbuzz.jing.adapters.EventAdapter
 import dk.itu.moapd.copenhagenbuzz.jing.databinding.FragmentTimelineBinding
-import dk.itu.moapd.copenhagenbuzz.jing.models.SharedViewModel
+import dk.itu.moapd.copenhagenbuzz.jing.models.DataViewModel
+import kotlinx.coroutines.launch
 
 /**
  * Fragment responsible for displaying the timeline of events.
  *
  * The [TimelineFragment] handles the display of events on the timeline and includes a button
  * for navigating to an event creation screen. The visibility of the "Add Event" button is
- * controlled based on the user's login status, which is managed via the [SharedViewModel].
+ * controlled based on the user's login status, which is managed via the [DataViewModel].
  */
 class TimelineFragment : Fragment() {
 
@@ -63,7 +67,7 @@ class TimelineFragment : Fragment() {
     /**
      * Shared ViewModel instance for managing login status across fragments.
      */
-    private lateinit var sharedViewModel: SharedViewModel
+    private val dataViewModel: DataViewModel by viewModels()
 
     /**
      * Called to create the view for the fragment.
@@ -76,10 +80,10 @@ class TimelineFragment : Fragment() {
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View = FragmentTimelineBinding.inflate(inflater, container, false).also {
-        sharedViewModel = ViewModelProvider(requireActivity()).get(SharedViewModel::class.java)
-        _binding = it
-    }.root
+    ): View {
+        _binding = FragmentTimelineBinding.inflate(inflater, container, false)
+        return binding.root
+    }
 
     /**
      * Called after the view has been created. Sets up the login state observer and button listener.
@@ -90,7 +94,7 @@ class TimelineFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        sharedViewModel.isLoggedIn.observe(viewLifecycleOwner, Observer { isLoggedIn ->
+        dataViewModel.isLoggedIn.observe(viewLifecycleOwner, Observer { isLoggedIn ->
             if (isLoggedIn) {
                 binding.openAddEventFragmentButton.visibility = View.VISIBLE
             } else {
@@ -100,6 +104,25 @@ class TimelineFragment : Fragment() {
 
         binding.openAddEventFragmentButton.setOnClickListener {
             navigateToAddEvent()
+        }
+
+        // Observe the events LiveData
+        dataViewModel.events.observe(viewLifecycleOwner) { events ->
+            // Update the adapter with the new list of events
+            val adapter = EventAdapter(requireContext(), ArrayList(events))
+            binding.listView?.adapter = adapter
+        }
+
+        // Assuming this code is inside a Fragment or Activity
+        lifecycleScope.launch {
+            // Fetch the list of events
+            val list = dataViewModel.fetchMockEvents() // This returns ArrayList<Event>
+
+            // Create the adapter and pass the list
+            val adapter = EventAdapter(requireContext(), list)
+
+            // Set the adapter to the ListView
+            binding.listView?.adapter = adapter
         }
     }
 
