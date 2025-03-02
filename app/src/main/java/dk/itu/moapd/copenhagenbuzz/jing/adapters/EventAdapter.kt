@@ -22,6 +22,7 @@ class EventAdapter(private val context: Context, private val events: ArrayList<E
         val eventTypeTextView: TextView = view.findViewById(R.id.event_type)
         val eventLocationTextView: TextView = view.findViewById(R.id.event_location)
         val eventDateTextView: TextView = view.findViewById(R.id.event_date)
+        val evenDescriptionTextView: TextView = view.findViewById(R.id.event_description)
         val eventPhotoImageView: ImageView = view.findViewById(R.id.event_photo)
         val circleTextView: TextView = view.findViewById(R.id.circle_text)
     }
@@ -68,11 +69,12 @@ class EventAdapter(private val context: Context, private val events: ArrayList<E
         viewHolder.eventTypeTextView.text = event.eventType
         viewHolder.eventLocationTextView.text = event.eventLocation
         viewHolder.eventDateTextView.text = event.eventDate
+        viewHolder.evenDescriptionTextView.text = event.eventDescription
         viewHolder.circleTextView.text = event.eventType.first().toString()
 
         // Load the event photo using Glide
         Glide.with(context)
-            .load(event.photo) // URL of the photo
+            .load(event.eventPhoto) // URL of the photo
             .placeholder(R.drawable.event_photo_placeholder) // Placeholder while loading
             .error(R.drawable.event_photo_placeholder) // Error image if loading fails
             .into(viewHolder.eventPhotoImageView)

@@ -31,10 +31,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.github.javafaker.Faker
-import dk.itu.moapd.copenhagenbuzz.jing.R
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import dk.itu.moapd.copenhagenbuzz.jing.data.Event
 import java.text.SimpleDateFormat
 import java.util.Locale
@@ -57,63 +54,55 @@ class DataViewModel : ViewModel() {
     val isLoggedIn = MutableLiveData<Boolean>()
     
     // LiveData to hold the list of events
-    private val _events = MutableLiveData<List<Event>>()
-    val events: LiveData<List<Event>> get() = _events
+    private val _events = MutableLiveData<List<Event>?>(emptyList())
+    val events: MutableLiveData<List<Event>?> get() = _events
 
-    // Method to fetch events asynchronously using coroutines
-    fun fetchEvents() {
-        // Use coroutine to simulate asynchronous fetching
-        viewModelScope.launch {
-            // Simulate network delay (you would replace this with real network request later)
-            val eventList = fetchMockEvents()
+    suspend fun fetchEvents(): ArrayList<Event> {
+        if (!areMockEventsGenerated) {
+            val faker = Faker()
+            val newEvents = ArrayList<Event>()
 
-            // Update LiveData with the list of events
-            _events.value = eventList
-        }
-    }
+            val dateFormat = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
 
-    suspend fun fetchMockEvents(): ArrayList<Event> {
-        return withContext(Dispatchers.IO) {
-            if (!areMockEventsGenerated) { // Generate mock events only once
-                val faker = Faker()
-                val newEvents = ArrayList<Event>()
+            val startDate = faker.date().future(10, TimeUnit.DAYS)
+            val endDate = faker.date().future(15, TimeUnit.DAYS)
 
-                val dateFormat = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
+            val date = "${dateFormat.format(startDate)} - ${dateFormat.format(endDate)}"
 
-                val startDate = faker.date().future(10, TimeUnit.DAYS)
-                val endDate = faker.date().future(15, TimeUnit.DAYS)
+            val types = listOf(
+                "Music", "Party", "Toilet", "Sport", "Art"
+            )
 
-                val date = "${dateFormat.format(startDate)} - ${dateFormat.format(endDate)}"
-
-                val eventTypes = ArrayList<String>(
-                    listOf("Music", "Sport", "Party", "Art", "Toilet")
+            for (i in 1..10) {
+                val random = Random.nextInt(types.size)
+                val randomEventType = types[random]
+                val event = Event(
+                    eventName = faker.lorem().word(),
+                    eventType = randomEventType,
+                    eventPhoto = faker.internet().image(),
+                    eventLocation = faker.address().city(),
+                    eventDate = date,
+                    eventDescription = faker.lorem().sentence()
                 )
-                val random = Random.nextInt(eventTypes.size)
-                val randomEventType = eventTypes[random]
-
-                for (i in 1..10) {
-                    val event = Event(
-                        eventName = faker.lorem().word(),
-                        eventType = "Music",
-                        photo = faker.internet().image(),
-                        eventLocation = faker.address().city(),
-                        eventDate = date,
-                        eventDescription = faker.lorem().sentence()
-                    )
-                    newEvents.add(event)
-                }
-
-                _events.value = newEvents // Set the mock events
-                areMockEventsGenerated = true // Mark mock events as generated
+                newEvents.add(event)
             }
-            (_events.value ?: ArrayList()) as ArrayList<Event> // Return the current list of events
+
+            // Append new mock events to the existing list
+            val currentEvents = _events.value ?: emptyList()
+            _events.value = currentEvents + newEvents
+            areMockEventsGenerated = true
         }
+        return _events.value as ArrayList<Event>
     }
 
     fun addEvent(event: Event) {
-        val currentEvents = _events.value ?: emptyList()
-        _events.value = currentEvents + event  // Add the new event to the list
-        Log.d("DataViewModel", "Event added: ${event.eventName}")
+        val currentEvents = _events.value
+        var updatedEvents = currentEvents?.plus(event)
+        if (updatedEvents != null) {
+            updatedEvents = updatedEvents.reversed()
+        }
+        _events.value = updatedEvents // Update the LiveData
     }
+
 }
 

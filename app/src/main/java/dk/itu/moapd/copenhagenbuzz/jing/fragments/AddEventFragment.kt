@@ -33,6 +33,7 @@ import android.view.ViewGroup
 import android.widget.ArrayAdapter
 import android.widget.TextView
 import android.widget.Toast
+import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
 import com.github.javafaker.Faker
@@ -40,6 +41,7 @@ import com.google.android.material.snackbar.Snackbar
 import dk.itu.moapd.copenhagenbuzz.jing.R
 import dk.itu.moapd.copenhagenbuzz.jing.data.Event
 import dk.itu.moapd.copenhagenbuzz.jing.databinding.FragmentAddEventBinding
+import dk.itu.moapd.copenhagenbuzz.jing.databinding.FragmentTimelineBinding
 import dk.itu.moapd.copenhagenbuzz.jing.models.DataViewModel
 import java.text.SimpleDateFormat
 import java.util.Date
@@ -52,7 +54,7 @@ class AddEventFragment : Fragment() {
 
     private val event: Event = Event("", "", "", "", "", faker.internet().image())
 
-    private lateinit var dataViewModel: DataViewModel  // Declare the DataViewModel
+    private val dataViewModel: DataViewModel by activityViewModels()
 
     private val binding
         get() = requireNotNull(_binding) {
@@ -62,15 +64,13 @@ class AddEventFragment : Fragment() {
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View = FragmentAddEventBinding.inflate(inflater, container, false).also {
-        _binding = it
-    }.root
+    ): View {
+        _binding = FragmentAddEventBinding.inflate(inflater, container, false)
+        return binding.root
+    }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-
-        // Get the DataViewModel from the ViewModelProvider
-        dataViewModel = ViewModelProvider(requireActivity()).get(DataViewModel::class.java)
 
         initializeViews()
     }
@@ -144,10 +144,11 @@ class AddEventFragment : Fragment() {
                 event.eventDate = binding.editTextEventDateRange.text.toString().trim()
                 event.eventType = binding.spinnerEventType.text.toString().trim()
                 event.eventDescription = binding.editTextEventDescription.text.toString().trim()
-
-                Toast.makeText(requireContext(), "Event shared! 🎉", Toast.LENGTH_SHORT).show()
+                event.eventPhoto = "https://example.com/default_image.jpg"
 
                 dataViewModel.addEvent(event)
+
+                Toast.makeText(requireContext(), "Event shared! 🎉", Toast.LENGTH_SHORT).show()
 
                 findNavController().navigate(R.id.action_add_event_to_timeline)
             } else {

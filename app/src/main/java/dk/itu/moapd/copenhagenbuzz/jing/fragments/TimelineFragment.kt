@@ -25,13 +25,13 @@ SOFTWARE.
 package dk.itu.moapd.copenhagenbuzz.jing.fragments
 
 import android.os.Bundle
+import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.fragment.app.viewModels
+import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.Observer
-import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.NavOptions
 import androidx.navigation.fragment.findNavController
@@ -67,7 +67,7 @@ class TimelineFragment : Fragment() {
     /**
      * Shared ViewModel instance for managing login status across fragments.
      */
-    private val dataViewModel: DataViewModel by viewModels()
+    private val dataViewModel: DataViewModel by activityViewModels()
 
     /**
      * Called to create the view for the fragment.
@@ -108,21 +108,22 @@ class TimelineFragment : Fragment() {
 
         // Observe the events LiveData
         dataViewModel.events.observe(viewLifecycleOwner) { events ->
-            // Update the adapter with the new list of events
-            val adapter = EventAdapter(requireContext(), ArrayList(events))
-            binding.listView?.adapter = adapter
+            if (events != null) {
+                Log.d("TimelineFragment", "Events updated: ${events.size} events")
+            }
+            val adapter = events?.let { ArrayList(it) }?.let { EventAdapter(requireContext(), it) }
+            binding.listView.adapter = adapter
         }
 
-        // Assuming this code is inside a Fragment or Activity
         lifecycleScope.launch {
-            // Fetch the list of events
-            val list = dataViewModel.fetchMockEvents() // This returns ArrayList<Event>
+            // Reverse this list
+            val list = dataViewModel.fetchEvents()
 
             // Create the adapter and pass the list
             val adapter = EventAdapter(requireContext(), list)
 
             // Set the adapter to the ListView
-            binding.listView?.adapter = adapter
+            binding.listView.adapter = adapter
         }
     }
 
