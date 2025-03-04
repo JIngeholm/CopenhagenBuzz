@@ -27,6 +27,7 @@ package dk.itu.moapd.copenhagenbuzz.jing.activities
 import android.content.Intent
 import android.content.res.Configuration
 import android.os.Bundle
+import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
 import androidx.appcompat.app.AppCompatActivity
@@ -123,7 +124,41 @@ class MainActivity : AppCompatActivity() {
                 binding.navigationRail!!.getPaddingRight(),
                 paddingBottom
             )
+
+            binding.navigationRail?.menu?.apply {
+                findItem(R.id.action_login)?.isVisible = !isLoggedIn
+                findItem(R.id.action_logout)?.isVisible = isLoggedIn
+            }
+            // Do it here
+
+            binding.navigationRail?.setOnItemSelectedListener { item ->
+                Log.d(TAG, "NavigationRail item clicked: ${item.itemId}")
+                when (item.itemId) {
+                    R.id.action_login -> {
+                        Log.d(TAG, "Login clicked")
+                        val intent = Intent(this, LoginActivity::class.java)
+                        intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+                        startActivity(intent)
+                        finish()
+                        true
+                    }
+                    R.id.action_logout -> {
+                        Log.d(TAG, "Logout clicked")
+                        isLoggedIn = false
+                        invalidateOptionsMenu() // This is still needed for portrait mode
+                        val intent = Intent(this, LoginActivity::class.java)
+                        intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+                        startActivity(intent)
+                        finish()
+                        true
+                    }
+                    else -> false
+                }
+            }
+
         }
+        // Force menu invalidation to refresh the options menu
+        invalidateOptionsMenu()
 
         //___________________________________________________________//
     }
@@ -151,6 +186,7 @@ class MainActivity : AppCompatActivity() {
      * @return Boolean value indicating whether the menu was successfully created.
      */
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
+        Log.d(TAG, "onCreateOptionsMenu called")
         if(resources.configuration.orientation == Configuration.ORIENTATION_PORTRAIT){
             menuInflater.inflate(R.menu.bottom_navigation_menu, menu)
             menuInflater.inflate(R.menu.top_app_bar_menu, menu)
@@ -174,6 +210,7 @@ class MainActivity : AppCompatActivity() {
      * @return Boolean value indicating whether the item selection was handled.
      */
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        Log.d(TAG, "onOptionsItemSelected called: ${item.itemId}")
         return when (item.itemId) {
             R.id.action_login -> {
                 val intent = Intent(this, LoginActivity::class.java)
