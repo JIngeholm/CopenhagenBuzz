@@ -24,24 +24,19 @@ SOFTWARE.
 
 package dk.itu.moapd.copenhagenbuzz.jing.fragments
 
-import android.graphics.Color
 import android.os.Bundle
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ArrayAdapter
-import android.widget.TextView
 import android.widget.Toast
 import androidx.fragment.app.activityViewModels
-import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
 import com.github.javafaker.Faker
-import com.google.android.material.snackbar.Snackbar
 import dk.itu.moapd.copenhagenbuzz.jing.R
 import dk.itu.moapd.copenhagenbuzz.jing.data.Event
 import dk.itu.moapd.copenhagenbuzz.jing.databinding.FragmentAddEventBinding
-import dk.itu.moapd.copenhagenbuzz.jing.databinding.FragmentTimelineBinding
 import dk.itu.moapd.copenhagenbuzz.jing.models.DataViewModel
 import java.text.SimpleDateFormat
 import java.util.Date
@@ -50,7 +45,7 @@ class AddEventFragment : Fragment() {
 
     private var _binding: FragmentAddEventBinding? = null
 
-    val faker = Faker()
+    private val faker = Faker()
 
     private val event: Event = Event("", "", "", "", "", faker.internet().image())
 
@@ -109,13 +104,13 @@ class AddEventFragment : Fragment() {
                     val endDate = SimpleDateFormat("MM-dd-yyyy", java.util.Locale.getDefault()).format(
                         Date(endDateMillis)
                     )
-                    val formattedDateRange = getString(dk.itu.moapd.copenhagenbuzz.jing.R.string.event_date_range_format, startDate, endDate)
+                    val formattedDateRange = getString(R.string.event_date_range_format, startDate, endDate)
                     binding.editTextEventDateRange.setText(formattedDateRange)
                 }
             }
         }
 
-        val eventTypes = resources.getStringArray(dk.itu.moapd.copenhagenbuzz.jing.R.array.event_types)
+        val eventTypes = resources.getStringArray(R.array.event_types)
         val adapter = ArrayAdapter(
             requireContext(),
             android.R.layout.simple_dropdown_item_1line,

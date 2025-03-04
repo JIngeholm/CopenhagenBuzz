@@ -30,7 +30,6 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.activityViewModels
-import androidx.lifecycle.Observer
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.NavOptions
 import androidx.navigation.fragment.findNavController
@@ -95,10 +94,10 @@ class TimelineFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         // Observe login status to toggle the visibility of the add event button.
-        dataViewModel.isLoggedIn.observe(viewLifecycleOwner, Observer { isLoggedIn ->
+        dataViewModel.isLoggedIn.observe(viewLifecycleOwner) { isLoggedIn ->
             binding.openAddEventFragmentButton.visibility =
                 if (isLoggedIn) View.VISIBLE else View.GONE
-        })
+        }
 
         // Set up navigation to the event creation screen.
         binding.openAddEventFragmentButton.setOnClickListener {

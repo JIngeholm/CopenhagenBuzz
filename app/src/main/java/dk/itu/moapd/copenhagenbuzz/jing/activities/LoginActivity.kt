@@ -25,9 +25,7 @@ SOFTWARE.
 package dk.itu.moapd.copenhagenbuzz.jing.activities
 
 import android.content.Intent
-import android.content.res.Configuration
 import android.os.Bundle
-import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.WindowCompat
 import dk.itu.moapd.copenhagenbuzz.jing.databinding.ActivityLoginBinding

@@ -78,7 +78,7 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
 
         isLoggedIn = intent.getBooleanExtra("isLoggedIn", false)
-        val dataViewModel = ViewModelProvider(this).get(DataViewModel::class.java)
+        val dataViewModel = ViewModelProvider(this)[DataViewModel::class.java]
         dataViewModel.setContext(this@MainActivity)
         dataViewModel.isLoggedIn.value = isLoggedIn
 
