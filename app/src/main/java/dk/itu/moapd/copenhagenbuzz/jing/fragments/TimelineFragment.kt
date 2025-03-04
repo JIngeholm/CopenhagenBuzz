@@ -25,7 +25,6 @@ SOFTWARE.
 package dk.itu.moapd.copenhagenbuzz.jing.fragments
 
 import android.os.Bundle
-import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
@@ -42,22 +41,22 @@ import dk.itu.moapd.copenhagenbuzz.jing.models.DataViewModel
 import kotlinx.coroutines.launch
 
 /**
- * Fragment responsible for displaying the timeline of events.
+ * A fragment that displays a timeline of events.
  *
- * The [TimelineFragment] handles the display of events on the timeline and includes a button
- * for navigating to an event creation screen. The visibility of the "Add Event" button is
- * controlled based on the user's login status, which is managed via the [DataViewModel].
+ * [TimelineFragment] manages the UI for viewing events in a timeline format. It includes
+ * a button for adding new events, which is only visible when the user is logged in.
+ * The login state and event data are managed via [DataViewModel].
  */
 class TimelineFragment : Fragment() {
 
     /**
-     * View binding for the timeline fragment layout.
+     * View binding for the fragment's layout.
      */
     private var _binding: FragmentTimelineBinding? = null
 
     /**
-     * Provides access to the binding for the fragment's views.
-     * Throws an exception if the binding is null, indicating that the view is not visible.
+     * Provides non-null access to the fragment's view binding.
+     * Throws an exception if accessed when the view is not available.
      */
     private val binding
         get() = requireNotNull(_binding) {
@@ -65,17 +64,17 @@ class TimelineFragment : Fragment() {
         }
 
     /**
-     * Shared ViewModel instance for managing login status across fragments.
+     * Shared ViewModel instance for managing login state and event data.
      */
     private val dataViewModel: DataViewModel by activityViewModels()
 
     /**
-     * Called to create the view for the fragment.
+     * Inflates the fragment's layout and initializes view binding.
      *
-     * @param inflater The LayoutInflater used to inflate the fragment's layout.
-     * @param container The parent view group that the fragment's UI should be attached to.
-     * @param savedInstanceState A bundle containing the fragment's previously saved state.
-     * @return The root view for the fragment.
+     * @param inflater The LayoutInflater used to inflate the layout.
+     * @param container The parent view group, or null if not attached to a parent.
+     * @param savedInstanceState A bundle containing any saved state.
+     * @return The root view of the fragment.
      */
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -86,76 +85,68 @@ class TimelineFragment : Fragment() {
     }
 
     /**
-     * Called after the view has been created. Sets up the login state observer and button listener.
+     * Called after the fragment's view has been created.
+     * Sets up observers for login state and event data, and configures UI interactions.
      *
      * @param view The root view of the fragment.
-     * @param savedInstanceState A bundle containing any saved state from a previous instance.
+     * @param savedInstanceState A bundle containing saved state data.
      */
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        // Observe login status to toggle the visibility of the add event button.
         dataViewModel.isLoggedIn.observe(viewLifecycleOwner, Observer { isLoggedIn ->
-            if (isLoggedIn) {
-                binding.openAddEventFragmentButton.visibility = View.VISIBLE
-            } else {
-                binding.openAddEventFragmentButton.visibility = View.GONE
-            }
+            binding.openAddEventFragmentButton.visibility =
+                if (isLoggedIn) View.VISIBLE else View.GONE
         })
 
+        // Set up navigation to the event creation screen.
         binding.openAddEventFragmentButton.setOnClickListener {
             navigateToAddEvent()
         }
 
-        // Observe the events LiveData
+        // Observe event list updates and update the adapter accordingly.
         dataViewModel.events.observe(viewLifecycleOwner) { events ->
-            if (events != null) {
-                Log.d("TimelineFragment", "Events updated: ${events.size} events")
-            }
-            val adapter = events?.let { ArrayList(it) }?.let { EventAdapter(requireContext(), it) }
+            val adapter = events?.let { EventAdapter(requireContext(), ArrayList(it)) }
             binding.listView.adapter = adapter
         }
 
+        // Fetch and display the latest events asynchronously.
         lifecycleScope.launch {
-            // Reverse this list
-            val list = dataViewModel.fetchEvents()
-
-            // Create the adapter and pass the list
-            val adapter = EventAdapter(requireContext(), list)
-
-            // Set the adapter to the ListView
-            binding.listView.adapter = adapter
+            val events = dataViewModel.fetchEvents()
+            binding.listView.adapter = EventAdapter(requireContext(), events)
         }
     }
 
     /**
-     * Navigates to the AddEventFragment. The navigation action depends on the current fragment.
-     * The backstack is managed to avoid navigating back to the AddEventFragment.
+     * Navigates to the AddEventFragment based on the current navigation destination.
+     * Ensures that the back stack is properly managed to prevent duplicate navigation.
      */
     private fun navigateToAddEvent() {
-        binding.openAddEventFragmentButton.setOnClickListener{
-            val navController = findNavController()
+        val navController = findNavController()
 
-            val actionId = when (navController.currentDestination?.id) {
-                R.id.fragment_timeline -> R.id.action_timeline_to_add_event
-                R.id.fragment_favorites -> R.id.action_favorites_to_add_event
-                else -> return@setOnClickListener // Exit if destination is unknown
-            }
-
-            navController.navigate(
-                actionId,
-                null,
-                NavOptions.Builder()
-                    .setPopUpTo(R.id.nav_graph, false)
-                    .build()
-            )
+        val actionId = when (navController.currentDestination?.id) {
+            R.id.fragment_timeline -> R.id.action_timeline_to_add_event
+            R.id.fragment_favorites -> R.id.action_favorites_to_add_event
+            else -> return // Exit if the current destination is unknown.
         }
+
+        navController.navigate(
+            actionId,
+            null,
+            NavOptions.Builder()
+                .setPopUpTo(R.id.nav_graph, false)
+                .build()
+        )
     }
 
     /**
-     * Called when the fragment's view is destroyed. Cleans up the binding to avoid memory leaks.
+     * Cleans up the view binding reference when the fragment's view is destroyed
+     * to prevent memory leaks.
      */
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null
     }
 }
+

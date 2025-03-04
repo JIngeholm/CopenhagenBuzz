@@ -1,3 +1,27 @@
+/*
+MIT License
+
+Copyright (c) [2025] [Johan Ingeholm]
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+ */
+
 package dk.itu.moapd.copenhagenbuzz.jing.adapters
 
 import android.content.Context
@@ -11,52 +35,83 @@ import com.bumptech.glide.Glide
 import dk.itu.moapd.copenhagenbuzz.jing.R
 import dk.itu.moapd.copenhagenbuzz.jing.data.Event
 
+/**
+ * Adapter class for displaying a list of events in a ListView.
+ *
+ * This adapter extends [BaseAdapter] and is responsible for binding event data
+ * to the list item views.
+ *
+ * @param context The context used for inflating layouts and loading resources.
+ * @param events The list of [Event] objects to be displayed.
+ */
 class EventAdapter(private val context: Context, private val events: ArrayList<Event>) : BaseAdapter() {
 
     // Inflater to inflate the list item layout
     private val inflater: LayoutInflater = LayoutInflater.from(context)
 
-    // ViewHolder class to hold references to the views
+    /**
+     * ViewHolder class to hold references to the views within a list item.
+     * This improves performance by avoiding repeated calls to findViewById.
+     *
+     * @param view The root view of the list item.
+     */
     private class ViewHolder(view: View) {
         val eventNameTextView: TextView = view.findViewById(R.id.event_name)
         val eventTypeTextView: TextView = view.findViewById(R.id.event_type)
         val eventLocationTextView: TextView = view.findViewById(R.id.event_location)
         val eventDateTextView: TextView = view.findViewById(R.id.event_date)
-        val evenDescriptionTextView: TextView = view.findViewById(R.id.event_description)
+        val eventDescriptionTextView: TextView = view.findViewById(R.id.event_description)
         val eventPhotoImageView: ImageView = view.findViewById(R.id.event_photo)
         val circleTextView: TextView = view.findViewById(R.id.circle_text)
     }
 
-    // Returns the number of items in the list
+    /**
+     * Returns the number of items in the list.
+     * @return The total number of events.
+     */
     override fun getCount(): Int {
         return events.size
     }
 
-    // Returns the item at the specified position
+    /**
+     * Returns the event at the specified position.
+     * @param position The index of the event.
+     * @return The [Event] object at the given position.
+     */
     override fun getItem(position: Int): Event {
         return events[position]
     }
 
-    // Returns the item ID at the specified position
+    /**
+     * Returns the item ID at the specified position.
+     * @param position The index of the item.
+     * @return The item ID as a [Long].
+     */
     override fun getItemId(position: Int): Long {
         return position.toLong()
     }
 
-    // Returns the view for the specified position
+    /**
+     * Returns the view for the specified position in the list.
+     *
+     * This method reuses existing views for better performance, using the ViewHolder pattern.
+     *
+     * @param position The index of the item.
+     * @param convertView The recycled view, or null if a new view should be created.
+     * @param parent The parent ViewGroup.
+     * @return The populated [View] representing the event.
+     */
     override fun getView(position: Int, convertView: View?, parent: ViewGroup): View {
         val view: View
         val viewHolder: ViewHolder
 
-        // Check if the view is being reused
         if (convertView == null) {
             // Inflate the list item layout
             view = inflater.inflate(R.layout.event_row_item, parent, false)
-            // Create a new ViewHolder
             viewHolder = ViewHolder(view)
-            // Store the ViewHolder in the view's tag
-            view.tag = viewHolder
+            view.tag = viewHolder // Store ViewHolder in view's tag
         } else {
-            // Reuse the existing view and ViewHolder
+            // Reuse existing view and ViewHolder
             view = convertView
             viewHolder = view.tag as ViewHolder
         }
@@ -69,7 +124,7 @@ class EventAdapter(private val context: Context, private val events: ArrayList<E
         viewHolder.eventTypeTextView.text = event.eventType
         viewHolder.eventLocationTextView.text = event.eventLocation
         viewHolder.eventDateTextView.text = event.eventDate
-        viewHolder.evenDescriptionTextView.text = event.eventDescription
+        viewHolder.eventDescriptionTextView.text = event.eventDescription
         viewHolder.circleTextView.text = event.eventType.first().toString()
 
         // Load the event photo using Glide

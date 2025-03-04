@@ -25,13 +25,9 @@ SOFTWARE.
 package dk.itu.moapd.copenhagenbuzz.jing.models
 
 import android.content.Context
-import android.util.Log
-import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
 import com.github.javafaker.Faker
-import kotlinx.coroutines.launch
 import dk.itu.moapd.copenhagenbuzz.jing.data.Event
 import java.text.SimpleDateFormat
 import java.util.Locale
@@ -39,25 +35,57 @@ import java.util.concurrent.TimeUnit
 import kotlin.random.Random
 
 /**
- * ViewModel class that fetches and manages event data.
+ * ViewModel responsible for managing event data and user authentication state.
+ *
+ * The [DataViewModel] handles fetching, storing, and providing event data using LiveData.
+ * It also maintains the login status of the user and provides methods to generate mock event data.
  */
 class DataViewModel : ViewModel() {
 
+    /**
+     * Application context, used when necessary.
+     * We need to do this differently to remove warnings.
+     */
     private var context: Context? = null
 
+    /**
+     * Tracks whether mock events have been generated to prevent duplication.
+     */
     private var areMockEventsGenerated = false
 
+    /**
+     * Sets the application context.
+     *
+     * @param context The application context.
+     */
     fun setContext(context: Context) {
         this.context = context
     }
 
+    /**
+     * LiveData representing the user's login status.
+     */
     val isLoggedIn = MutableLiveData<Boolean>()
-    
-    // LiveData to hold the list of events
+
+    /**
+     * LiveData holding the list of events.
+     */
     private val _events = MutableLiveData<List<Event>?>(emptyList())
+
+    /**
+     * Public accessor for events LiveData.
+     */
     val events: MutableLiveData<List<Event>?> get() = _events
 
-    suspend fun fetchEvents(): ArrayList<Event> {
+    /**
+     * Fetches a list of events, generating mock data if not already generated.
+     *
+     * This method ensures that mock events are created only once and appended
+     * to the current list of events.
+     *
+     * @return A list of events in an [ArrayList].
+     */
+    fun fetchEvents(): ArrayList<Event> {
         if (!areMockEventsGenerated) {
             val faker = Faker()
             val newEvents = ArrayList<Event>()
@@ -69,9 +97,7 @@ class DataViewModel : ViewModel() {
 
             val date = "${dateFormat.format(startDate)} - ${dateFormat.format(endDate)}"
 
-            val types = listOf(
-                "Music", "Party", "Toilet", "Sport", "Art"
-            )
+            val types = listOf("Music", "Party", "Toilet", "Sport", "Art")
 
             for (i in 1..10) {
                 val random = Random.nextInt(types.size)
@@ -95,6 +121,13 @@ class DataViewModel : ViewModel() {
         return _events.value as ArrayList<Event>
     }
 
+    /**
+     * Adds a new event to the list and updates the LiveData.
+     *
+     * The new event is appended to the list, and the order is reversed to maintain a specific order.
+     *
+     * @param event The event to be added.
+     */
     fun addEvent(event: Event) {
         val currentEvents = _events.value
         var updatedEvents = currentEvents?.plus(event)
@@ -103,6 +136,6 @@ class DataViewModel : ViewModel() {
         }
         _events.value = updatedEvents // Update the LiveData
     }
-
 }
+
 

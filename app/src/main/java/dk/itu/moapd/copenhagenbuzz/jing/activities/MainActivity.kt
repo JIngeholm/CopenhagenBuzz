@@ -95,8 +95,9 @@ class MainActivity : AppCompatActivity() {
 
         //___________________________________________________________//
 
-        // App bar handling__________________________________________//
+        // Menu handling____________________________________________//
 
+        // Only use top appbar if orientation is portrait mode.
         if(resources.configuration.orientation == Configuration.ORIENTATION_PORTRAIT){
             setSupportActionBar(binding.topAppBar)
             appBarConfiguration = AppBarConfiguration(navController.graph)
