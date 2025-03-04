@@ -93,6 +93,9 @@ class TimelineFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        // Retrieve the argument passed to this fragment
+        val isFavorites = arguments?.getBoolean("isFavorites", false) ?: false
+
         // Observe login status to toggle the visibility of the add event button.
         dataViewModel.isLoggedIn.observe(viewLifecycleOwner) { isLoggedIn ->
             binding.openAddEventFragmentButton.visibility =
@@ -104,16 +107,18 @@ class TimelineFragment : Fragment() {
             navigateToAddEvent()
         }
 
-        // Observe event list updates and update the adapter accordingly.
-        dataViewModel.events.observe(viewLifecycleOwner) { events ->
-            val adapter = events?.let { EventAdapter(requireContext(), ArrayList(it)) }
-            binding.listView.adapter = adapter
-        }
+        if(!isFavorites){
+            // Observe event list updates and update the adapter accordingly.
+            dataViewModel.events.observe(viewLifecycleOwner) { events ->
+                val adapter = events?.let { EventAdapter(requireContext(), ArrayList(it)) }
+                binding.listView.adapter = adapter
+            }
 
-        // Fetch and display the latest events asynchronously.
-        lifecycleScope.launch {
-            val events = dataViewModel.fetchEvents()
-            binding.listView.adapter = EventAdapter(requireContext(), events)
+            // Fetch and display the latest events asynchronously.
+            lifecycleScope.launch {
+                val events = dataViewModel.fetchEvents()
+                binding.listView.adapter = EventAdapter(requireContext(), events)
+            }
         }
     }
 

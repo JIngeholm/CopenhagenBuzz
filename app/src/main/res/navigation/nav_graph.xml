@@ -11,6 +11,10 @@
         android:name="dk.itu.moapd.copenhagenbuzz.jing.fragments.TimelineFragment"
         android:label="@string/fragment_timeline"
         tools:layout="@layout/fragment_timeline">
+        <argument
+            android:name="isFavorites"
+            app:argType="boolean"
+            android:defaultValue="false" />
         <action
             android:id="@+id/action_timeline_to_favorites"
             app:destination="@+id/fragment_favorites" />
@@ -24,6 +28,10 @@
         android:name="dk.itu.moapd.copenhagenbuzz.jing.fragments.TimelineFragment"
         android:label="@string/fragment_favorites"
         tools:layout="@layout/fragment_timeline">
+        <argument
+            android:name="isFavorites"
+            app:argType="boolean"
+            android:defaultValue="true" />
         <action
             android:id="@+id/action_favorites_to_maps"
             app:destination="@+id/fragment_maps" />

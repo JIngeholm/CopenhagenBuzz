@@ -19,11 +19,22 @@
     <com.google.android.material.navigationrail.NavigationRailView
         android:id="@+id/navigation_rail"
         android:layout_width="wrap_content"
-        android:layout_height="match_parent"
+        android:layout_height="340dp"
+        app:itemPaddingTop="7dp"
         app:labelVisibilityMode="selected"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:menu="@menu/side_navigation_menu"
+        />
+
+    <com.google.android.material.navigationrail.NavigationRailView
+        android:id="@+id/log_bar"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:menu="@menu/top_app_bar_menu"
+        app:labelVisibilityMode="unlabeled"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
         />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

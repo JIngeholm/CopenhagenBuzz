@@ -108,14 +108,14 @@ class MainActivity : AppCompatActivity() {
         }else{
             binding.navigationRail?.setupWithNavController(navController)
 
+            /*
             // Get the screen height in pixels
             val displayMetrics = resources.displayMetrics
             val screenHeight = displayMetrics.heightPixels
 
-
             // Calculate padding as a proportion of the screen height (e.g., 10%)
-            val paddingTop = screenHeight / 10 // 10% of screen height
-            val paddingBottom = screenHeight / 10 // 10% of screen height
+            val paddingTop = screenHeight / 7
+            val paddingBottom = screenHeight / 7
 
             // Set the padding dynamically
             binding.navigationRail?.setPadding(
@@ -125,13 +125,14 @@ class MainActivity : AppCompatActivity() {
                 paddingBottom
             )
 
-            binding.navigationRail?.menu?.apply {
+             */
+
+            binding.logBar?.menu?.apply {
                 findItem(R.id.action_login)?.isVisible = !isLoggedIn
                 findItem(R.id.action_logout)?.isVisible = isLoggedIn
             }
-            // Do it here
 
-            binding.navigationRail?.setOnItemSelectedListener { item ->
+            binding.logBar?.setOnItemSelectedListener { item ->
                 Log.d(TAG, "NavigationRail item clicked: ${item.itemId}")
                 when (item.itemId) {
                     R.id.action_login -> {
@@ -155,11 +156,7 @@ class MainActivity : AppCompatActivity() {
                     else -> false
                 }
             }
-
         }
-        // Force menu invalidation to refresh the options menu
-        invalidateOptionsMenu()
-
         //___________________________________________________________//
     }
 
@@ -186,7 +183,6 @@ class MainActivity : AppCompatActivity() {
      * @return Boolean value indicating whether the menu was successfully created.
      */
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
-        Log.d(TAG, "onCreateOptionsMenu called")
         if(resources.configuration.orientation == Configuration.ORIENTATION_PORTRAIT){
             menuInflater.inflate(R.menu.bottom_navigation_menu, menu)
             menuInflater.inflate(R.menu.top_app_bar_menu, menu)
@@ -210,7 +206,6 @@ class MainActivity : AppCompatActivity() {
      * @return Boolean value indicating whether the item selection was handled.
      */
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        Log.d(TAG, "onOptionsItemSelected called: ${item.itemId}")
         return when (item.itemId) {
             R.id.action_login -> {
                 val intent = Intent(this, LoginActivity::class.java)
