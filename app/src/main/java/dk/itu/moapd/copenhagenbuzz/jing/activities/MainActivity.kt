@@ -42,6 +42,7 @@ import dk.itu.moapd.copenhagenbuzz.jing.R
 import dk.itu.moapd.copenhagenbuzz.jing.databinding.ActivityMainBinding
 import dk.itu.moapd.copenhagenbuzz.jing.models.DataViewModel
 
+
 /**
  * Main activity for the CopenhagenBuzz application.
  *
@@ -102,9 +103,27 @@ class MainActivity : AppCompatActivity() {
             setSupportActionBar(binding.topAppBar)
             appBarConfiguration = AppBarConfiguration(navController.graph)
             setupActionBarWithNavController(navController, appBarConfiguration)
-        }
+            binding.bottomNavigation?.setupWithNavController(navController)
+        }else{
+            binding.navigationRail?.setupWithNavController(navController)
 
-        binding.bottomNavigation?.setupWithNavController(navController)
+            // Get the screen height in pixels
+            val displayMetrics = resources.displayMetrics
+            val screenHeight = displayMetrics.heightPixels
+
+
+            // Calculate padding as a proportion of the screen height (e.g., 10%)
+            val paddingTop = screenHeight / 10 // 10% of screen height
+            val paddingBottom = screenHeight / 10 // 10% of screen height
+
+            // Set the padding dynamically
+            binding.navigationRail?.setPadding(
+                binding.navigationRail!!.getPaddingLeft(),
+                paddingTop,
+                binding.navigationRail!!.getPaddingRight(),
+                paddingBottom
+            )
+        }
 
         //___________________________________________________________//
     }
@@ -132,8 +151,12 @@ class MainActivity : AppCompatActivity() {
      * @return Boolean value indicating whether the menu was successfully created.
      */
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
-        menuInflater.inflate(R.menu.bottom_navigation_menu, menu)
-        menuInflater.inflate(R.menu.top_app_bar_menu, menu)
+        if(resources.configuration.orientation == Configuration.ORIENTATION_PORTRAIT){
+            menuInflater.inflate(R.menu.bottom_navigation_menu, menu)
+            menuInflater.inflate(R.menu.top_app_bar_menu, menu)
+        }else{
+            menuInflater.inflate(R.menu.side_navigation_menu, menu)
+        }
 
         menu?.findItem(R.id.action_login)?.isVisible = !isLoggedIn
         menu?.findItem(R.id.action_logout)?.isVisible = isLoggedIn
@@ -154,6 +177,7 @@ class MainActivity : AppCompatActivity() {
         return when (item.itemId) {
             R.id.action_login -> {
                 val intent = Intent(this, LoginActivity::class.java)
+                intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
                 startActivity(intent)
                 finish()
                 true

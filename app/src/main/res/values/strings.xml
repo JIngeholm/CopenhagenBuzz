@@ -16,6 +16,8 @@
     <string name="fragment_maps">Maps</string>
     <string name="fragment_calendar">Calendar</string>
     <string name="fragment_add_event">Add Event</string>
+    <string name="select_image">Select Image</string>
+    <string name="selected_image">Selected image</string>
 
     <string-array name="event_types">
         <item>Music</item>

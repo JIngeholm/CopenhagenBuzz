@@ -23,6 +23,7 @@
         app:labelVisibilityMode="selected"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:menu="@menu/bottom_navigation_menu" />
+        app:menu="@menu/side_navigation_menu"
+        />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

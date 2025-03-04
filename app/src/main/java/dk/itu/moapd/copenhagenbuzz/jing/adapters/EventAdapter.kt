@@ -31,7 +31,7 @@ import android.view.ViewGroup
 import android.widget.BaseAdapter
 import android.widget.ImageView
 import android.widget.TextView
-import com.bumptech.glide.Glide
+import com.squareup.picasso.Picasso
 import dk.itu.moapd.copenhagenbuzz.jing.R
 import dk.itu.moapd.copenhagenbuzz.jing.data.Event
 
@@ -127,11 +127,11 @@ class EventAdapter(private val context: Context, private val events: ArrayList<E
         viewHolder.eventDescriptionTextView.text = event.eventDescription
         viewHolder.circleTextView.text = event.eventType.first().toString()
 
-        // Load the event photo using Glide
-        Glide.with(context)
-            .load(event.eventPhoto) // URL of the photo
-            .placeholder(R.drawable.event_photo_placeholder) // Placeholder while loading
-            .error(R.drawable.event_photo_placeholder) // Error image if loading fails
+        // Use Picasso to load the event photo
+        Picasso.get()
+            .load(event.eventPhoto) // URL or resource ID of the photo
+            .placeholder(R.drawable.baseline_refresh_24) // Placeholder image while loading
+            .error(R.drawable.baseline_image_not_supported_24) // Error image if loading fails
             .into(viewHolder.eventPhotoImageView)
 
         return view

@@ -24,13 +24,16 @@ SOFTWARE.
 
 package dk.itu.moapd.copenhagenbuzz.jing.fragments
 
+import android.content.Intent
+import android.net.Uri
 import android.os.Bundle
-import androidx.fragment.app.Fragment
+import android.provider.MediaStore
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ArrayAdapter
 import android.widget.Toast
+import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.findNavController
 import com.github.javafaker.Faker
@@ -40,6 +43,7 @@ import dk.itu.moapd.copenhagenbuzz.jing.databinding.FragmentAddEventBinding
 import dk.itu.moapd.copenhagenbuzz.jing.models.DataViewModel
 import java.text.SimpleDateFormat
 import java.util.Date
+import android.app.Activity.RESULT_OK
 
 class AddEventFragment : Fragment() {
 
@@ -50,6 +54,10 @@ class AddEventFragment : Fragment() {
     private val event: Event = Event("", "", "", "", "", faker.internet().image())
 
     private val dataViewModel: DataViewModel by activityViewModels()
+
+    companion object {
+        private const val IMAGE_REQUEST_CODE = 100
+    }
 
     private val binding
         get() = requireNotNull(_binding) {
@@ -110,6 +118,11 @@ class AddEventFragment : Fragment() {
             }
         }
 
+        binding.selectImageButton.setOnClickListener {
+            val intent = Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI)
+            startActivityForResult(intent, IMAGE_REQUEST_CODE)
+        }
+
         val eventTypes = resources.getStringArray(R.array.event_types)
         val adapter = ArrayAdapter(
             requireContext(),
@@ -139,7 +152,6 @@ class AddEventFragment : Fragment() {
                 event.eventDate = binding.editTextEventDateRange.text.toString().trim()
                 event.eventType = binding.spinnerEventType.text.toString().trim()
                 event.eventDescription = binding.editTextEventDescription.text.toString().trim()
-                event.eventPhoto = "https://example.com/default_image.jpg"
 
                 dataViewModel.addEvent(event)
 
@@ -149,6 +161,22 @@ class AddEventFragment : Fragment() {
             } else {
                 Toast.makeText(requireContext(), "Please fill all fields!", Toast.LENGTH_SHORT).show()
             }
+        }
+    }
+
+    @Deprecated("Deprecated in Java")
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+
+        if (requestCode == IMAGE_REQUEST_CODE && resultCode == RESULT_OK && data != null) {
+            val imageUri: Uri? = data.data
+            val imageUrl = imageUri.toString()
+
+
+            // Set the image URI to the ImageView (assuming you have an ImageView with id `imageView_event_picture`)
+            binding.imageViewEventPicture.setImageURI(imageUri)
+            event.eventPhoto = imageUrl
+
         }
     }
 
