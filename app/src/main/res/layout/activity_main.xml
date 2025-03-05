@@ -11,16 +11,15 @@
         android:id="@+id/top_app_bar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@color/white"
-        android:title="@string/app_name"
-        app:menu="@menu/top_app_bar_menu"
         android:layout_marginTop="24dp"
+        tools:title="@string/app_name"
+        app:menu="@menu/top_app_bar_menu"
         app:titleCentered="true"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:titleTextAppearance="@style/CustomToolbarTitleTextAppearance"
-        tools:title="@string/app_name" />
+        />
 
     <include
         android:id="@+id/content_main"
@@ -37,7 +36,6 @@
         android:id="@+id/bottom_navigation"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@color/white"
         android:fitsSystemWindows="true"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"

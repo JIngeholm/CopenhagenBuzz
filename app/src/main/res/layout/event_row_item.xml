@@ -81,7 +81,6 @@
                         android:layout_height="wrap_content"
                         android:text="@string/event_type"
                         android:textSize="14sp"
-                        android:textColor="@color/black"
                         android:layout_marginTop="4dp" />
                 </LinearLayout>
 
@@ -164,10 +163,11 @@
                     android:layout_height="wrap_content"
                     android:text="@string/edit"
                     android:backgroundTint="@android:color/transparent"
-                    app:strokeColor="@color/black"
+                    android:textColor="@color/text"
+                    android:layout_marginEnd="8dp"
+                    app:strokeColor="@color/text"
                     app:strokeWidth="@dimen/thin_outline"
-                    android:textColor="@color/bluey"
-                    android:layout_marginEnd="8dp" />
+                    />
 
                 <com.google.android.material.button.MaterialButton
                     android:id="@+id/info_button"
