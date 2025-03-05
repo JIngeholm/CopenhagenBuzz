@@ -30,8 +30,10 @@ import android.os.Bundle
 import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
+import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.WindowCompat
+import androidx.core.view.isVisible
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.findNavController
 import androidx.navigation.fragment.NavHostFragment
@@ -108,14 +110,14 @@ class MainActivity : AppCompatActivity() {
         }else{
             binding.navigationRail?.setupWithNavController(navController)
 
-            /*
+
             // Get the screen height in pixels
             val displayMetrics = resources.displayMetrics
             val screenHeight = displayMetrics.heightPixels
 
             // Calculate padding as a proportion of the screen height (e.g., 10%)
-            val paddingTop = screenHeight / 7
-            val paddingBottom = screenHeight / 7
+            val paddingTop = screenHeight / 6
+            val paddingBottom = screenHeight / 6
 
             // Set the padding dynamically
             binding.navigationRail?.setPadding(
@@ -125,37 +127,27 @@ class MainActivity : AppCompatActivity() {
                 paddingBottom
             )
 
-             */
+            binding.actionLogin?.visibility = if (!isLoggedIn) View.VISIBLE else View.GONE
+            binding.actionLogout?.visibility = if (isLoggedIn) View.VISIBLE else View.GONE
 
-            binding.logBar?.menu?.apply {
-                findItem(R.id.action_login)?.isVisible = !isLoggedIn
-                findItem(R.id.action_logout)?.isVisible = isLoggedIn
+            binding.actionLogin?.setOnClickListener {
+                Log.d(TAG, "Login button clicked")
+                val intent = Intent(this, LoginActivity::class.java)
+                intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+                startActivity(intent)
+                finish()
             }
 
-            binding.logBar?.setOnItemSelectedListener { item ->
-                Log.d(TAG, "NavigationRail item clicked: ${item.itemId}")
-                when (item.itemId) {
-                    R.id.action_login -> {
-                        Log.d(TAG, "Login clicked")
-                        val intent = Intent(this, LoginActivity::class.java)
-                        intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
-                        startActivity(intent)
-                        finish()
-                        true
-                    }
-                    R.id.action_logout -> {
-                        Log.d(TAG, "Logout clicked")
-                        isLoggedIn = false
-                        invalidateOptionsMenu() // This is still needed for portrait mode
-                        val intent = Intent(this, LoginActivity::class.java)
-                        intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
-                        startActivity(intent)
-                        finish()
-                        true
-                    }
-                    else -> false
-                }
+            binding.actionLogout?.setOnClickListener {
+                Log.d(TAG, "Logout button clicked")
+                isLoggedIn = false
+                invalidateOptionsMenu() // This is still needed for portrait mode
+                val intent = Intent(this, LoginActivity::class.java)
+                intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+                startActivity(intent)
+                finish()
             }
+
         }
         //___________________________________________________________//
     }
