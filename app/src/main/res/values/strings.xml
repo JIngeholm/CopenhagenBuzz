@@ -1,30 +1,47 @@
 <resources>
+
+
     <string name="app_name">CopenhagenBuzz</string>
     <string name="event_name">Event name</string>
     <string name="event_location">Event location</string>
     <string name="event_type">Event type</string>
     <string name="event_date">Event date</string>
+
+
     <string name="event_date_range_format">%1$s to %2$s</string>
     <string name="event_description">Event description</string>
     <string name="button_description">button which adds events</string>
+
+
     <string name="guest">Guest</string>
     <string name="login">Login</string>
     <string name="logout">Logout</string>
+
 
     <string name="fragment_timeline">Timeline</string>
     <string name="fragment_favorites">Favorites</string>
     <string name="fragment_maps">Maps</string>
     <string name="fragment_calendar">Calendar</string>
     <string name="fragment_add_event">Add Event</string>
+
+
     <string name="select_image">Select Image</string>
     <string name="selected_image">Selected image</string>
     <string name="info">Info</string>
+    <string name="edit">Edit</string>
+    <string name="e">E</string>
+
 
     <string-array name="event_types">
         <item>Music</item>
         <item>Sport</item>
         <item>Party</item>
         <item>Art</item>
-        <item>Toilet</item>
+        <item>School</item>
+        <item>Dinner</item>
+        <item>Lunch</item>
+        <item>Duel</item>
     </string-array>
+
+
 </resources>

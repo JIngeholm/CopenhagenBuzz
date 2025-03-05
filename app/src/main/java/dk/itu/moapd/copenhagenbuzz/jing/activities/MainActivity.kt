@@ -49,8 +49,9 @@ import dk.itu.moapd.copenhagenbuzz.jing.models.DataViewModel
 /**
  * Main activity for the CopenhagenBuzz application.
  *
- * This activity handles event creation, including input for event details such as name, location,
- * date range, type, and description. It utilizes MaterialDatePicker for selecting event dates.
+ * This activity manages the navigation and UI components of the app, including handling
+ * user authentication (login/logout) and menu visibility. It supports both portrait and
+ * landscape orientations, adapting navigation elements accordingly.
  */
 class MainActivity : AppCompatActivity() {
 
@@ -59,21 +60,28 @@ class MainActivity : AppCompatActivity() {
      */
     private lateinit var binding: ActivityMainBinding
 
+    /**
+     * Configuration for the AppBar to manage navigation.
+     */
     private lateinit var appBarConfiguration: AppBarConfiguration
 
+    /**
+     * Indicates whether the user is logged in.
+     */
     private var isLoggedIn: Boolean = false
 
     /**
-     * Companion object to store a static tag for logging.
+     * Companion object containing a static tag for logging.
      */
     companion object {
         private val TAG = MainActivity::class.qualifiedName
     }
 
     /**
-     * Called when the activity is first created.
-     * Initializes the UI and sets up event listeners.
-     * Shares the boolean isLoggedIn with a shared ViewModel class.
+     * Called when the activity is created.
+     *
+     * Initializes the UI, sets up navigation, and configures authentication-related UI elements.
+     * Shares the `isLoggedIn` state with a shared ViewModel.
      *
      * @param savedInstanceState A [Bundle] containing the activity's previously saved state.
      */
@@ -89,76 +97,82 @@ class MainActivity : AppCompatActivity() {
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        // Fragment container handling_______________________________//
+        setupNavigation()
+        setupAuthButtons()
+    }
 
+    /**
+     * Configures navigation components based on the screen orientation.
+     */
+    private fun setupNavigation() {
         val navHostFragment = supportFragmentManager
-            .findFragmentById(
-                R.id.fragment_container_view
-            ) as NavHostFragment
+            .findFragmentById(R.id.fragment_container_view) as NavHostFragment
         val navController = navHostFragment.navController
 
-        //___________________________________________________________//
-
-        // Menu handling____________________________________________//
-
-        // Only use top appbar if orientation is portrait mode.
-        if(resources.configuration.orientation == Configuration.ORIENTATION_PORTRAIT){
+        if (resources.configuration.orientation == Configuration.ORIENTATION_PORTRAIT) {
             setSupportActionBar(binding.topAppBar)
             appBarConfiguration = AppBarConfiguration(navController.graph)
             setupActionBarWithNavController(navController, appBarConfiguration)
             binding.bottomNavigation?.setupWithNavController(navController)
-        }else{
+        } else {
             binding.navigationRail?.setupWithNavController(navController)
+            adjustNavigationPadding()
+        }
+    }
 
+    /**
+     * Dynamically adjusts padding for the navigation rail in landscape mode.
+     */
+    private fun adjustNavigationPadding() {
+        val screenHeight = resources.displayMetrics.heightPixels
+        val padding = screenHeight / 6
+        binding.navigationRail?.setPadding(
+            binding.navigationRail!!.paddingLeft,
+            padding,
+            binding.navigationRail!!.paddingRight,
+            padding
+        )
+    }
 
-            // Get the screen height in pixels
-            val displayMetrics = resources.displayMetrics
-            val screenHeight = displayMetrics.heightPixels
+    /**
+     * Configures login and logout buttons in landscape mode.
+     */
+    private fun setupAuthButtons() {
+        if (resources.configuration.orientation == Configuration.ORIENTATION_LANDSCAPE) {
+            binding.login?.visibility = if (!isLoggedIn) View.VISIBLE else View.GONE
+            binding.logout?.visibility = if (isLoggedIn) View.VISIBLE else View.GONE
 
-            // Calculate padding as a proportion of the screen height (e.g., 10%)
-            val paddingTop = screenHeight / 6
-            val paddingBottom = screenHeight / 6
-
-            // Set the padding dynamically
-            binding.navigationRail?.setPadding(
-                binding.navigationRail!!.getPaddingLeft(),
-                paddingTop,
-                binding.navigationRail!!.getPaddingRight(),
-                paddingBottom
-            )
-
-            binding.actionLogin?.visibility = if (!isLoggedIn) View.VISIBLE else View.GONE
-            binding.actionLogout?.visibility = if (isLoggedIn) View.VISIBLE else View.GONE
-
-            binding.actionLogin?.setOnClickListener {
+            binding.login?.setOnClickListener {
                 Log.d(TAG, "Login button clicked")
-                val intent = Intent(this, LoginActivity::class.java)
-                intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
-                startActivity(intent)
-                finish()
+                navigateToLogin()
             }
 
-            binding.actionLogout?.setOnClickListener {
+            binding.logout?.setOnClickListener {
                 Log.d(TAG, "Logout button clicked")
                 isLoggedIn = false
-                invalidateOptionsMenu() // This is still needed for portrait mode
-                val intent = Intent(this, LoginActivity::class.java)
-                intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
-                startActivity(intent)
-                finish()
+                invalidateOptionsMenu()
+                navigateToLogin()
             }
-
         }
-        //___________________________________________________________//
+    }
+
+    /**
+     * Navigates to the login activity and clears the back stack.
+     */
+    private fun navigateToLogin() {
+        val intent = Intent(this, LoginActivity::class.java)
+        intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+        startActivity(intent)
+        finish()
     }
 
     /**
      * Handles the Up navigation action in the app bar.
      *
-     * This method allows the user to navigate up in the app's navigation hierarchy.
-     * If the navigation action cannot be performed, the method falls back to the default behavior.
+     * Allows users to navigate up in the app’s hierarchy. Falls back to the default behavior
+     * if navigation cannot be handled.
      *
-     * @return Boolean value indicating whether the navigation action was handled.
+     * @return `true` if navigation is successful, otherwise falls back to the default behavior.
      */
     override fun onSupportNavigateUp(): Boolean {
         val navController = findNavController(R.id.fragment_container_view)
@@ -166,19 +180,19 @@ class MainActivity : AppCompatActivity() {
     }
 
     /**
-     * Called to create the options menu for the activity.
+     * Creates the options menu for the activity.
      *
-     * This method inflates the top app bar menu and adjusts visibility of menu items
-     * based on the user's login state.
+     * Inflates the appropriate menu based on screen orientation and adjusts visibility of
+     * login/logout menu items.
      *
      * @param menu The menu to be inflated.
-     * @return Boolean value indicating whether the menu was successfully created.
+     * @return `true` if the menu was successfully created.
      */
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
-        if(resources.configuration.orientation == Configuration.ORIENTATION_PORTRAIT){
+        if (resources.configuration.orientation == Configuration.ORIENTATION_PORTRAIT) {
             menuInflater.inflate(R.menu.bottom_navigation_menu, menu)
             menuInflater.inflate(R.menu.top_app_bar_menu, menu)
-        }else{
+        } else {
             menuInflater.inflate(R.menu.side_navigation_menu, menu)
         }
 
@@ -188,36 +202,29 @@ class MainActivity : AppCompatActivity() {
     }
 
     /**
-     * Handles menu item selections for login and logout actions.
+     * Handles menu item selections, including login and logout actions.
      *
-     * When the login action is selected, the LoginActivity is started. When the logout action
-     * is selected, the user is logged out, and the app navigates to the login screen.
-     * The back stack is cleared to prevent navigating back to the main activity after logout.
+     * If the user selects login, the LoginActivity is started. If logout is selected,
+     * the user is logged out, and the app navigates to the login screen, clearing the back stack.
      *
-     * @param item The menu item that was selected.
-     * @return Boolean value indicating whether the item selection was handled.
+     * @param item The selected menu item.
+     * @return `true` if the action was handled, otherwise calls the superclass implementation.
      */
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         return when (item.itemId) {
             R.id.action_login -> {
-                val intent = Intent(this, LoginActivity::class.java)
-                intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
-                startActivity(intent)
-                finish()
+                navigateToLogin()
                 true
             }
             R.id.action_logout -> {
                 isLoggedIn = false
                 invalidateOptionsMenu()
-                val intent = Intent(this, LoginActivity::class.java)
-                intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
-                startActivity(intent)
-                finish()
-
+                navigateToLogin()
                 true
             }
             else -> super.onOptionsItemSelected(item)
         }
     }
 }
+
 

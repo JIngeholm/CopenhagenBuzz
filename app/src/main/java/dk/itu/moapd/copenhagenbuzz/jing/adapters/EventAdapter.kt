@@ -25,6 +25,7 @@ SOFTWARE.
 package dk.itu.moapd.copenhagenbuzz.jing.adapters
 
 import android.content.Context
+import android.graphics.Bitmap
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -127,12 +128,27 @@ class EventAdapter(private val context: Context, private val events: ArrayList<E
         viewHolder.eventDescriptionTextView.text = event.eventDescription
         viewHolder.circleTextView.text = event.eventType.first().toString()
 
-        // Use Picasso to load the event photo
+        // Use Picasso to load the event photo with a 90-degree rotation
         Picasso.get()
             .load(event.eventPhoto) // URL or resource ID of the photo
-            .placeholder(R.drawable.baseline_refresh_24) // Placeholder image while loading
-            .error(R.drawable.baseline_image_not_supported_24) // Error image if loading fails
-            .into(viewHolder.eventPhotoImageView)
+            .placeholder(R.drawable.baseline_image_not_supported_24) // Placeholder image while loading
+            .error(R.drawable.event_photo_placeholder) // Error image if loading fails
+            .transform(object : com.squareup.picasso.Transformation {
+                override fun transform(source: Bitmap): Bitmap {
+                    // Rotate the image 90 degrees to the right (clockwise)
+                    val matrix = android.graphics.Matrix()
+                    matrix.postRotate(90f)
+                    val rotatedBitmap = Bitmap.createBitmap(source, 0, 0, source.width, source.height, matrix, true)
+                    source.recycle() // Recycle the original bitmap to prevent memory leaks
+                    return rotatedBitmap
+                }
+
+                override fun key(): String {
+                    return "rotate90"
+                }
+            })
+            .into(viewHolder.eventPhotoImageView) // Use the ImageView from the ViewHolder
+
 
         return view
     }

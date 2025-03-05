@@ -88,7 +88,7 @@ class DataViewModel : ViewModel() {
      */
     fun fetchEvents(): ArrayList<Event> {
         if (!areMockEventsGenerated) {
-            val faker = Faker()
+            val faker = Faker(Locale.ENGLISH)
             val newEvents = ArrayList<Event>()
 
             val dateFormat = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
@@ -98,18 +98,18 @@ class DataViewModel : ViewModel() {
 
             val date = "${dateFormat.format(startDate)} - ${dateFormat.format(endDate)}"
 
-            val types = listOf("Music", "Party", "Toilet", "Sport", "Art")
+            val types = listOf("Music", "Party", "Sport", "Art", "School", "Dinner", "Lunch", "Duel")
 
             for (i in 1..10) {
                 val random = Random.nextInt(types.size)
                 val randomEventType = types[random]
                 val event = Event(
-                    eventName = faker.lorem().word(),
+                    eventName = faker.commerce().productName(),
                     eventType = randomEventType,
-                    eventPhoto = faker.internet().image(),
+                    eventPhoto = "https://picsum.photos/400/300?random=${Random.nextInt(1000)}",
                     eventLocation = faker.address().city(),
                     eventDate = date,
-                    eventDescription = faker.lorem().sentence()
+                    eventDescription = faker.shakespeare().hamletQuote()
                 )
                 newEvents.add(event)
             }

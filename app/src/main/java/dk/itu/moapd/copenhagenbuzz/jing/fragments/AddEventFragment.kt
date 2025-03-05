@@ -45,14 +45,15 @@ import java.text.SimpleDateFormat
 import java.util.Date
 import android.app.Activity.RESULT_OK
 
+/**
+ * Fragment responsible for adding a new event.
+ */
 class AddEventFragment : Fragment() {
 
     private var _binding: FragmentAddEventBinding? = null
-
     private val faker = Faker()
 
     private val event: Event = Event("", "", "", "", "", faker.internet().image())
-
     private val dataViewModel: DataViewModel by activityViewModels()
 
     companion object {
@@ -64,6 +65,9 @@ class AddEventFragment : Fragment() {
             "Cannot access binding because it is null. Is the view visible?"
         }
 
+    /**
+     * Inflates the fragment's layout and sets up the binding.
+     */
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -72,22 +76,28 @@ class AddEventFragment : Fragment() {
         return binding.root
     }
 
+    /**
+     * Initializes the UI components and sets up event listeners for user interactions.
+     */
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-
         initializeViews()
     }
 
+    /**
+     * Cleans up the binding when the view is destroyed.
+     */
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null
     }
 
     /**
-     * Initializes the UI components and sets up event listeners for user interactions.
+     * Initializes UI components and sets their listeners.
      */
     private fun initializeViews() {
 
+        // Set up date range picker for event start and end dates
         binding.editTextEventDateRange.setOnClickListener {
             val datePicker = com.google.android.material.datepicker.MaterialDatePicker.Builder.datePicker()
                 .setTitleText("Select event start date")
@@ -101,6 +111,7 @@ class AddEventFragment : Fragment() {
                     Date(startDateMillis)
                 )
 
+                // Set up end date picker after selecting start date
                 val endDatePicker = com.google.android.material.datepicker.MaterialDatePicker.Builder.datePicker()
                     .setTitleText("Select event end date")
                     .setSelection(startDateMillis)
@@ -118,11 +129,13 @@ class AddEventFragment : Fragment() {
             }
         }
 
+        // Set up image selection button
         binding.selectImageButton.setOnClickListener {
             val intent = Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI)
             startActivityForResult(intent, IMAGE_REQUEST_CODE)
         }
 
+        // Set up spinner for event types
         val eventTypes = resources.getStringArray(R.array.event_types)
         val adapter = ArrayAdapter(
             requireContext(),
@@ -136,27 +149,23 @@ class AddEventFragment : Fragment() {
             isFocusableInTouchMode = false
         }
 
+        // Open dropdown when the spinner is clicked
         binding.spinnerEventType.setOnClickListener {
             binding.spinnerEventType.showDropDown()
         }
 
+        // Set up the Add Event button click listener
         binding.addEventButton.setOnClickListener {
-            if (binding.editTextEventName.text.toString().isNotEmpty() &&
-                binding.editTextEventLocation.text.toString().isNotEmpty() &&
-                binding.editTextEventDateRange.text.toString().isNotEmpty() &&
-                binding.spinnerEventType.text.toString().isNotEmpty() &&
-                binding.editTextEventDescription.text.toString().isNotEmpty()
-            ) {
+            if (isInputValid()) {
                 event.eventName = binding.editTextEventName.text.toString().trim()
                 event.eventLocation = binding.editTextEventLocation.text.toString().trim()
                 event.eventDate = binding.editTextEventDateRange.text.toString().trim()
                 event.eventType = binding.spinnerEventType.text.toString().trim()
                 event.eventDescription = binding.editTextEventDescription.text.toString().trim()
 
+                // Add event to the ViewModel and navigate to the timeline
                 dataViewModel.addEvent(event)
-
                 Toast.makeText(requireContext(), "Event shared! 🎉", Toast.LENGTH_SHORT).show()
-
                 findNavController().navigate(R.id.action_add_event_to_timeline)
             } else {
                 Toast.makeText(requireContext(), "Please fill all fields!", Toast.LENGTH_SHORT).show()
@@ -164,6 +173,24 @@ class AddEventFragment : Fragment() {
         }
     }
 
+    /**
+     * Checks if all input fields are valid.
+     * @return true if all fields are filled, false otherwise.
+     */
+    private fun isInputValid(): Boolean {
+        return binding.editTextEventName.text.toString().isNotEmpty() &&
+                binding.editTextEventLocation.text.toString().isNotEmpty() &&
+                binding.editTextEventDateRange.text.toString().isNotEmpty() &&
+                binding.spinnerEventType.text.toString().isNotEmpty() &&
+                binding.editTextEventDescription.text.toString().isNotEmpty()
+    }
+
+    /**
+     * Handles the result of the image selection activity.
+     * @param requestCode The request code of the activity.
+     * @param resultCode The result code of the activity.
+     * @param data The data returned by the activity.
+     */
     @Deprecated("Deprecated in Java")
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
@@ -172,12 +199,9 @@ class AddEventFragment : Fragment() {
             val imageUri: Uri? = data.data
             val imageUrl = imageUri.toString()
 
-
-            // Set the image URI to the ImageView (assuming you have an ImageView with id `imageView_event_picture`)
+            // Set the image URI to the ImageView
             binding.imageViewEventPicture.setImageURI(imageUri)
             event.eventPhoto = imageUrl
-
         }
     }
-
 }

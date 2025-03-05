@@ -28,7 +28,7 @@
         />
 
     <ImageButton
-        android:id="@+id/action_login"
+        android:id="@+id/login"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:src="@drawable/guest_24"
@@ -41,7 +41,7 @@
         app:layout_constraintBottom_toBottomOf="parent"/>
 
     <ImageButton
-        android:id="@+id/action_logout"
+        android:id="@+id/logout"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:src="@drawable/login_24"
