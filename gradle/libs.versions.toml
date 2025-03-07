@@ -24,6 +24,7 @@ compiler = { module = "com.github.bumptech.glide:compiler", version.ref = "glide
 glide = { module = "com.github.bumptech.glide:glide", version.ref = "glide" }
 javafaker = { module = "com.github.javafaker:javafaker", version.ref = "javafaker" }
 junit = { group = "junit", name = "junit", version.ref = "junit" }
+androidx-recyclerview = { group = "androidx.recyclerview", name = "recyclerview", version = "1.2.1" }
 androidx-junit = { group = "androidx.test.ext", name = "junit", version.ref = "junitVersion" }
 androidx-espresso-core = { group = "androidx.test.espresso", name = "espresso-core", version.ref = "espressoCore" }
 androidx-appcompat = { group = "androidx.appcompat", name = "appcompat", version.ref = "appcompat" }

@@ -47,7 +47,7 @@ import kotlinx.coroutines.launch
  * a button for adding new events, which is only visible when the user is logged in.
  * The login state and event data are managed via [DataViewModel].
  */
-class TimelineFragment : Fragment() {
+class FavoritesFragmentFragment : Fragment() {
 
     // Retrieve the argument passed to this fragment
     val isFavorites = arguments?.getBoolean("isFavorites", false) ?: false
@@ -55,7 +55,7 @@ class TimelineFragment : Fragment() {
     /**
      * View binding for the fragment's layout.
      */
-    private var _binding: FragmentTimelineBinding? = null
+    private var _binding: FragmentFavoritesBinding? = null
 
     /**
      * Provides non-null access to the fragment's view binding.
@@ -83,7 +83,7 @@ class TimelineFragment : Fragment() {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        _binding = FragmentTimelineBinding.inflate(inflater, container, false)
+        _binding = FragmentFavoritesBinding.inflate(inflater, container, false)
         return binding.root
     }
 
@@ -108,18 +108,9 @@ class TimelineFragment : Fragment() {
             navigateToAddEvent()
         }
 
+        dataViewModel.favorites.observe(viewLifecycleOwner) { favorites ->
+            val adapter = favorites?.let { EventAdapter(requireContext(), ArrayList(it)) }
 
-
-        // Observe event list updates and update the adapter accordingly.
-        dataViewModel.events.observe(viewLifecycleOwner) { events ->
-            val adapter = events?.let { EventAdapter(requireContext(), ArrayList(it)) }
-            binding.listView.adapter = adapter
-        }
-
-        // Fetch and display the latest events asynchronously.
-        lifecycleScope.launch {
-            val events = dataViewModel.fetchEvents()
-            binding.listView.adapter = EventAdapter(requireContext(), events)
         }
     }
 

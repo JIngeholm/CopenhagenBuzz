@@ -4,5 +4,6 @@
         <item name="fontFamily">@font/madimi_one_regular</item>
         <item name="android:textSize">30sp</item>
         <item name="android:lineSpacingExtra">4sp</item>
+        <item name="android:textColor">?attr/colorAccent</item>
     </style>
 </resources>

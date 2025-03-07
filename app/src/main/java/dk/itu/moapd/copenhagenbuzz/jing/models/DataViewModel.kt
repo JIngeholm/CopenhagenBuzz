@@ -109,7 +109,8 @@ class DataViewModel : ViewModel() {
                     eventPhoto = "https://picsum.photos/400/300?random=${Random.nextInt(1000)}",
                     eventLocation = faker.address().city(),
                     eventDate = date,
-                    eventDescription = faker.shakespeare().hamletQuote()
+                    eventDescription = faker.shakespeare().hamletQuote(),
+                    liked = false
                 )
                 newEvents.add(event)
             }
@@ -136,6 +137,67 @@ class DataViewModel : ViewModel() {
             updatedEvents = updatedEvents.reversed()
         }
         _events.value = updatedEvents // Update the LiveData
+    }
+
+    /**
+     * LiveData holding the list of favorite events.
+     */
+    private val _favorites = MutableLiveData<List<Event>?>()
+
+    /**
+     * Public accessor for favorites LiveData.
+     */
+    val favorites: MutableLiveData<List<Event>> get() = _favorites
+
+    /**
+     * Generates a random sample of favorite events from the available events.
+     * This method takes a list of events and randomly selects 25 to add to the favorites list.
+     *
+     * @param events The list of events to choose from.
+     * @return A list of 25 random events.
+     */
+    private fun generateRandomFavorites(events: List<Event>): List<Event> {
+        val shuffledIndices = (events.indices).shuffled().take(25).sorted()
+        return shuffledIndices.mapNotNull { index -> events.getOrNull(index) }
+    }
+
+    /**
+     * Updates the favorite events list with a random sample of events.
+     * This will trigger observers of the 'favorites' LiveData.
+     */
+    fun updateFavorites() {
+        val currentEvents = _events.value ?: emptyList()
+        val favoriteEvents = generateRandomFavorites(currentEvents)
+        _favorites.value = favoriteEvents // Update the LiveData with the favorite events
+    }
+
+    /**
+     * Adds an event to the favorites list if it's liked.
+     * Updates the 'favorites' LiveData after adding the event.
+     *
+     * @param event The event to be liked and added to the favorites.
+     */
+    fun toggleFavorite(event: Event) {
+        // Toggle the 'liked' status of the event
+        val updatedEvent = event.copy(liked = !event.liked)
+
+        // Update the events list with the updated event (toggle liked status)
+        val currentEvents = _events.value?.map {
+            if (it == event) updatedEvent else it
+        }
+        _events.value = currentEvents // Update LiveData with the new event list
+
+        // Add to the favorites list if liked
+        if (updatedEvent.liked) {
+            val currentFavorites = _favorites.value?.toMutableList() ?: mutableListOf()
+            currentFavorites.add(updatedEvent) // Add the event to favorites
+            _favorites.value = currentFavorites // Update LiveData for favorites
+        } else {
+            // Remove from favorites if no longer liked
+            val currentFavorites = _favorites.value?.toMutableList()
+            currentFavorites?.remove(updatedEvent)
+            _favorites.value = currentFavorites // Update LiveData for favorites
+        }
     }
 }
 

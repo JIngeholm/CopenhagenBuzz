@@ -39,5 +39,6 @@ data class Event(
     var eventDate: String,
     var eventType: String,
     var eventDescription: String,
-    var eventPhoto: String
+    var eventPhoto: String,
+    var liked: Boolean
 )

@@ -53,7 +53,7 @@ class AddEventFragment : Fragment() {
     private var _binding: FragmentAddEventBinding? = null
     private val faker = Faker()
 
-    private val event: Event = Event("", "", "", "", "", faker.internet().image())
+    private val event: Event = Event("", "", "", "", "", faker.internet().image(), false)
     private val dataViewModel: DataViewModel by activityViewModels()
 
     companion object {

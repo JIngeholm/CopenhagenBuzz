@@ -40,6 +40,7 @@ android {
 }
 
 dependencies {
+    implementation(libs.androidx.recyclerview)
     implementation(libs.picasso)
     implementation(libs.glide)
     annotationProcessor(libs.compiler)

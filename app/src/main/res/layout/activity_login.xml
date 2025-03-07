@@ -48,7 +48,7 @@
                 app:icon="@drawable/login_24"
                 app:iconGravity="textStart"
                 app:iconPadding="8dp"
-                android:backgroundTint="@color/bluey"/>
+                android:backgroundTint="?attr/colorAccent"/>
 
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/guest_button"
@@ -58,7 +58,7 @@
                 app:icon="@drawable/guest_24"
                 app:iconGravity="textStart"
                 app:iconPadding="8dp"
-                android:backgroundTint="@color/bluey"/>
+                android:backgroundTint="?attr/colorAccent"/>
 
         </LinearLayout>
     </LinearLayout>

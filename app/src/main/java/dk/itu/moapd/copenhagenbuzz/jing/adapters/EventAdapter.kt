@@ -30,11 +30,13 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.BaseAdapter
+import android.widget.Button
 import android.widget.ImageView
 import android.widget.TextView
 import com.squareup.picasso.Picasso
 import dk.itu.moapd.copenhagenbuzz.jing.R
 import dk.itu.moapd.copenhagenbuzz.jing.data.Event
+import com.google.android.material.card.MaterialCardView
 
 /**
  * Adapter class for displaying a list of events in a ListView.
@@ -64,6 +66,8 @@ class EventAdapter(private val context: Context, private val events: ArrayList<E
         val eventDescriptionTextView: TextView = view.findViewById(R.id.event_description)
         val eventPhotoImageView: ImageView = view.findViewById(R.id.event_photo)
         val circleTextView: TextView = view.findViewById(R.id.circle_text)
+        val likeButton: Button = view.findViewById(R.id.like)
+        val eventCard: MaterialCardView = view.findViewById(R.id.event_card)
     }
 
     /**
@@ -149,6 +153,29 @@ class EventAdapter(private val context: Context, private val events: ArrayList<E
             })
             .into(viewHolder.eventPhotoImageView) // Use the ImageView from the ViewHolder
 
+
+        // Set the like button background based on the 'liked' state
+        if (event.liked) {
+            viewHolder.likeButton.setBackgroundResource(R.drawable.baseline_favorite_24)
+        } else {
+            viewHolder.likeButton.setBackgroundResource(R.drawable.baseline_favorite_border_24)
+        }
+
+        // Handle button click to toggle 'liked' state
+        viewHolder.likeButton.setOnClickListener {
+            // Toggle the liked state
+            event.liked = !event.liked
+
+            // Update the button background based on the new 'liked' state
+            if (event.liked) {
+                viewHolder.likeButton.setBackgroundResource(R.drawable.baseline_favorite_24)
+            } else {
+                viewHolder.likeButton.setBackgroundResource(R.drawable.baseline_favorite_border_24)
+            }
+
+            // Optionally, update your data (events list) to reflect the change
+            notifyDataSetChanged()  // This will refresh the ListView if needed
+        }
 
         return view
     }

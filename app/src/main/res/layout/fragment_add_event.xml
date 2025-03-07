@@ -27,9 +27,6 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            app:boxStrokeColor="@color/bluey"
-            app:hintTextColor="@color/bluey"
-            app:cursorColor="@color/bluey"
             >
 
             <com.google.android.material.textfield.TextInputEditText
@@ -39,7 +36,7 @@
                 android:inputType="text"
                 android:paddingStart="48dp"
                 android:paddingEnd="0dp"
-                android:textColorHint="@color/bluey" />
+                />
         </com.google.android.material.textfield.TextInputLayout>
 
         <com.google.android.material.textfield.TextInputLayout
@@ -55,9 +52,6 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/text_field_event_name"
-            app:boxStrokeColor="@color/bluey"
-            app:hintTextColor="@color/bluey"
-            app:cursorColor="@color/bluey"
             >
 
             <com.google.android.material.textfield.TextInputEditText
@@ -67,7 +61,6 @@
                 android:inputType="text"
                 android:paddingStart="48dp"
                 android:paddingEnd="0dp"
-                android:textColorHint="@color/bluey"
                 />
         </com.google.android.material.textfield.TextInputLayout>
 
@@ -84,9 +77,6 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/text_field_event_location"
-            app:boxStrokeColor="@color/bluey"
-            app:hintTextColor="@color/bluey"
-            app:cursorColor="@color/bluey"
             >
 
             <com.google.android.material.textfield.TextInputEditText
@@ -97,7 +87,6 @@
                 android:inputType="none"
                 android:paddingStart="48dp"
                 android:paddingEnd="0dp"
-                android:textColorHint="@color/bluey"
                 />
         </com.google.android.material.textfield.TextInputLayout>
 
@@ -116,9 +105,6 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/text_field_event_date_range"
-            app:boxStrokeColor="@color/bluey"
-            app:hintTextColor="@color/bluey"
-            app:cursorColor="@color/bluey"
             >
 
             <com.google.android.material.textfield.MaterialAutoCompleteTextView
@@ -131,7 +117,6 @@
                 android:inputType="none"
                 android:focusable="true"
                 android:focusableInTouchMode="true"
-                android:textColorHint="@color/bluey"
                 />
         </com.google.android.material.textfield.TextInputLayout>
 
@@ -150,9 +135,7 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/text_field_event_type"
             app:layout_constraintHeight_percent="0.8"
-            app:boxStrokeColor="@color/bluey"
-            app:hintTextColor="@color/bluey"
-            app:cursorColor="@color/bluey"
+
             >
 
             <com.google.android.material.textfield.TextInputEditText
@@ -165,9 +148,6 @@
                 android:scrollbars="vertical"
                 android:maxLines="5"
                 android:lineSpacingExtra="4dp"
-                android:textColorHint="@color/bluey"
-                android:textColor="@color/bluey"
-                app:cursorColor="@color/bluey"
                 />
         </com.google.android.material.textfield.TextInputLayout>
 
@@ -177,11 +157,11 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="16dp"
-            android:textColor="@color/black"
+            android:textColor="?attr/colorOnSecondary"
             android:layout_marginStart="16dp"
             android:layout_marginEnd="16dp"
             android:text="@string/select_image"
-            app:backgroundTint="@color/daGreyMan"
+            app:backgroundTint="?attr/colorAccent"
             app:layout_constraintTop_toBottomOf="@id/text_field_event_description"
             app:layout_constraintStart_toStartOf="parent"
              />
@@ -198,7 +178,7 @@
             app:layout_constraintHeight_percent="0.2"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/select_image_button"
-            app:strokeColor="@color/daGreyMan"
+            app:strokeColor="?attr/colorAccent"
             app:strokeWidth="2dp"
         />
 
@@ -209,11 +189,11 @@
             android:layout_margin="16dp"
             android:clickable="true"
             android:contentDescription="@string/button_description"
-            app:backgroundTint="@color/daGreyMan"
+            app:backgroundTint="?attr/colorAccent"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:srcCompat="@drawable/baseline_add_24"
-            app:tint="@android:color/black"
+            app:tint="?attr/colorOnSecondary"
             />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
