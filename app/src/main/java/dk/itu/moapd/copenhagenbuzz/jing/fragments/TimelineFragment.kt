@@ -29,16 +29,14 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.AbsListView
 import androidx.fragment.app.activityViewModels
-import androidx.lifecycle.lifecycleScope
 import androidx.navigation.NavOptions
 import androidx.navigation.fragment.findNavController
 import dk.itu.moapd.copenhagenbuzz.jing.R
 import dk.itu.moapd.copenhagenbuzz.jing.adapters.EventAdapter
-import dk.itu.moapd.copenhagenbuzz.jing.databinding.FragmentFavoritesBinding
 import dk.itu.moapd.copenhagenbuzz.jing.databinding.FragmentTimelineBinding
 import dk.itu.moapd.copenhagenbuzz.jing.models.DataViewModel
-import kotlinx.coroutines.launch
 
 /**
  * A fragment that displays a timeline of events.
@@ -48,9 +46,6 @@ import kotlinx.coroutines.launch
  * The login state and event data are managed via [DataViewModel].
  */
 class TimelineFragment : Fragment() {
-
-    // Retrieve the argument passed to this fragment
-    val isFavorites = arguments?.getBoolean("isFavorites", false) ?: false
 
     /**
      * View binding for the fragment's layout.
@@ -71,6 +66,11 @@ class TimelineFragment : Fragment() {
      */
     private val dataViewModel: DataViewModel by activityViewModels()
 
+    // Variable to save the current scroll position
+    var currentScrollPosition = 0
+
+    private var currentScrollOffset: Int = 0
+
     /**
      * Inflates the fragment's layout and initializes view binding.
      *
@@ -88,40 +88,78 @@ class TimelineFragment : Fragment() {
     }
 
     /**
-     * Called after the fragment's view has been created.
-     * Sets up observers for login state and event data, and configures UI interactions.
+     * Called when the view for this fragment has been created.
+     * This method is responsible for setting up various UI elements and observing data changes.
+     *
+     * It performs the following actions:
+     * - Observes the login status (`isLoggedIn`) and toggles the visibility of the "Add Event" button.
+     * - Sets up navigation to the event creation screen when the "Add Event" button is clicked.
+     * - Observes the list of events and updates the list view with the new data.
+     * - Maintains the scroll position of the list view even after it has been updated.
+     * - Fetches and displays the latest events asynchronously.
+     * - Saves the current scroll position and offset when the list is scrolled.
      *
      * @param view The root view of the fragment.
-     * @param savedInstanceState A bundle containing saved state data.
+     * @param savedInstanceState A bundle containing the state information of the fragment, if any.
      */
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        // Observe login status to toggle the visibility of the add event button.
+        // Observe the login status to toggle the visibility of the 'Add Event' button.
+        // The button will only be visible if the user is logged in.
         dataViewModel.isLoggedIn.observe(viewLifecycleOwner) { isLoggedIn ->
-            binding.openAddEventFragmentButton.visibility =
-                if (isLoggedIn) View.VISIBLE else View.GONE
+            binding.openAddEventFragmentButton.visibility = if (isLoggedIn) View.VISIBLE else View.GONE
         }
 
-        // Set up navigation to the event creation screen.
+        // Set up the click listener to navigate to the event creation screen.
         binding.openAddEventFragmentButton.setOnClickListener {
-            navigateToAddEvent()
+            navigateToAddEvent()  // Navigate to the 'Add Event' fragment
         }
 
-
-
-        // Observe event list updates and update the adapter accordingly.
+        // Observe the event list updates to refresh the adapter with new data.
+        // This ensures that the displayed events are always up-to-date.
         dataViewModel.events.observe(viewLifecycleOwner) { events ->
-            val adapter = events?.let { EventAdapter(requireContext(), ArrayList(it)) }
-            binding.listView.adapter = adapter
+            val adapter = binding.listView.adapter as? EventAdapter
+            if (adapter == null) {
+                // Set the adapter only if it hasn't been set yet.
+                binding.listView.adapter = EventAdapter(requireContext(), dataViewModel, ArrayList(events ?: emptyList()))
+            } else {
+                // Update the existing adapter with the new event data.
+                adapter.updateData(events ?: emptyList())
+            }
+
+            // Use postDelayed to ensure the scroll position is set after the list is rendered.
+            // This ensures the list is scrolled to the previous position after it is updated.
+            binding.listView.postDelayed({
+                binding.listView.setSelectionFromTop(currentScrollPosition, currentScrollOffset)
+            }, 100)  // Delay to ensure the list has been rendered
         }
 
-        // Fetch and display the latest events asynchronously.
-        lifecycleScope.launch {
-            val events = dataViewModel.fetchEvents()
-            binding.listView.adapter = EventAdapter(requireContext(), events)
-        }
+        // Fetch and display the latest events asynchronously from the ViewModel.
+        dataViewModel.loadEvents()
+
+        // Save the current scroll position and offset when the list is scrolled.
+        // This ensures the list maintains its position even after updates.
+        binding.listView.setOnScrollListener(object : AbsListView.OnScrollListener {
+            override fun onScrollStateChanged(view: AbsListView?, scrollState: Int) {}
+
+            override fun onScroll(
+                view: AbsListView?,
+                firstVisibleItem: Int,
+                visibleItemCount: Int,
+                totalItemCount: Int
+            ) {
+                if (view != null) {
+                    // Save the first visible item and its offset to maintain the scroll position.
+                    currentScrollPosition = firstVisibleItem
+                    currentScrollOffset = view.getChildAt(0)?.top ?: 0
+                }
+            }
+        })
     }
+
+
+
 
     /**
      * Navigates to the AddEventFragment based on the current navigation destination.

@@ -36,7 +36,7 @@ import android.widget.TextView
 import com.squareup.picasso.Picasso
 import dk.itu.moapd.copenhagenbuzz.jing.R
 import dk.itu.moapd.copenhagenbuzz.jing.data.Event
-import com.google.android.material.card.MaterialCardView
+import dk.itu.moapd.copenhagenbuzz.jing.models.DataViewModel
 
 /**
  * Adapter class for displaying a list of events in a ListView.
@@ -47,7 +47,7 @@ import com.google.android.material.card.MaterialCardView
  * @param context The context used for inflating layouts and loading resources.
  * @param events The list of [Event] objects to be displayed.
  */
-class EventAdapter(private val context: Context, private val events: ArrayList<Event>) : BaseAdapter() {
+class EventAdapter(private val context: Context, private val dataViewModel: DataViewModel, private val events: ArrayList<Event>) : BaseAdapter() {
 
     // Inflater to inflate the list item layout
     private val inflater: LayoutInflater = LayoutInflater.from(context)
@@ -67,7 +67,6 @@ class EventAdapter(private val context: Context, private val events: ArrayList<E
         val eventPhotoImageView: ImageView = view.findViewById(R.id.event_photo)
         val circleTextView: TextView = view.findViewById(R.id.circle_text)
         val likeButton: Button = view.findViewById(R.id.like)
-        val eventCard: MaterialCardView = view.findViewById(R.id.event_card)
     }
 
     /**
@@ -153,7 +152,6 @@ class EventAdapter(private val context: Context, private val events: ArrayList<E
             })
             .into(viewHolder.eventPhotoImageView) // Use the ImageView from the ViewHolder
 
-
         // Set the like button background based on the 'liked' state
         if (event.liked) {
             viewHolder.likeButton.setBackgroundResource(R.drawable.baseline_favorite_24)
@@ -161,22 +159,38 @@ class EventAdapter(private val context: Context, private val events: ArrayList<E
             viewHolder.likeButton.setBackgroundResource(R.drawable.baseline_favorite_border_24)
         }
 
-        // Handle button click to toggle 'liked' state
-        viewHolder.likeButton.setOnClickListener {
+        viewHolder.likeButton.setOnClickListener{
             // Toggle the liked state
-            event.liked = !event.liked
+            dataViewModel.toggleFavorite(event)
 
-            // Update the button background based on the new 'liked' state
             if (event.liked) {
                 viewHolder.likeButton.setBackgroundResource(R.drawable.baseline_favorite_24)
             } else {
                 viewHolder.likeButton.setBackgroundResource(R.drawable.baseline_favorite_border_24)
             }
 
-            // Optionally, update your data (events list) to reflect the change
-            notifyDataSetChanged()  // This will refresh the ListView if needed
+            // Notify the adapter that only this item has changed
+            notifyDataSetChanged()
         }
 
         return view
     }
+
+
+    /**
+     * Updates the adapter's data with a new list of events.
+     *
+     * This method clears the existing events in the adapter and adds the new list of events.
+     * After updating the data, it notifies the adapter that the data set has changed,
+     * ensuring the list view is refreshed to reflect the new data.
+     *
+     * @param newEvents A list of new events that will replace the current events in the adapter.
+     */
+    fun updateData(newEvents: List<Event>) {
+        this.events.clear()          // Clear the existing events in the adapter
+        this.events.addAll(newEvents)  // Add the new events to the adapter
+        notifyDataSetChanged()       // Notify the adapter that the data has changed and the view should be updated
+    }
+
+
 }

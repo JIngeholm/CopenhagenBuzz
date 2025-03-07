@@ -24,44 +24,31 @@ SOFTWARE.
 
 package dk.itu.moapd.copenhagenbuzz.jing.models
 
-import android.content.Context
-import android.util.Log
+import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.github.javafaker.Faker
 import dk.itu.moapd.copenhagenbuzz.jing.data.Event
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import java.text.SimpleDateFormat
 import java.util.Locale
 import java.util.concurrent.TimeUnit
 import kotlin.random.Random
 
 /**
- * ViewModel responsible for managing event data and user authentication state.
+ * ViewModel that handles the business logic for managing events and favorites.
  *
- * The [DataViewModel] handles fetching, storing, and providing event data using LiveData.
- * It also maintains the login status of the user and provides methods to generate mock event data.
+ * This ViewModel is responsible for fetching, adding, and managing events, as well as toggling favorites.
  */
 class DataViewModel : ViewModel() {
-
-    /**
-     * Application context, used when necessary.
-     * We need to do this differently to remove warnings.
-     */
-    private var context: Context? = null
 
     /**
      * Tracks whether mock events have been generated to prevent duplication.
      */
     private var areMockEventsGenerated = false
-
-    /**
-     * Sets the application context.
-     *
-     * @param context The application context.
-     */
-    fun setContext(context: Context) {
-        this.context = context
-    }
 
     /**
      * LiveData representing the user's login status.
@@ -76,31 +63,40 @@ class DataViewModel : ViewModel() {
     /**
      * Public accessor for events LiveData.
      */
-    val events: MutableLiveData<List<Event>?> get() = _events
+    val events: LiveData<List<Event>?> get() = _events
 
     /**
-     * Fetches a list of events, generating mock data if not already generated.
-     *
-     * This method ensures that mock events are created only once and appended
-     * to the current list of events.
-     *
-     * @return A list of events in an [ArrayList].
+     * Fetches a list of events asynchronously using coroutines.
+     * This simulates fetching events from a remote source or database.
      */
-    fun fetchEvents(): ArrayList<Event> {
+    fun fetchEvents() {
+        viewModelScope.launch {
+            val events = withContext(Dispatchers.IO) {
+                generateMockEvents() // Generate mock data in the background
+            }
+            _events.value = events
+        }
+    }
+
+    /**
+     * Generates mock events if not already generated.
+     * Uses Faker to generate random event data.
+     *
+     * @return A list of mock events.
+     */
+    private fun generateMockEvents(): List<Event> {
         if (!areMockEventsGenerated) {
             val faker = Faker(Locale.ENGLISH)
             val newEvents = ArrayList<Event>()
 
             val dateFormat = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
-
             val startDate = faker.date().future(10, TimeUnit.DAYS)
             val endDate = faker.date().future(15, TimeUnit.DAYS)
-
             val date = "${dateFormat.format(startDate)} - ${dateFormat.format(endDate)}"
 
             val types = listOf("Music", "Party", "Sport", "Art", "School", "Dinner", "Lunch", "Duel")
 
-            for (i in 1..10) {
+            for (i in 1..50) {
                 val random = Random.nextInt(types.size)
                 val randomEventType = types[random]
                 val event = Event(
@@ -115,90 +111,76 @@ class DataViewModel : ViewModel() {
                 newEvents.add(event)
             }
 
-            // Append new mock events to the existing list
-            val currentEvents = _events.value ?: emptyList()
-            _events.value = currentEvents + newEvents
             areMockEventsGenerated = true
+            return newEvents
         }
-        return _events.value as ArrayList<Event>
+        return _events.value ?: emptyList()
     }
 
     /**
      * Adds a new event to the list and updates the LiveData.
+     * The new event is added to the beginning of the list.
      *
-     * The new event is appended to the list, and the order is reversed to maintain a specific order.
-     *
-     * @param event The event to be added.
+     * @param event The event to add to the list.
      */
     fun addEvent(event: Event) {
         val currentEvents = _events.value
-        var updatedEvents = currentEvents?.plus(event)
-        if (updatedEvents != null) {
-            updatedEvents = updatedEvents.reversed()
-        }
-        _events.value = updatedEvents // Update the LiveData
+        val updatedEvents = currentEvents?.plus(event)?.reversed()
+        _events.value = updatedEvents
+    }
+
+    /**
+     * Loads the events by fetching them asynchronously.
+     */
+    fun loadEvents() {
+        fetchEvents()
     }
 
     /**
      * LiveData holding the list of favorite events.
      */
-    private val _favorites = MutableLiveData<List<Event>?>()
+    private val _favorites = MutableLiveData<List<Event>?>(emptyList())
 
     /**
      * Public accessor for favorites LiveData.
      */
-    val favorites: MutableLiveData<List<Event>> get() = _favorites
+    val favorites: LiveData<List<Event>?> get() = _favorites
 
     /**
-     * Generates a random sample of favorite events from the available events.
-     * This method takes a list of events and randomly selects 25 to add to the favorites list.
+     * Toggles the liked status of an event and updates the favorites list.
+     * If the event is liked, it is added to the favorites list; if it is unliked, it is removed.
      *
-     * @param events The list of events to choose from.
-     * @return A list of 25 random events.
-     */
-    private fun generateRandomFavorites(events: List<Event>): List<Event> {
-        val shuffledIndices = (events.indices).shuffled().take(25).sorted()
-        return shuffledIndices.mapNotNull { index -> events.getOrNull(index) }
-    }
-
-    /**
-     * Updates the favorite events list with a random sample of events.
-     * This will trigger observers of the 'favorites' LiveData.
-     */
-    fun updateFavorites() {
-        val currentEvents = _events.value ?: emptyList()
-        val favoriteEvents = generateRandomFavorites(currentEvents)
-        _favorites.value = favoriteEvents // Update the LiveData with the favorite events
-    }
-
-    /**
-     * Adds an event to the favorites list if it's liked.
-     * Updates the 'favorites' LiveData after adding the event.
-     *
-     * @param event The event to be liked and added to the favorites.
+     * @param event The event whose liked status is toggled.
      */
     fun toggleFavorite(event: Event) {
-        // Toggle the 'liked' status of the event
         val updatedEvent = event.copy(liked = !event.liked)
 
-        // Update the events list with the updated event (toggle liked status)
+        // Update the events list
         val currentEvents = _events.value?.map {
             if (it == event) updatedEvent else it
         }
-        _events.value = currentEvents // Update LiveData with the new event list
+        _events.value = currentEvents
 
-        // Add to the favorites list if liked
-        if (updatedEvent.liked) {
-            val currentFavorites = _favorites.value?.toMutableList() ?: mutableListOf()
-            currentFavorites.add(updatedEvent) // Add the event to favorites
-            _favorites.value = currentFavorites // Update LiveData for favorites
+        // Update the favorites list
+        val currentFavorites = _favorites.value ?: emptyList()
+        val updatedFavorites = if (updatedEvent.liked) {
+            currentFavorites + updatedEvent // Add the event to favorites
         } else {
-            // Remove from favorites if no longer liked
-            val currentFavorites = _favorites.value?.toMutableList()
-            currentFavorites?.remove(updatedEvent)
-            _favorites.value = currentFavorites // Update LiveData for favorites
+            currentFavorites - event // Remove the event from favorites
         }
+        _favorites.value = updatedFavorites
+    }
+
+    /**
+     * Fetches the list of favorite events.
+     *
+     * @return A list of favorite events.
+     */
+    fun fetchFavorites(): List<Event>? {
+        // Replace this with actual data fetching logic if needed
+        return _favorites.value
     }
 }
+
 
 

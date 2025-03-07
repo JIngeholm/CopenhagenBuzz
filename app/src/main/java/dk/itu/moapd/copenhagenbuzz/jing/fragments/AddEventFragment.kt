@@ -47,6 +47,12 @@ import android.app.Activity.RESULT_OK
 
 /**
  * Fragment responsible for adding a new event.
+ *
+ * This fragment provides an interface for users to create and add events to the system.
+ * It includes fields for the event's name, location, date range, type, description, and an option to select an image.
+ * Once the event details are filled out, users can save the event, which will be added to the ViewModel and reflected in the system.
+ *
+ * The fragment also handles date range selection and image picking for the event.
  */
 class AddEventFragment : Fragment() {
 
@@ -67,6 +73,13 @@ class AddEventFragment : Fragment() {
 
     /**
      * Inflates the fragment's layout and sets up the binding.
+     *
+     * This method initializes the view by inflating the layout and binding it to the fragment.
+     *
+     * @param inflater The LayoutInflater object that can be used to inflate the view.
+     * @param container The parent container that the fragment's UI will be attached to.
+     * @param savedInstanceState A bundle containing saved state information, if available.
+     * @return The root view of the fragment.
      */
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -78,6 +91,12 @@ class AddEventFragment : Fragment() {
 
     /**
      * Initializes the UI components and sets up event listeners for user interactions.
+     *
+     * This method is responsible for initializing the views, setting up date range pickers,
+     * image selection, event type selection, and handling the Add Event button click.
+     *
+     * @param view The root view of the fragment.
+     * @param savedInstanceState A bundle containing saved state information, if available.
      */
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -86,6 +105,8 @@ class AddEventFragment : Fragment() {
 
     /**
      * Cleans up the binding when the view is destroyed.
+     *
+     * This method is called when the view is destroyed. It releases the binding to avoid memory leaks.
      */
     override fun onDestroyView() {
         super.onDestroyView()
@@ -94,6 +115,9 @@ class AddEventFragment : Fragment() {
 
     /**
      * Initializes UI components and sets their listeners.
+     *
+     * This method configures the UI components, including setting up the date range pickers,
+     * image selection, event type spinner, and the Add Event button's click listener.
      */
     private fun initializeViews() {
 
@@ -175,6 +199,10 @@ class AddEventFragment : Fragment() {
 
     /**
      * Checks if all input fields are valid.
+     *
+     * This method validates the user input by checking if all required fields (event name, location,
+     * date range, type, and description) are filled out.
+     *
      * @return true if all fields are filled, false otherwise.
      */
     private fun isInputValid(): Boolean {
@@ -187,6 +215,10 @@ class AddEventFragment : Fragment() {
 
     /**
      * Handles the result of the image selection activity.
+     *
+     * This method processes the result from the image selection activity and updates the event's photo
+     * with the selected image URI. It also sets the image in the UI.
+     *
      * @param requestCode The request code of the activity.
      * @param resultCode The result code of the activity.
      * @param data The data returned by the activity.
@@ -205,3 +237,4 @@ class AddEventFragment : Fragment() {
         }
     }
 }
+

@@ -27,13 +27,11 @@ package dk.itu.moapd.copenhagenbuzz.jing.activities
 import android.content.Intent
 import android.content.res.Configuration
 import android.os.Bundle
-import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.WindowCompat
-import androidx.core.view.isVisible
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.findNavController
 import androidx.navigation.fragment.NavHostFragment
@@ -91,7 +89,6 @@ class MainActivity : AppCompatActivity() {
 
         isLoggedIn = intent.getBooleanExtra("isLoggedIn", false)
         val dataViewModel = ViewModelProvider(this)[DataViewModel::class.java]
-        dataViewModel.setContext(this@MainActivity)
         dataViewModel.isLoggedIn.value = isLoggedIn
 
         binding = ActivityMainBinding.inflate(layoutInflater)
@@ -122,7 +119,6 @@ class MainActivity : AppCompatActivity() {
             binding.bottomNavigation?.setupWithNavController(navController)
         } else {
             binding.navigationRail?.setupWithNavController(navController)
-            adjustNavigationPadding()
         }
     }
 
@@ -149,12 +145,10 @@ class MainActivity : AppCompatActivity() {
             binding.logout?.visibility = if (isLoggedIn) View.VISIBLE else View.GONE
 
             binding.login?.setOnClickListener {
-                Log.d(TAG, "Login button clicked")
                 navigateToLogin()
             }
 
             binding.logout?.setOnClickListener {
-                Log.d(TAG, "Logout button clicked")
                 isLoggedIn = false
                 invalidateOptionsMenu()
                 navigateToLogin()

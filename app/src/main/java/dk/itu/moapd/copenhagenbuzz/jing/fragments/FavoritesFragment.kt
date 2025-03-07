@@ -30,15 +30,13 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.activityViewModels
-import androidx.lifecycle.lifecycleScope
 import androidx.navigation.NavOptions
 import androidx.navigation.fragment.findNavController
+import androidx.recyclerview.widget.LinearLayoutManager
 import dk.itu.moapd.copenhagenbuzz.jing.R
-import dk.itu.moapd.copenhagenbuzz.jing.adapters.EventAdapter
+import dk.itu.moapd.copenhagenbuzz.jing.adapters.FavoriteAdapter
 import dk.itu.moapd.copenhagenbuzz.jing.databinding.FragmentFavoritesBinding
-import dk.itu.moapd.copenhagenbuzz.jing.databinding.FragmentTimelineBinding
 import dk.itu.moapd.copenhagenbuzz.jing.models.DataViewModel
-import kotlinx.coroutines.launch
 
 /**
  * A fragment that displays a timeline of events.
@@ -47,10 +45,7 @@ import kotlinx.coroutines.launch
  * a button for adding new events, which is only visible when the user is logged in.
  * The login state and event data are managed via [DataViewModel].
  */
-class FavoritesFragmentFragment : Fragment() {
-
-    // Retrieve the argument passed to this fragment
-    val isFavorites = arguments?.getBoolean("isFavorites", false) ?: false
+class FavoritesFragment : Fragment() {
 
     /**
      * View binding for the fragment's layout.
@@ -87,20 +82,12 @@ class FavoritesFragmentFragment : Fragment() {
         return binding.root
     }
 
-    /**
-     * Called after the fragment's view has been created.
-     * Sets up observers for login state and event data, and configures UI interactions.
-     *
-     * @param view The root view of the fragment.
-     * @param savedInstanceState A bundle containing saved state data.
-     */
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
         // Observe login status to toggle the visibility of the add event button.
         dataViewModel.isLoggedIn.observe(viewLifecycleOwner) { isLoggedIn ->
-            binding.openAddEventFragmentButton.visibility =
-                if (isLoggedIn) View.VISIBLE else View.GONE
+            binding.openAddEventFragmentButton.visibility = if (isLoggedIn) View.VISIBLE else View.GONE
         }
 
         // Set up navigation to the event creation screen.
@@ -108,10 +95,24 @@ class FavoritesFragmentFragment : Fragment() {
             navigateToAddEvent()
         }
 
-        dataViewModel.favorites.observe(viewLifecycleOwner) { favorites ->
-            val adapter = favorites?.let { EventAdapter(requireContext(), ArrayList(it)) }
+        // Set up RecyclerView layout manager
+        binding.recyclerView.layoutManager = LinearLayoutManager(requireContext())
 
+        // Observe favorites list updates and update the adapter accordingly.
+        dataViewModel.favorites.observe(viewLifecycleOwner) { favorites ->
+
+            val adapter = binding.recyclerView.adapter as? FavoriteAdapter
+            if (adapter == null) {
+                // Set the adapter only if it hasn't been set yet
+                binding.recyclerView.adapter = FavoriteAdapter(ArrayList(favorites ?: emptyList()))
+            } else {
+                // Update the existing adapter's data
+                adapter.updateData(ArrayList(favorites ?: emptyList()))
+            }
         }
+
+        // Fetch and display the latest favorites asynchronously.
+        dataViewModel.fetchFavorites()
     }
 
     /**
