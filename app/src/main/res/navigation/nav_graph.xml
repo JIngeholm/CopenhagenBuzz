@@ -12,9 +12,6 @@
         android:label="@string/fragment_timeline"
         tools:layout="@layout/fragment_timeline">
         <action
-            android:id="@+id/action_timeline_to_favorites"
-            app:destination="@+id/fragment_favorites" />
-        <action
             android:id="@+id/action_timeline_to_add_event"
             app:destination="@+id/fragment_add_event" />
     </fragment>
@@ -25,9 +22,6 @@
         android:label="@string/fragment_favorites"
         tools:layout="@layout/fragment_favorites">
         <action
-            android:id="@+id/action_favorites_to_maps"
-            app:destination="@+id/fragment_maps" />
-        <action
             android:id="@+id/action_favorites_to_add_event"
             app:destination="@+id/fragment_add_event" />
     </fragment>
@@ -37,9 +31,6 @@
         android:name="dk.itu.moapd.copenhagenbuzz.jing.fragments.MapsFragment"
         android:label="@string/fragment_maps"
         tools:layout="@layout/fragment_maps">
-        <action
-            android:id="@+id/action_maps_to_calendar"
-            app:destination="@+id/fragment_calendar" />
     </fragment>
 
     <fragment
@@ -47,9 +38,6 @@
         android:name="dk.itu.moapd.copenhagenbuzz.jing.fragments.CalendarFragment"
         android:label="@string/fragment_calendar"
         tools:layout="@layout/fragment_calendar">
-        <action
-            android:id="@+id/action_calendar_to_timeline"
-            app:destination="@+id/fragment_timeline" />
     </fragment>
 
     <fragment
