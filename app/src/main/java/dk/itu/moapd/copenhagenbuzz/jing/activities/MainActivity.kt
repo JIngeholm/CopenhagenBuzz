@@ -167,19 +167,6 @@ class MainActivity : AppCompatActivity() {
     }
 
     /**
-     * Handles the Up navigation action in the app bar.
-     *
-     * Allows users to navigate up in the app’s hierarchy. Falls back to the default behavior
-     * if navigation cannot be handled.
-     *
-     * @return `true` if navigation is successful, otherwise falls back to the default behavior.
-     */
-    override fun onSupportNavigateUp(): Boolean {
-        val navController = findNavController(R.id.fragment_container_view)
-        return navController.navigateUp(appBarConfiguration) || super.onSupportNavigateUp()
-    }
-
-    /**
      * Creates the options menu for the activity.
      *
      * Inflates the appropriate menu based on screen orientation and adjusts visibility of
