@@ -111,11 +111,6 @@ class MainActivity : AppCompatActivity() {
             appBarConfiguration = AppBarConfiguration(navController.graph)
             setupActionBarWithNavController(navController, appBarConfiguration)
 
-            // Override Navigation Title Change
-            navController.addOnDestinationChangedListener { _, _, _ ->
-                binding.topAppBar?.title = getString(R.string.app_name)
-            }
-
             binding.bottomNavigation?.setupWithNavController(navController)
         } else {
             binding.navigationRail?.setupWithNavController(navController)

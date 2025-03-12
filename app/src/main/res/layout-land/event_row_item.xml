@@ -4,18 +4,18 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:layout_margin="3dp">
+    android:layout_margin="@dimen/_3dp">
 
     <com.google.android.material.card.MaterialCardView
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginStart="5dp"
-        android:layout_marginEnd="40dp"
-        android:layout_marginTop="10dp"
-        app:cardCornerRadius="16dp"
-        app:cardElevation="4dp"
+        android:layout_marginStart="@dimen/_5dp"
+        android:layout_marginEnd="@dimen/_40dp"
+        android:layout_marginTop="@dimen/_10dp"
+        app:cardCornerRadius="@dimen/_16dp"
+        app:cardElevation="@dimen/_4dp"
         app:strokeColor="?attr/colorOnBackground"
-        app:strokeWidth="1dp"
+        app:strokeWidth="@dimen/_1dp"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent"
@@ -32,13 +32,13 @@
             <androidx.constraintlayout.widget.ConstraintLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:padding="16dp">
+                android:padding="@dimen/_16dp">
 
                 <!-- Circle with Letter -->
                 <FrameLayout
                     android:id="@+id/circle"
-                    android:layout_width="55dp"
-                    android:layout_height="55dp"
+                    android:layout_width="@dimen/_55dp"
+                    android:layout_height="@dimen/_55dp"
                     android:background="@drawable/circle_background"
                     app:layout_constraintTop_toTopOf="parent"
                     app:layout_constraintBottom_toBottomOf="parent"
@@ -50,7 +50,7 @@
                         android:layout_height="match_parent"
                         android:gravity="center"
                         android:text="@string/e"
-                        android:textSize="18sp"
+                        android:textSize="@dimen/_18sp"
                         android:textColor="?attr/colorOnPrimary"
                         android:fontFamily="sans-serif-medium"/>
                 </FrameLayout>
@@ -60,7 +60,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:orientation="vertical"
-                    android:layout_marginStart="8dp"
+                    android:layout_marginStart="@dimen/_8dp"
                     app:layout_constraintStart_toEndOf="@id/circle"
                     app:layout_constraintTop_toTopOf="parent"
                     app:layout_constraintBottom_toBottomOf="parent">
@@ -71,10 +71,10 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="@string/event_name"
-                        android:textSize="18sp"
+                        android:textSize="@dimen/_18sp"
                         android:textStyle="bold"
-                        android:layout_marginTop="4dp"
-                        android:layout_marginBottom="4dp"/>
+                        android:layout_marginTop="@dimen/_4dp"
+                        android:layout_marginBottom="@dimen/_4dp"/>
 
                     <!-- Event Type -->
                     <TextView
@@ -82,14 +82,14 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="@string/event_type"
-                        android:textSize="14sp"
-                        android:layout_marginTop="4dp" />
+                        android:textSize="@dimen/_14sp"
+                        android:layout_marginTop="@dimen/_4dp" />
                 </LinearLayout>
 
                 <Button
                     android:id="@+id/like"
-                    android:layout_width="25dp"
-                    android:layout_height="25dp"
+                    android:layout_width="@dimen/_25dp"
+                    android:layout_height="@dimen/_25dp"
                     android:background="@drawable/baseline_favorite_border_24"
                     android:backgroundTint="?attr/colorPrimary"
                     app:layout_constraintTop_toTopOf="parent"
@@ -102,11 +102,11 @@
             <ImageView
                 android:id="@+id/event_photo"
                 android:layout_width="match_parent"
-                android:layout_height="200dp"
+                android:layout_height="@dimen/_200dp"
                 android:scaleType="centerCrop"
                 android:src="@drawable/event_photo_placeholder"
-                android:layout_marginTop="8dp"
-                android:layout_marginBottom="8dp"/>
+                android:layout_marginTop="@dimen/_8dp"
+                android:layout_marginBottom="@dimen/_8dp"/>
 
             <!-- Event Location -->
             <TextView
@@ -114,9 +114,9 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@string/event_location"
-                android:textSize="16sp"
-                android:layout_marginTop="4dp"
-                android:layout_marginStart="15dp"
+                android:textSize="@dimen/_16sp"
+                android:layout_marginTop="@dimen/_4dp"
+                android:layout_marginStart="@dimen/_15dp"
                 />
 
             <!-- Event Date -->
@@ -125,9 +125,9 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@string/event_date"
-                android:textSize="12sp"
-                android:layout_marginStart="15dp"
-                android:layout_marginTop="2dp"
+                android:textSize="@dimen/_12sp"
+                android:layout_marginStart="@dimen/_15dp"
+                android:layout_marginTop="@dimen/_2dp"
                 />
 
             <!-- Event Description -->
@@ -136,10 +136,10 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@string/event_description"
-                android:textSize="12sp"
-                android:layout_marginTop="16dp"
-                android:layout_marginStart="15dp"
-                android:padding="1dp"
+                android:textSize="@dimen/_12sp"
+                android:layout_marginTop="@dimen/_16dp"
+                android:layout_marginStart="@dimen/_15dp"
+                android:padding="@dimen/_1dp"
                 android:maxLines="2"
                 android:ellipsize="end" />
 
@@ -148,8 +148,8 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal"
-                android:layout_marginTop="8dp"
-                android:padding="10dp">
+                android:layout_marginTop="@dimen/_8dp"
+                android:padding="@dimen/_10dp">
 
                 <!-- Spacer to push buttons to the right -->
                 <View
@@ -167,7 +167,7 @@
                     app:strokeColor="?attr/colorPrimary"
                     app:strokeWidth="@dimen/thin_outline"
                     android:textColor="?attr/colorPrimary"
-                    android:layout_marginEnd="8dp" />
+                    android:layout_marginEnd="@dimen/_8dp" />
 
                 <com.google.android.material.button.MaterialButton
                     android:id="@+id/info_button"

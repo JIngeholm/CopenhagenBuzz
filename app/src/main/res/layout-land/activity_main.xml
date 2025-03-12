@@ -20,7 +20,7 @@
         android:id="@+id/navigation_rail"
         android:layout_width="wrap_content"
         android:layout_height="match_parent"
-        app:itemPaddingTop="7dp"
+        app:itemPaddingTop="@dimen/_7dp"
         app:labelVisibilityMode="selected"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
@@ -35,7 +35,7 @@
         android:background="@android:color/transparent"
         android:contentDescription="@string/login"
         android:visibility="visible"
-        android:layout_marginBottom="30dp"
+        android:layout_marginBottom="@dimen/_30dp"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="@id/navigation_rail"
         app:layout_constraintBottom_toBottomOf="parent"/>
@@ -48,7 +48,7 @@
         android:background="@android:color/transparent"
         android:contentDescription="@string/logout"
         android:visibility="gone"
-        android:layout_marginBottom="30dp"
+        android:layout_marginBottom="@dimen/_30dp"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="@id/navigation_rail"
         app:layout_constraintBottom_toBottomOf="parent"/>
