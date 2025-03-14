@@ -33,12 +33,11 @@ import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.WindowCompat
 import androidx.lifecycle.ViewModelProvider
-import androidx.navigation.findNavController
 import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.ui.AppBarConfiguration
-import androidx.navigation.ui.navigateUp
 import androidx.navigation.ui.setupActionBarWithNavController
 import androidx.navigation.ui.setupWithNavController
+import com.google.firebase.auth.FirebaseAuth
 import dk.itu.moapd.copenhagenbuzz.jing.R
 import dk.itu.moapd.copenhagenbuzz.jing.databinding.ActivityMainBinding
 import dk.itu.moapd.copenhagenbuzz.jing.models.DataViewModel
@@ -68,6 +67,8 @@ class MainActivity : AppCompatActivity() {
      */
     private var isLoggedIn: Boolean = false
 
+    private lateinit var auth: FirebaseAuth
+
     /**
      * Companion object containing a static tag for logging.
      */
@@ -96,7 +97,27 @@ class MainActivity : AppCompatActivity() {
 
         setupNavigation()
         setupAuthButtons()
+
+        // Initialize Firebase Auth.
+        auth = FirebaseAuth.getInstance()
     }
+
+    /*
+    override fun onStart() {
+        super.onStart()
+        // Redirect the user to the LoginActivity
+        // if they are not logged in.
+        auth.currentUser ?: startLoginActivity()
+    }
+
+    private fun startLoginActivity() {
+        Intent(this, LoginActivity::class.java).apply {
+            flags = Intent.FLAG_ACTIVITY_NEW_TASK or
+                    Intent.FLAG_ACTIVITY_CLEAR_TASK
+        }.let(::startActivity)
+    }
+
+     */
 
     /**
      * Configures navigation components based on the screen orientation.
@@ -155,7 +176,7 @@ class MainActivity : AppCompatActivity() {
      * Navigates to the login activity and clears the back stack.
      */
     private fun navigateToLogin() {
-        val intent = Intent(this, LoginActivity::class.java)
+        val intent = Intent(this, LoginActivityOld::class.java)
         intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
         startActivity(intent)
         finish()

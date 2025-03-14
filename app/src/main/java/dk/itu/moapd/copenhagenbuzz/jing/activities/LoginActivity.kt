@@ -1,87 +1,79 @@
-/*
-MIT License
-
-Copyright (c) [2025] [Johan Ingeholm]
-
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following conditions:
-
-The above copyright notice and this permission notice shall be included in all
-copies or substantial portions of the Software.
-
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-SOFTWARE.
- */
-
 package dk.itu.moapd.copenhagenbuzz.jing.activities
 
 import android.content.Intent
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.view.WindowCompat
-import dk.itu.moapd.copenhagenbuzz.jing.databinding.ActivityLoginBinding
+import dk.itu.moapd.copenhagenbuzz.jing.R
+import com.google.android.material.snackbar.Snackbar
 
-/**
- * The LoginActivity class provides the UI for the user to log in or
- * access the application as a guest.
- */
+import com.firebase.ui.auth.AuthUI
+import com.firebase.ui.auth.FirebaseAuthUIActivityResultContract
+import com.firebase.ui.auth.FirebaseAuthUIAuthenticationResult
+
+
 class LoginActivity : AppCompatActivity() {
 
-    /**
-     * Binding object for the login activity layout.
-     */
-    private lateinit var mainBinding: ActivityLoginBinding
+    // Register the result launcher for Firebase Auth UI
+    private val signInLauncher =
+        registerForActivityResult(FirebaseAuthUIActivityResultContract()) { result ->
+            onSignInResult(result)
+        }
 
-    companion object {
-        /**
-         * Log tag used for debugging purposes.
-         */
-        private val TAG = MainActivity::class.qualifiedName
-    }
-
-    /**
-     * Called when the activity is starting. Initializes the view components.
-     *
-     * @param savedInstanceState If the activity is being re-initialized after previously
-     * being shut down, this Bundle contains the data it most recently supplied.
-     */
     override fun onCreate(savedInstanceState: Bundle?) {
-        WindowCompat.setDecorFitsSystemWindows(window, false)
         super.onCreate(savedInstanceState)
-        initializeViews()
+        setContentView(R.layout.activity_login) // Make sure you have a layout set here
+        createSignInIntent()
     }
 
-    /**
-     * Initializes the UI views and sets up click listeners for login and guest access.
-     * Navigates to the main activity with the corresponding login status.
-     */
-    private fun initializeViews(){
-        mainBinding = ActivityLoginBinding.inflate(layoutInflater)
-        setContentView(mainBinding.root)
+    private fun createSignInIntent() {
+        // Choose authentication providers.
+        val providers = arrayListOf(
+            AuthUI.IdpConfig.GoogleBuilder().build() // You can add other providers as well.
+        )
 
-        mainBinding.loginButton.setOnClickListener {
-            val intent = Intent(this, MainActivity::class.java).apply {
-                putExtra("isLoggedIn", true)
+        // Create and launch the sign-in intent.
+        val signInIntent = AuthUI.getInstance()
+            .createSignInIntentBuilder()
+            .setAvailableProviders(providers)
+            .setIsSmartLockEnabled(false)
+            .setLogo(R.drawable.baseline_firebase_24) // Set your logo
+            .setTheme(R.style.Theme_FirebaseAuthentication) // Make sure you have this theme in your styles.xml
+            .apply {
+                setTosAndPrivacyPolicyUrls(
+                    "https://firebase.google.com/terms/",
+                    "https://firebase.google.com/policies/…"
+                )
             }
-            startActivity(intent)
-            finish()
-        }
+            .build()
 
-        mainBinding.guestButton.setOnClickListener {
-            val intent = Intent(this, MainActivity::class.java).apply {
-                putExtra("isLoggedIn", false)
+        // Launch the sign-in activity
+        signInLauncher.launch(signInIntent)
+    }
+
+    private fun onSignInResult(result: FirebaseAuthUIAuthenticationResult) {
+        when (result.resultCode) {
+            RESULT_OK -> {
+                // Successfully signed in.
+                showSnackBar("User logged in the app.")
+                startMainActivity()
             }
-            startActivity(intent)
-            finish()
+            else -> {
+                // Sign in failed.
+                showSnackBar("Authentication failed.")
+            }
         }
+    }
+
+    private fun startMainActivity() {
+        // Start MainActivity after successful login
+        Intent(this, MainActivity::class.java).apply {
+            startActivity(this)
+            finish() // Close LoginActivity so the user cannot return here
+        }
+    }
+
+    private fun showSnackBar(message: String) {
+        // Assuming you have a SnackBar to show feedback
+        Snackbar.make(findViewById(android.R.id.content), message, Snackbar.LENGTH_SHORT).show()
     }
 }
