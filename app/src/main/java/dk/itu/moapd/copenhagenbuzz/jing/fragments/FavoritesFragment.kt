@@ -30,10 +30,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.activityViewModels
-import androidx.navigation.NavOptions
-import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
-import dk.itu.moapd.copenhagenbuzz.jing.R
 import dk.itu.moapd.copenhagenbuzz.jing.adapters.FavoriteAdapter
 import dk.itu.moapd.copenhagenbuzz.jing.databinding.FragmentFavoritesBinding
 import dk.itu.moapd.copenhagenbuzz.jing.models.DataViewModel
@@ -85,16 +82,6 @@ class FavoritesFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        // Observe login status to toggle the visibility of the add event button.
-        dataViewModel.isLoggedIn.observe(viewLifecycleOwner) { isLoggedIn ->
-            binding.openAddEventFragmentButton.visibility = if (isLoggedIn) View.VISIBLE else View.GONE
-        }
-
-        // Set up navigation to the event creation screen.
-        binding.openAddEventFragmentButton.setOnClickListener {
-            navigateToAddEvent()
-        }
-
         // Set up RecyclerView layout manager
         binding.recyclerView.layoutManager = LinearLayoutManager(requireContext())
 
@@ -113,28 +100,6 @@ class FavoritesFragment : Fragment() {
 
         // Fetch and display the latest favorites asynchronously.
         dataViewModel.fetchFavorites()
-    }
-
-    /**
-     * Navigates to the AddEventFragment based on the current navigation destination.
-     * Ensures that the back stack is properly managed to prevent duplicate navigation.
-     */
-    private fun navigateToAddEvent() {
-        val navController = findNavController()
-
-        val actionId = when (navController.currentDestination?.id) {
-            R.id.fragment_timeline -> R.id.action_timeline_to_add_event
-            R.id.fragment_favorites -> R.id.action_favorites_to_add_event
-            else -> return // Exit if the current destination is unknown.
-        }
-
-        navController.navigate(
-            actionId,
-            null,
-            NavOptions.Builder()
-                .setPopUpTo(R.id.nav_graph, false)
-                .build()
-        )
     }
 
     /**

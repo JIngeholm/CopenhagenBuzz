@@ -27,17 +27,22 @@ package dk.itu.moapd.copenhagenbuzz.jing.activities
 import android.content.Intent
 import android.content.res.Configuration
 import android.os.Bundle
+import android.util.Log
 import android.view.Menu
-import android.view.MenuItem
-import android.view.View
+import android.widget.ImageView
+import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.WindowCompat
 import androidx.lifecycle.ViewModelProvider
+import androidx.navigation.NavOptions
+import androidx.navigation.findNavController
 import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.setupActionBarWithNavController
 import androidx.navigation.ui.setupWithNavController
+import com.google.android.material.button.MaterialButton
 import com.google.firebase.auth.FirebaseAuth
+import com.squareup.picasso.Picasso
 import dk.itu.moapd.copenhagenbuzz.jing.R
 import dk.itu.moapd.copenhagenbuzz.jing.databinding.ActivityMainBinding
 import dk.itu.moapd.copenhagenbuzz.jing.models.DataViewModel
@@ -63,10 +68,14 @@ class MainActivity : AppCompatActivity() {
     private lateinit var appBarConfiguration: AppBarConfiguration
 
     /**
-     * Indicates if the user is a guest
+     * Indicates if the user is a guest.
+     * This is used to determine whether user-specific information should be shown in the UI.
      */
     private var isGuest: Boolean = true
 
+    /**
+     * Firebase authentication instance for managing user authentication.
+     */
     private lateinit var auth: FirebaseAuth
 
     /**
@@ -88,20 +97,22 @@ class MainActivity : AppCompatActivity() {
         WindowCompat.setDecorFitsSystemWindows(window, true)
         super.onCreate(savedInstanceState)
 
+        // Initialize Firebase Auth.
+        auth = FirebaseAuth.getInstance()
+
+        // Get guest status from intent and update ViewModel state
         isGuest = intent.getBooleanExtra("isGuest", true)
         val dataViewModel = ViewModelProvider(this)[DataViewModel::class.java]
         dataViewModel.isLoggedIn.value = isGuest
 
+        // Set up the UI using view binding
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
+        // Initialize navigation and drawer components
         setupNavigation()
-        setupAuthButtons()
-
-        // Initialize Firebase Auth.
-        auth = FirebaseAuth.getInstance()
+        setupDrawer()
     }
-
 
     /**
      * Called when the activity is starting or restarting. This is where the activity
@@ -135,9 +146,12 @@ class MainActivity : AppCompatActivity() {
         }.let(::startActivity)
     }
 
-
     /**
      * Configures navigation components based on the screen orientation.
+     *
+     * This method handles setting up the navigation bar and configuring the app to adapt to both
+     * portrait and landscape orientations. It adjusts the visibility and configuration of
+     * navigation elements like the AppBar and BottomNavigationView or NavigationRail.
      */
     private fun setupNavigation() {
         val navHostFragment = supportFragmentManager
@@ -153,26 +167,107 @@ class MainActivity : AppCompatActivity() {
         } else {
             binding.navigationRail?.setupWithNavController(navController)
         }
+
+        // Ensure the correct icon appears on each fragment
+        navController.addOnDestinationChangedListener { _, destination, _ ->
+            if (destination.id == R.id.fragment_timeline) { // Change to your fragment ID
+                supportActionBar?.setHomeAsUpIndicator(R.drawable.baseline_menu_24)
+                supportActionBar?.setDisplayHomeAsUpEnabled(true)
+            } else {
+                supportActionBar?.setHomeAsUpIndicator(null)
+                supportActionBar?.setDisplayHomeAsUpEnabled(true) // Shows the back arrow
+            }
+        }
     }
 
     /**
-     * Configures login and logout buttons in landscape mode.
+     * Configures the navigation drawer, including handling the visibility of user-specific settings
+     * and setting up actions for menu items.
+     *
+     * This method controls the opening of the drawer, the visibility of user settings based on
+     * whether the user is a guest, and sets up the menu item actions such as navigating to the AddEvent
+     * screen.
      */
-    private fun setupAuthButtons() {
-        if (resources.configuration.orientation == Configuration.ORIENTATION_LANDSCAPE) {
-            binding.login?.visibility = if (isGuest) View.VISIBLE else View.GONE
-            binding.logout?.visibility = if (!isGuest) View.VISIBLE else View.GONE
+    private fun setupDrawer() {
+        // Show or hide user settings section based on login status
+        binding.navigationView?.menu?.setGroupVisible(R.id.user_settings, !isGuest)
 
-            binding.login?.setOnClickListener {
-                navigateToLogin()
-            }
-
-            binding.logout?.setOnClickListener {
-                isGuest = true
-                invalidateOptionsMenu()
-                navigateToLogin()
-            }
+        // Open the drawer when the menu button is pressed
+        binding.topAppBar?.setNavigationOnClickListener {
+            binding.drawerLayout.open()
         }
+
+        // Setup header for drawer with account info
+        setupDrawerHeader()
+
+        // Actions for pressing menu items
+        binding.navigationView?.setNavigationItemSelectedListener { menuItem ->
+            when (menuItem.itemId) {
+                R.id.new_event -> navigateToAddEvent()
+            }
+            binding.drawerLayout.close()
+            true
+        }
+    }
+
+    /**
+     * Sets up the drawer header with user information, such as the profile photo and username.
+     *
+     * This method also sets the login button's text and click listener based on the guest status.
+     */
+    private fun setupDrawerHeader() {
+        val headerView = binding.navigationView?.getHeaderView(0) // Get the first (and only) header view
+        val loginButton = headerView?.findViewById<MaterialButton>(R.id.login_button)
+
+        loginButton?.setOnClickListener {
+            navigateToLogin()
+        }
+
+        if (isGuest) return
+
+        val profileImageView = headerView?.findViewById<ImageView>(R.id.drawer_profile_photo)
+        if (profileImageView == null) {
+            Log.e("MainActivity", "profileImageView is null")
+            return
+        }
+
+        // Use Picasso to load the profile photo
+        Picasso.get()
+            .load(auth.currentUser?.photoUrl) // Load user's photo
+            .placeholder(R.drawable.baseline_account_circle_60) // Placeholder image
+            .error(R.drawable.baseline_account_circle_60) // Error image
+            .into(profileImageView) // Into the ImageView
+
+        // Set username and email
+        headerView.findViewById<TextView>(R.id.drawer_username)?.text = auth.currentUser?.displayName
+        headerView.findViewById<TextView>(R.id.drawer_email)?.text = auth.currentUser?.email
+
+        // Set login button text and click listener
+        val loginTextRes = if (isGuest) R.string.sign_in else R.string.sign_out
+        loginButton?.setText(loginTextRes)
+    }
+
+    /**
+     * Navigates to the AddEventFragment based on the current navigation destination.
+     * Ensures that the back stack is properly managed to prevent duplicate navigation.
+     */
+    private fun navigateToAddEvent() {
+        val navController = findNavController(R.id.fragment_container_view)
+        val actionId = when (navController.currentDestination?.id) {
+            R.id.fragment_timeline -> R.id.action_timeline_to_add_event
+            R.id.fragment_favorites -> R.id.action_favorites_to_add_event
+            R.id.fragment_maps -> R.id.action_maps_to_add_event
+            R.id.fragment_calendar -> R.id.action_calendar_to_add_event
+            else -> return
+        }
+
+        navController.navigate(
+            actionId,
+            null,
+            NavOptions.Builder()
+                .setPopUpTo(R.id.nav_graph, false)
+                .build()
+        )
     }
 
     /**
@@ -201,36 +296,11 @@ class MainActivity : AppCompatActivity() {
         } else {
             menuInflater.inflate(R.menu.side_navigation_menu, menu)
         }
+        menuInflater.inflate(R.menu.drawer_menu, menu)
 
-        menu?.findItem(R.id.action_login)?.isVisible = isGuest
-        menu?.findItem(R.id.action_logout)?.isVisible = !isGuest
         return true
     }
-
-    /**
-     * Handles menu item selections, including login and logout actions.
-     *
-     * If the user selects login, the LoginActivity is started. If logout is selected,
-     * the user is logged out, and the app navigates to the login screen, clearing the back stack.
-     *
-     * @param item The selected menu item.
-     * @return `true` if the action was handled, otherwise calls the superclass implementation.
-     */
-    override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        return when (item.itemId) {
-            R.id.action_login -> {
-                navigateToLogin()
-                true
-            }
-            R.id.action_logout -> {
-                isGuest = true
-                invalidateOptionsMenu()
-                navigateToLogin()
-                true
-            }
-            else -> super.onOptionsItemSelected(item)
-        }
-    }
 }
+
 
 

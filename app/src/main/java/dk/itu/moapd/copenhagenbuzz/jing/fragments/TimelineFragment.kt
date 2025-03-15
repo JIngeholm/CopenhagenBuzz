@@ -104,18 +104,6 @@ class TimelineFragment : Fragment() {
      */
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-
-        // Observe the login status to toggle the visibility of the 'Add Event' button.
-        // The button will only be visible if the user is logged in.
-        dataViewModel.isLoggedIn.observe(viewLifecycleOwner) { isLoggedIn ->
-            binding.openAddEventFragmentButton.visibility = if (isLoggedIn) View.VISIBLE else View.GONE
-        }
-
-        // Set up the click listener to navigate to the event creation screen.
-        binding.openAddEventFragmentButton.setOnClickListener {
-            navigateToAddEvent()  // Navigate to the 'Add Event' fragment
-        }
-
         // Observe the event list updates to refresh the adapter with new data.
         // This ensures that the displayed events are always up-to-date.
         dataViewModel.events.observe(viewLifecycleOwner) { events ->

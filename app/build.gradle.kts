@@ -45,6 +45,7 @@ dependencies {
     implementation (libs.google.firebase.auth.ktx)
     implementation (libs.firebaseui.firebase.ui.auth)
 
+    implementation(libs.circleimageview)
     implementation(libs.androidx.recyclerview)
     implementation(libs.picasso)
     implementation(libs.glide)

@@ -1,5 +1,6 @@
 [versions]
 agp = "8.8.0"
+circleimageview = "3.1.0"
 glide = "4.16.0"
 javafaker = "1.0.2"
 kotlin = "1.9.24"
@@ -44,6 +45,10 @@ play-services-maps = { group = "com.google.android.gms", name = "play-services-m
 firebase-bom = { group = "com.google.firebase", name = "firebase-bom", version.ref = "firebase-bom" }
 google-firebase-auth-ktx = { group = "com.google.firebase", name = "firebase-auth-ktx", version.ref = "firebase-auth" }
 firebaseui-firebase-ui-auth = { group = "com.firebaseui", name = "firebase-ui-auth", version.ref = "firebase-ui-auth" }
+
+circleimageview = { module = "de.hdodenhof:circleimageview", version = "3.1.0" }
+
+
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }

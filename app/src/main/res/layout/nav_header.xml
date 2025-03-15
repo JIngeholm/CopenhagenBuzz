@@ -1,0 +1,49 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:orientation="vertical"
+    android:padding="16dp">
+
+    <de.hdodenhof.circleimageview.CircleImageView
+        android:id="@+id/drawer_profile_photo"
+        android:layout_width="80dp"
+        android:layout_height="80dp"
+        android:src="@drawable/baseline_account_circle_60"
+        />
+
+
+    <TextView
+        android:id="@+id/drawer_username"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/guest_account"
+        android:textColor="?attr/colorAccent"
+        android:textStyle="bold"
+        android:textSize="@dimen/_25sp"
+        android:paddingTop="@dimen/_5dp"
+        />
+
+    <TextView
+        android:id="@+id/drawer_email"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/guest_email_com"
+        android:textColor="?attr/colorAccent"
+        android:textStyle="bold"
+        android:textSize="@dimen/_12sp"
+        android:paddingTop="@dimen/_5dp"
+        />
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/login_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/sign_in"
+        android:textColor="@android:color/white"
+        android:layout_marginTop="@dimen/_8dp"
+        app:backgroundTint="?attr/colorAccent"
+        app:cornerRadius="50dp"
+        />
+
+</LinearLayout>

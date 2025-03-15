@@ -131,7 +131,7 @@ class LoginActivity : AppCompatActivity() {
         Intent(this, MainActivity::class.java).apply {
             // Add the isLoggedIn boolean to the intent
             val isGuest = FirebaseAuth.getInstance().currentUser?.isAnonymous == true
-            putExtra("isLoggedIn", isGuest) // Key-value pair
+            putExtra("isGuest", isGuest) // Key-value pair
             startActivity(this)
             finish() // Close LoginActivity so the user cannot return here
         }
