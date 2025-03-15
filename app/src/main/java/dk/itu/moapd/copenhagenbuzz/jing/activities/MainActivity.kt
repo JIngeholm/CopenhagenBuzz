@@ -102,7 +102,7 @@ class MainActivity : AppCompatActivity() {
         auth = FirebaseAuth.getInstance()
     }
 
-    /*
+
     override fun onStart() {
         super.onStart()
         // Redirect the user to the LoginActivity
@@ -117,7 +117,7 @@ class MainActivity : AppCompatActivity() {
         }.let(::startActivity)
     }
 
-     */
+
 
     /**
      * Configures navigation components based on the screen orientation.
@@ -136,20 +136,6 @@ class MainActivity : AppCompatActivity() {
         } else {
             binding.navigationRail?.setupWithNavController(navController)
         }
-    }
-
-    /**
-     * Dynamically adjusts padding for the navigation rail in landscape mode.
-     */
-    private fun adjustNavigationPadding() {
-        val screenHeight = resources.displayMetrics.heightPixels
-        val padding = screenHeight / 6
-        binding.navigationRail?.setPadding(
-            binding.navigationRail!!.paddingLeft,
-            padding,
-            binding.navigationRail!!.paddingRight,
-            padding
-        )
     }
 
     /**
@@ -176,7 +162,7 @@ class MainActivity : AppCompatActivity() {
      * Navigates to the login activity and clears the back stack.
      */
     private fun navigateToLogin() {
-        val intent = Intent(this, LoginActivityOld::class.java)
+        val intent = Intent(this, LoginActivity::class.java)
         intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
         startActivity(intent)
         finish()

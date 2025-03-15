@@ -41,7 +41,9 @@ android {
 }
 
 dependencies {
-    implementation(platform(libs.firebase.bom))
+    implementation (platform(libs.firebase.bom))
+    implementation (libs.google.firebase.auth.ktx)
+    implementation (libs.firebaseui.firebase.ui.auth)
 
     implementation(libs.androidx.recyclerview)
     implementation(libs.picasso)
@@ -60,7 +62,4 @@ dependencies {
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
-
-    implementation(libs.firebase.auth.ktx)
-    implementation(libs.firebase.ui.auth)
 }
