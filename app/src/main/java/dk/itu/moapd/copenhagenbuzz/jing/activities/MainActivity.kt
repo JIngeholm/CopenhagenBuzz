@@ -63,9 +63,9 @@ class MainActivity : AppCompatActivity() {
     private lateinit var appBarConfiguration: AppBarConfiguration
 
     /**
-     * Indicates whether the user is logged in.
+     * Indicates if the user is a guest
      */
-    private var isLoggedIn: Boolean = false
+    private var isGuest: Boolean = true
 
     private lateinit var auth: FirebaseAuth
 
@@ -85,12 +85,12 @@ class MainActivity : AppCompatActivity() {
      * @param savedInstanceState A [Bundle] containing the activity's previously saved state.
      */
     override fun onCreate(savedInstanceState: Bundle?) {
-        WindowCompat.setDecorFitsSystemWindows(window, false)
+        WindowCompat.setDecorFitsSystemWindows(window, true)
         super.onCreate(savedInstanceState)
 
-        isLoggedIn = intent.getBooleanExtra("isLoggedIn", false)
+        isGuest = intent.getBooleanExtra("isGuest", true)
         val dataViewModel = ViewModelProvider(this)[DataViewModel::class.java]
-        dataViewModel.isLoggedIn.value = isLoggedIn
+        dataViewModel.isLoggedIn.value = isGuest
 
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
@@ -103,20 +103,37 @@ class MainActivity : AppCompatActivity() {
     }
 
 
+    /**
+     * Called when the activity is starting or restarting. This is where the activity
+     * checks if the user is logged in. If the user is not logged in (i.e., `auth.currentUser` is null),
+     * the user is redirected to the [LoginActivity].
+     *
+     * This method ensures that the user is authenticated before proceeding to the main functionality
+     * of the app. If the user is not authenticated, they are taken to the login screen.
+     *
+     * @see android.app.Activity.onStart
+     */
     override fun onStart() {
         super.onStart()
-        // Redirect the user to the LoginActivity
-        // if they are not logged in.
+        // Redirect the user to the LoginActivity if they are not logged in.
         auth.currentUser ?: startLoginActivity()
     }
 
+    /**
+     * Starts the [LoginActivity] and clears the back stack, ensuring that the user cannot navigate back
+     * to the previous activity using the back button.
+     *
+     * This method is typically called when the user is not logged in and needs to be redirected
+     * to the login screen. The [Intent.FLAG_ACTIVITY_NEW_TASK] and [Intent.FLAG_ACTIVITY_CLEAR_TASK]
+     * flags are used to clear the back stack, ensuring a clean navigation flow.
+     *
+     * @see android.content.Intent
+     */
     private fun startLoginActivity() {
         Intent(this, LoginActivity::class.java).apply {
-            flags = Intent.FLAG_ACTIVITY_NEW_TASK or
-                    Intent.FLAG_ACTIVITY_CLEAR_TASK
+            flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
         }.let(::startActivity)
     }
-
 
 
     /**
@@ -143,15 +160,15 @@ class MainActivity : AppCompatActivity() {
      */
     private fun setupAuthButtons() {
         if (resources.configuration.orientation == Configuration.ORIENTATION_LANDSCAPE) {
-            binding.login?.visibility = if (!isLoggedIn) View.VISIBLE else View.GONE
-            binding.logout?.visibility = if (isLoggedIn) View.VISIBLE else View.GONE
+            binding.login?.visibility = if (isGuest) View.VISIBLE else View.GONE
+            binding.logout?.visibility = if (!isGuest) View.VISIBLE else View.GONE
 
             binding.login?.setOnClickListener {
                 navigateToLogin()
             }
 
             binding.logout?.setOnClickListener {
-                isLoggedIn = false
+                isGuest = true
                 invalidateOptionsMenu()
                 navigateToLogin()
             }
@@ -185,8 +202,8 @@ class MainActivity : AppCompatActivity() {
             menuInflater.inflate(R.menu.side_navigation_menu, menu)
         }
 
-        menu?.findItem(R.id.action_login)?.isVisible = !isLoggedIn
-        menu?.findItem(R.id.action_logout)?.isVisible = isLoggedIn
+        menu?.findItem(R.id.action_login)?.isVisible = isGuest
+        menu?.findItem(R.id.action_logout)?.isVisible = !isGuest
         return true
     }
 
@@ -206,7 +223,7 @@ class MainActivity : AppCompatActivity() {
                 true
             }
             R.id.action_logout -> {
-                isLoggedIn = false
+                isGuest = true
                 invalidateOptionsMenu()
                 navigateToLogin()
                 true
