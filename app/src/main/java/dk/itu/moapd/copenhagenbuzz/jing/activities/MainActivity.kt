@@ -29,16 +29,17 @@ import android.content.res.Configuration
 import android.os.Bundle
 import android.util.Log
 import android.view.Menu
+import android.view.MenuItem
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.WindowCompat
+import androidx.core.view.isVisible
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.NavOptions
 import androidx.navigation.findNavController
 import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.ui.AppBarConfiguration
-import androidx.navigation.ui.setupActionBarWithNavController
 import androidx.navigation.ui.setupWithNavController
 import com.google.android.material.button.MaterialButton
 import com.google.firebase.auth.FirebaseAuth
@@ -160,12 +161,12 @@ class MainActivity : AppCompatActivity() {
 
         if (resources.configuration.orientation == Configuration.ORIENTATION_PORTRAIT) {
             setSupportActionBar(binding.topAppBar)
-            appBarConfiguration = AppBarConfiguration(navController.graph)
-            setupActionBarWithNavController(navController, appBarConfiguration)
+            binding.topAppBar?.setOverflowIcon(null)
 
             binding.bottomNavigation?.setupWithNavController(navController)
         } else {
             binding.navigationRail?.setupWithNavController(navController)
+
         }
 
         // Ensure the correct icon appears on each fragment
@@ -190,18 +191,24 @@ class MainActivity : AppCompatActivity() {
      */
     private fun setupDrawer() {
         // Show or hide user settings section based on login status
-        binding.navigationView?.menu?.setGroupVisible(R.id.user_settings, !isGuest)
+        binding.navigationView.menu.setGroupVisible(R.id.user_settings, !isGuest)
 
-        // Open the drawer when the menu button is pressed
-        binding.topAppBar?.setNavigationOnClickListener {
-            binding.drawerLayout.open()
+        if (resources.configuration.orientation == Configuration.ORIENTATION_PORTRAIT) {
+            // Open the drawer when the menu button is pressed
+            binding.topAppBar?.setNavigationOnClickListener {
+                binding.drawerLayout.open()
+            }
+        }else{
+            binding.navButton?.setOnClickListener {
+                binding.drawerLayout.open()
+            }
         }
 
         // Setup header for drawer with account info
         setupDrawerHeader()
 
         // Actions for pressing menu items
-        binding.navigationView?.setNavigationItemSelectedListener { menuItem ->
+        binding.navigationView.setNavigationItemSelectedListener { menuItem ->
             when (menuItem.itemId) {
                 R.id.new_event -> navigateToAddEvent()
             }
@@ -216,7 +223,7 @@ class MainActivity : AppCompatActivity() {
      * This method also sets the login button's text and click listener based on the guest status.
      */
     private fun setupDrawerHeader() {
-        val headerView = binding.navigationView?.getHeaderView(0) // Get the first (and only) header view
+        val headerView = binding.navigationView.getHeaderView(0) // Get the first (and only) header view
         val loginButton = headerView?.findViewById<MaterialButton>(R.id.login_button)
 
         loginButton?.setOnClickListener {
@@ -280,26 +287,6 @@ class MainActivity : AppCompatActivity() {
         finish()
     }
 
-    /**
-     * Creates the options menu for the activity.
-     *
-     * Inflates the appropriate menu based on screen orientation and adjusts visibility of
-     * login/logout menu items.
-     *
-     * @param menu The menu to be inflated.
-     * @return `true` if the menu was successfully created.
-     */
-    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
-        if (resources.configuration.orientation == Configuration.ORIENTATION_PORTRAIT) {
-            menuInflater.inflate(R.menu.bottom_navigation_menu, menu)
-            menuInflater.inflate(R.menu.top_app_bar_menu, menu)
-        } else {
-            menuInflater.inflate(R.menu.side_navigation_menu, menu)
-        }
-        menuInflater.inflate(R.menu.drawer_menu, menu)
-
-        return true
-    }
 }
 
 

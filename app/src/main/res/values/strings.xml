@@ -46,6 +46,7 @@
     <string name="logs_in_or_out">Logs in or out</string>
     <string name="sign_in">Sign In</string>
     <string name="sign_out">Sign Out</string>
+    <string name="open_navigation_drawer">Open navigation drawer</string>
 
 
     <string-array name="event_types">
