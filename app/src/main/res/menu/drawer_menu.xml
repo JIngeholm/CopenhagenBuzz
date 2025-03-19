@@ -1,14 +1,10 @@
-<menu xmlns:android="http://schemas.android.com/apk/res/android">
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <!-- Section for Logged-in Users -->
-    <group android:id="@+id/user_settings">
-        <!-- Header for User Settings -->
-        <item
-            android:id="@+id/user_settings_header"
-            android:title="@string/user_settings"
-            android:enabled="false"
-            android:icon="@null"
-            />
+    <group
+        android:id="@+id/user_settings"
+        android:title="@string/user_settings">
 
         <item
             android:id="@+id/account"
@@ -26,13 +22,9 @@
 
 
     <!-- Always Visible Items -->
-    <group android:id="@+id/general_settings">
-        <!-- Header for General Settings -->
-        <item
-            android:id="@+id/general_settings_header"
-            android:title="@string/general_settings"
-            android:enabled="false"
-            android:icon="@null" />
+    <group
+        android:id="@+id/general_settings"
+        android:title="@string/general_settings">
 
         <item
             android:id="@+id/notifications"

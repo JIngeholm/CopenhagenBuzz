@@ -61,9 +61,11 @@
                     android:layout_height="wrap_content"
                     android:orientation="vertical"
                     android:layout_marginStart="@dimen/_8dp"
+                    android:layout_marginEnd="@dimen/_16dp"
                     app:layout_constraintStart_toEndOf="@id/circle"
                     app:layout_constraintTop_toTopOf="parent"
-                    app:layout_constraintBottom_toBottomOf="parent">
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    >
 
                     <!-- Event Name -->
                     <TextView
@@ -75,6 +77,7 @@
                         android:textStyle="bold"
                         android:layout_marginTop="@dimen/_4dp"
                         android:layout_marginBottom="@dimen/_4dp"/>
+
 
                     <!-- Event Type -->
                     <TextView
