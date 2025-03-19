@@ -2,50 +2,53 @@
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <!-- Section for Logged-in Users -->
-    <group
+    <item
         android:id="@+id/user_settings"
-        android:title="@string/user_settings">
-
-        <item
-            android:id="@+id/account"
-            android:icon="@drawable/guest_24"
-            android:title="@string/account" />
-        <item
-            android:id="@+id/new_event"
-            android:icon="@drawable/baseline_add_circle_24"
-            android:title="@string/new_event" />
-        <item
-            android:id="@+id/event_history"
-            android:icon="@drawable/baseline_history_24"
-            android:title="@string/event_history" />
-    </group>
-
+        android:title="@string/user_settings"
+        >
+        <menu>
+            <item
+                android:id="@+id/account"
+                android:icon="@drawable/guest_24"
+                android:title="@string/account" />
+            <item
+                android:id="@+id/new_event"
+                android:icon="@drawable/baseline_add_circle_24"
+                android:title="@string/new_event" />
+            <item
+                android:id="@+id/event_history"
+                android:icon="@drawable/baseline_history_24"
+                android:title="@string/event_history" />
+        </menu>
+    </item>
 
     <!-- Always Visible Items -->
-    <group
+    <item
         android:id="@+id/general_settings"
-        android:title="@string/general_settings">
-
-        <item
-            android:id="@+id/notifications"
-            android:icon="@drawable/baseline_circle_notifications_24"
-            android:title="@string/notifications" />
-        <item
-            android:id="@+id/support"
-            android:icon="@drawable/baseline_support_24"
-            android:title="@string/support" />
-        <item
-            android:id="@+id/settings"
-            android:icon="@drawable/baseline_settings_24"
-            android:title="@string/settings" />
-        <item
-            android:id="@+id/help"
-            android:icon="@drawable/baseline_help_24"
-            android:title="@string/help" />
-        <item
-            android:id="@+id/terms_and_conditions"
-            android:icon="@drawable/baseline_gavel_24"
-            android:title="@string/terms_amp_conditions" />
-    </group>
+        android:title="@string/general_settings"
+        > <!-- Change icon as needed -->
+        <menu>
+            <item
+                android:id="@+id/notifications"
+                android:icon="@drawable/baseline_circle_notifications_24"
+                android:title="@string/notifications" />
+            <item
+                android:id="@+id/support"
+                android:icon="@drawable/baseline_support_24"
+                android:title="@string/support" />
+            <item
+                android:id="@+id/settings"
+                android:icon="@drawable/baseline_settings_24"
+                android:title="@string/settings" />
+            <item
+                android:id="@+id/help"
+                android:icon="@drawable/baseline_help_24"
+                android:title="@string/help" />
+            <item
+                android:id="@+id/terms_and_conditions"
+                android:icon="@drawable/baseline_gavel_24"
+                android:title="@string/terms_amp_conditions" />
+        </menu>
+    </item>
 
 </menu>

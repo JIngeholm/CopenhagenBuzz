@@ -191,7 +191,7 @@ class MainActivity : AppCompatActivity() {
      */
     private fun setupDrawer() {
         // Show or hide user settings section based on login status
-        binding.navigationView.menu.setGroupVisible(R.id.user_settings, !isGuest)
+        binding.navigationView.menu.findItem(R.id.user_settings).isVisible = !isGuest
 
         if (resources.configuration.orientation == Configuration.ORIENTATION_PORTRAIT) {
             // Open the drawer when the menu button is pressed
