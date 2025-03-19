@@ -24,6 +24,7 @@ SOFTWARE.
 
 package dk.itu.moapd.copenhagenbuzz.jing.fragments
 
+import DataViewModel
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
@@ -40,7 +41,6 @@ import com.github.javafaker.Faker
 import dk.itu.moapd.copenhagenbuzz.jing.R
 import dk.itu.moapd.copenhagenbuzz.jing.data.Event
 import dk.itu.moapd.copenhagenbuzz.jing.databinding.FragmentAddEventBinding
-import dk.itu.moapd.copenhagenbuzz.jing.models.DataViewModel
 import java.text.SimpleDateFormat
 import java.util.Date
 import android.app.Activity.RESULT_OK
@@ -59,7 +59,7 @@ class AddEventFragment : Fragment() {
     private var _binding: FragmentAddEventBinding? = null
     private val faker = Faker()
 
-    private val event: Event = Event("", "", "", "", "", faker.internet().image(), false)
+    private val event: Event = Event("", "", "", "", "", faker.internet().image(), false, "")
     private val dataViewModel: DataViewModel by activityViewModels()
 
     companion object {
@@ -100,6 +100,9 @@ class AddEventFragment : Fragment() {
      */
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
+        event.userId = dataViewModel.auth.currentUser?.uid ?: "unknown user"
+
         initializeViews()
     }
 
@@ -187,8 +190,9 @@ class AddEventFragment : Fragment() {
                 event.eventType = binding.spinnerEventType.text.toString().trim()
                 event.eventDescription = binding.editTextEventDescription.text.toString().trim()
 
-                // Add event to the ViewModel and navigate to the timeline
+
                 dataViewModel.addEvent(event)
+
                 Toast.makeText(requireContext(), "Event shared! 🎉", Toast.LENGTH_SHORT).show()
                 findNavController().navigate(R.id.action_add_event_to_timeline)
             } else {

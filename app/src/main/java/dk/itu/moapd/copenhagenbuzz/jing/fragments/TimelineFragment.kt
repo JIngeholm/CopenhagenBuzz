@@ -29,14 +29,17 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.AbsListView
+
 import androidx.fragment.app.activityViewModels
-import androidx.navigation.NavOptions
-import androidx.navigation.fragment.findNavController
-import dk.itu.moapd.copenhagenbuzz.jing.R
-import dk.itu.moapd.copenhagenbuzz.jing.adapters.EventAdapter
+import androidx.recyclerview.widget.LinearLayoutManager
+import com.firebase.ui.database.FirebaseRecyclerOptions
+import com.google.firebase.Firebase
+import com.google.firebase.database.database
+import dk.itu.moapd.copenhagenbuzz.jing.MyApplication.Companion.DATABASE_URL
+import dk.itu.moapd.copenhagenbuzz.jing.adapters.TimeLineAdapter
+import dk.itu.moapd.copenhagenbuzz.jing.data.Event
 import dk.itu.moapd.copenhagenbuzz.jing.databinding.FragmentTimelineBinding
-import dk.itu.moapd.copenhagenbuzz.jing.models.DataViewModel
+import DataViewModel
 
 /**
  * A fragment that displays a timeline of events.
@@ -65,11 +68,6 @@ class TimelineFragment : Fragment() {
      * Shared ViewModel instance for managing login state and event data.
      */
     private val dataViewModel: DataViewModel by activityViewModels()
-
-    // Variable to save the current scroll position
-    var currentScrollPosition = 0
-
-    private var currentScrollOffset: Int = 0
 
     /**
      * Inflates the fragment's layout and initializes view binding.
@@ -104,71 +102,28 @@ class TimelineFragment : Fragment() {
      */
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        // Observe the event list updates to refresh the adapter with new data.
-        // This ensures that the displayed events are always up-to-date.
-        dataViewModel.events.observe(viewLifecycleOwner) { events ->
-            val adapter = binding.listView.adapter as? EventAdapter
-            if (adapter == null) {
-                // Set the adapter only if it hasn't been set yet.
-                binding.listView.adapter = EventAdapter(requireContext(), dataViewModel, ArrayList(events ?: emptyList()))
-            } else {
-                // Update the existing adapter with the new event data.
-                adapter.updateData(events ?: emptyList())
-            }
 
-            // Use postDelayed to ensure the scroll position is set after the list is rendered.
-            // This ensures the list is scrolled to the previous position after it is updated.
-            binding.listView.postDelayed({
-                binding.listView.setSelectionFromTop(currentScrollPosition, currentScrollOffset)
-            }, 100)  // Delay to ensure the list has been rendered
-        }
+        dataViewModel.auth.currentUser?.let { user ->
+            val query = Firebase.database(DATABASE_URL).reference
+                .child("events")
+                .child(user.uid)
+                .orderByChild("createdAt")
 
-        // Fetch and display the latest events asynchronously from the ViewModel.
-        dataViewModel.loadEvents()
-
-        // Save the current scroll position and offset when the list is scrolled.
-        // This ensures the list maintains its position even after updates.
-        binding.listView.setOnScrollListener(object : AbsListView.OnScrollListener {
-            override fun onScrollStateChanged(view: AbsListView?, scrollState: Int) {}
-
-            override fun onScroll(
-                view: AbsListView?,
-                firstVisibleItem: Int,
-                visibleItemCount: Int,
-                totalItemCount: Int
-            ) {
-                if (view != null) {
-                    // Save the first visible item and its offset to maintain the scroll position.
-                    currentScrollPosition = firstVisibleItem
-                    currentScrollOffset = view.getChildAt(0)?.top ?: 0
-                }
-            }
-        })
-    }
-
-
-
-
-    /**
-     * Navigates to the AddEventFragment based on the current navigation destination.
-     * Ensures that the back stack is properly managed to prevent duplicate navigation.
-     */
-    private fun navigateToAddEvent() {
-        val navController = findNavController()
-
-        val actionId = when (navController.currentDestination?.id) {
-            R.id.fragment_timeline -> R.id.action_timeline_to_add_event
-            R.id.fragment_favorites -> R.id.action_favorites_to_add_event
-            else -> return // Exit if the current destination is unknown.
-        }
-
-        navController.navigate(
-            actionId,
-            null,
-            NavOptions.Builder()
-                .setPopUpTo(R.id.nav_graph, false)
+            val options = FirebaseRecyclerOptions.Builder<Event>()
+                .setQuery(query, Event::class.java)
+                .setLifecycleOwner(this)
                 .build()
-        )
+
+            // Create the custom adapter to bind a list of strings.
+            val adapter = TimeLineAdapter(options,dataViewModel)
+
+            binding.recyclerView?.apply{
+                layoutManager = LinearLayoutManager(requireContext())
+                this.adapter = adapter
+            }
+        }
+
+
     }
 
     /**

@@ -40,5 +40,6 @@ data class Event(
     var eventType: String,
     var eventDescription: String,
     var eventPhoto: String,
-    var liked: Boolean
+    var liked: Boolean,
+    var userId: String
 )

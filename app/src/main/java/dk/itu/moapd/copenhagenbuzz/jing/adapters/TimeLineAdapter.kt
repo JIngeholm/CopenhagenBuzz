@@ -1,5 +1,6 @@
 package dk.itu.moapd.copenhagenbuzz.jing.adapters
 
+import DataViewModel
 import android.graphics.Bitmap
 import android.graphics.Matrix
 import android.util.Log
@@ -12,15 +13,18 @@ import com.squareup.picasso.Picasso
 import com.squareup.picasso.Transformation
 import dk.itu.moapd.copenhagenbuzz.jing.R
 import dk.itu.moapd.copenhagenbuzz.jing.data.Event
-import dk.itu.moapd.copenhagenbuzz.jing.databinding.FavoriteRowItemBinding
+import dk.itu.moapd.copenhagenbuzz.jing.databinding.EventRowItemBinding
 
-class FavoriteAdapter(options: FirebaseRecyclerOptions<Event>) : FirebaseRecyclerAdapter<Event, FavoriteAdapter.ViewHolder>(options) {
+class TimeLineAdapter(options: FirebaseRecyclerOptions<Event>, private val dataViewModel: DataViewModel) : FirebaseRecyclerAdapter<Event, TimeLineAdapter.ViewHolder>(options) {
 
-    inner class ViewHolder(private val binding: FavoriteRowItemBinding) : RecyclerView.ViewHolder(binding.root) {
+    inner class ViewHolder(private val binding: EventRowItemBinding) : RecyclerView.ViewHolder(binding.root) {
 
         fun bind(event: Event) {
             binding.eventName.text = event.eventName
             binding.eventType.text = event.eventType
+            binding.eventLocation.text = event.eventLocation
+            binding.eventDate.text = event.eventDate
+            binding.eventDescription.text = event.eventDescription
             binding.circleText.text = event.eventType.firstOrNull()?.toString() ?: ""
 
             // Load the event photo using Picasso with a 90-degree rotation
@@ -41,11 +45,24 @@ class FavoriteAdapter(options: FirebaseRecyclerOptions<Event>) : FirebaseRecycle
                     override fun key(): String = "rotate90"
                 })
                 .into(binding.eventPhoto)
+
+            // Set the like button background based on the 'liked' state
+            if (event.liked) {
+                binding.like.setBackgroundResource(R.drawable.baseline_favorite_24)
+            } else {
+                binding.like.setBackgroundResource(R.drawable.baseline_favorite_border_24)
+            }
+
+            /*
+            binding.like.setOnClickListener{
+                dataViewModel.toggleFavorite(event)
+            }
+             */
         }
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
-        val binding = FavoriteRowItemBinding.inflate(LayoutInflater.from(parent.context), parent, false)
+        val binding = EventRowItemBinding.inflate(LayoutInflater.from(parent.context), parent, false)
         return ViewHolder(binding)
     }
 

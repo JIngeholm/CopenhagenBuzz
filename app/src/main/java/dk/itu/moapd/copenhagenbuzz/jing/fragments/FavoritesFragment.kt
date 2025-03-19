@@ -31,9 +31,14 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.activityViewModels
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.firebase.ui.database.FirebaseRecyclerOptions
+import com.google.firebase.Firebase
+import com.google.firebase.database.database
+import dk.itu.moapd.copenhagenbuzz.jing.MyApplication.Companion.DATABASE_URL
 import dk.itu.moapd.copenhagenbuzz.jing.adapters.FavoriteAdapter
+import dk.itu.moapd.copenhagenbuzz.jing.data.Event
 import dk.itu.moapd.copenhagenbuzz.jing.databinding.FragmentFavoritesBinding
-import dk.itu.moapd.copenhagenbuzz.jing.models.DataViewModel
+import DataViewModel
 
 /**
  * A fragment that displays a timeline of events.
@@ -82,24 +87,25 @@ class FavoritesFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        // Set up RecyclerView layout manager
-        binding.recyclerView.layoutManager = LinearLayoutManager(requireContext())
+        dataViewModel.auth.currentUser?.let { user ->
+            val query = Firebase.database(DATABASE_URL).reference
+                .child("events")
+                .child(user.uid)
+                .orderByChild("createdAt")
 
-        // Observe favorites list updates and update the adapter accordingly.
-        dataViewModel.favorites.observe(viewLifecycleOwner) { favorites ->
+            val options = FirebaseRecyclerOptions.Builder<Event>()
+                .setQuery(query, Event::class.java)
+                .setLifecycleOwner(this)
+                .build()
 
-            val adapter = binding.recyclerView.adapter as? FavoriteAdapter
-            if (adapter == null) {
-                // Set the adapter only if it hasn't been set yet
-                binding.recyclerView.adapter = FavoriteAdapter(ArrayList(favorites ?: emptyList()))
-            } else {
-                // Update the existing adapter's data
-                adapter.updateData(ArrayList(favorites ?: emptyList()))
+            // Create the custom adapter to bind a list of strings.
+            val adapter = FavoriteAdapter(options)
+
+            binding.recyclerView.apply{
+                layoutManager = LinearLayoutManager(requireContext())
+                this.adapter = adapter
             }
         }
-
-        // Fetch and display the latest favorites asynchronously.
-        dataViewModel.fetchFavorites()
     }
 
     /**

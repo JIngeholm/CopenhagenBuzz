@@ -24,17 +24,15 @@ SOFTWARE.
 
 package dk.itu.moapd.copenhagenbuzz.jing.activities
 
+import DataViewModel
 import android.content.Intent
 import android.content.res.Configuration
 import android.os.Bundle
 import android.util.Log
-import android.view.Menu
-import android.view.MenuItem
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.WindowCompat
-import androidx.core.view.isVisible
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.NavOptions
 import androidx.navigation.findNavController
@@ -46,7 +44,6 @@ import com.google.firebase.auth.FirebaseAuth
 import com.squareup.picasso.Picasso
 import dk.itu.moapd.copenhagenbuzz.jing.R
 import dk.itu.moapd.copenhagenbuzz.jing.databinding.ActivityMainBinding
-import dk.itu.moapd.copenhagenbuzz.jing.models.DataViewModel
 
 
 /**
@@ -105,6 +102,7 @@ class MainActivity : AppCompatActivity() {
         isGuest = intent.getBooleanExtra("isGuest", true)
         val dataViewModel = ViewModelProvider(this)[DataViewModel::class.java]
         dataViewModel.isLoggedIn.value = isGuest
+        dataViewModel.auth = auth
 
         // Set up the UI using view binding
         binding = ActivityMainBinding.inflate(layoutInflater)

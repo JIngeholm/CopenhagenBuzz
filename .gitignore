@@ -12,5 +12,7 @@
 /captures
 .externalNativeBuild
 .cxx
+# Ignore .env file to prevent leaking secrets
+.env
 local.properties
 google-services.json

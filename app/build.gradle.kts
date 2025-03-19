@@ -44,14 +44,18 @@ dependencies {
     implementation (platform(libs.firebase.bom))
     implementation (libs.google.firebase.auth.ktx)
     implementation (libs.firebaseui.firebase.ui.auth)
+    implementation(libs.google.firebase.database.ktx)
+    implementation(libs.firebaseui.firebase.ui.database)
+    implementation(libs.dotenv.kotlin)
 
     implementation(libs.circleimageview)
     implementation(libs.androidx.recyclerview)
     implementation(libs.picasso)
-    implementation(libs.glide)
     annotationProcessor(libs.compiler)
+
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.appcompat)
+
     implementation(libs.material)
     implementation(libs.androidx.constraintlayout)
     implementation(libs.androidx.navigation.fragment.ktx)
