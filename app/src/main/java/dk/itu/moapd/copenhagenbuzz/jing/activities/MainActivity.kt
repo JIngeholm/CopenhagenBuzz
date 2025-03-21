@@ -37,7 +37,6 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.NavOptions
 import androidx.navigation.findNavController
 import androidx.navigation.fragment.NavHostFragment
-import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.setupWithNavController
 import com.google.android.material.button.MaterialButton
 import com.google.firebase.auth.FirebaseAuth
@@ -59,11 +58,6 @@ class MainActivity : AppCompatActivity() {
      * View binding instance for accessing UI components.
      */
     private lateinit var binding: ActivityMainBinding
-
-    /**
-     * Configuration for the AppBar to manage navigation.
-     */
-    private lateinit var appBarConfiguration: AppBarConfiguration
 
     /**
      * Indicates if the user is a guest.

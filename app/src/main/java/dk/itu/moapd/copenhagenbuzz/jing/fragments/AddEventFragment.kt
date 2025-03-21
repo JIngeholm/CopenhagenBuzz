@@ -25,6 +25,7 @@ SOFTWARE.
 package dk.itu.moapd.copenhagenbuzz.jing.fragments
 
 import DataViewModel
+import android.app.Activity
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
@@ -44,6 +45,8 @@ import dk.itu.moapd.copenhagenbuzz.jing.databinding.FragmentAddEventBinding
 import java.text.SimpleDateFormat
 import java.util.Date
 import android.app.Activity.RESULT_OK
+import androidx.activity.result.ActivityResultLauncher
+import androidx.activity.result.contract.ActivityResultContracts
 
 /**
  * Fragment responsible for adding a new event.
@@ -71,6 +74,8 @@ class AddEventFragment : Fragment() {
             "Cannot access binding because it is null. Is the view visible?"
         }
 
+    private lateinit var imagePickerLauncher: ActivityResultLauncher<Intent>
+
     /**
      * Inflates the fragment's layout and sets up the binding.
      *
@@ -86,6 +91,19 @@ class AddEventFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View {
         _binding = FragmentAddEventBinding.inflate(inflater, container, false)
+
+        // Initialize ActivityResultLauncher
+        imagePickerLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+            if (result.resultCode == Activity.RESULT_OK) {
+                val data: Intent? = result.data
+                val imageUri: Uri? = data?.data
+                // Handle the selected image URI (e.g., display it in an ImageView)
+                imageUri?.let {
+                    binding.imageViewEventPicture.setImageURI(it)
+                    event.eventPhoto = it.toString() // Update the event's photo
+                }
+            }
+        }
         return binding.root
     }
 
@@ -159,7 +177,7 @@ class AddEventFragment : Fragment() {
         // Set up image selection button
         binding.selectImageButton.setOnClickListener {
             val intent = Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI)
-            startActivityForResult(intent, IMAGE_REQUEST_CODE)
+            imagePickerLauncher.launch(intent)
         }
 
         // Set up spinner for event types
@@ -215,30 +233,6 @@ class AddEventFragment : Fragment() {
                 binding.editTextEventDateRange.text.toString().isNotEmpty() &&
                 binding.spinnerEventType.text.toString().isNotEmpty() &&
                 binding.editTextEventDescription.text.toString().isNotEmpty()
-    }
-
-    /**
-     * Handles the result of the image selection activity.
-     *
-     * This method processes the result from the image selection activity and updates the event's photo
-     * with the selected image URI. It also sets the image in the UI.
-     *
-     * @param requestCode The request code of the activity.
-     * @param resultCode The result code of the activity.
-     * @param data The data returned by the activity.
-     */
-    @Deprecated("Deprecated in Java")
-    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        super.onActivityResult(requestCode, resultCode, data)
-
-        if (requestCode == IMAGE_REQUEST_CODE && resultCode == RESULT_OK && data != null) {
-            val imageUri: Uri? = data.data
-            val imageUrl = imageUri.toString()
-
-            // Set the image URI to the ImageView
-            binding.imageViewEventPicture.setImageURI(imageUri)
-            event.eventPhoto = imageUrl
-        }
     }
 }
 

@@ -31,7 +31,6 @@ dotenv-kotlin = "6.4.1"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
-compiler = { module = "com.github.bumptech.glide:compiler", version.ref = "glide" }
 javafaker = { module = "com.github.javafaker:javafaker", version.ref = "javafaker" }
 junit = { group = "junit", name = "junit", version.ref = "junit" }
 androidx-recyclerview = { group = "androidx.recyclerview", name = "recyclerview", version = "1.2.1" }

@@ -53,11 +53,11 @@ class TimeLineAdapter(options: FirebaseRecyclerOptions<Event>, private val dataV
                 binding.like.setBackgroundResource(R.drawable.baseline_favorite_border_24)
             }
 
-            /*
+
             binding.like.setOnClickListener{
                 dataViewModel.toggleFavorite(event)
             }
-             */
+
         }
     }
 

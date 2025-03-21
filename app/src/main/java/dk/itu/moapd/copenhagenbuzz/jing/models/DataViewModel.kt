@@ -1,3 +1,4 @@
+import android.util.Log
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.google.firebase.auth.FirebaseAuth
@@ -27,68 +28,68 @@ class DataViewModel : ViewModel() {
             // Get a reference to Firebase Realtime Database
             val databaseReference = FirebaseDatabase.getInstance().reference
 
+            Log.d("DataViewModel", "db reference = $databaseReference")
+
             // Push a new event to the database under the user's UID
             val eventReference = databaseReference.child("events")
                 .child(user.uid)
                 .push()
 
-            eventReference.key?.let { uid ->
+            event.eventID = eventReference.key.toString()
+
+            eventReference.key?.let { _ ->
                 // Insert the event object in the database
                 eventReference.setValue(event)
                     .addOnSuccessListener {
-                        // You can handle success here if needed
+                        Log.d("Firebase", "Event added successfully!")
                     }
                     .addOnFailureListener { exception ->
-                        // Handle failure (e.g., log or show a message)
+                        Log.e("Firebase", "Error adding event", exception)
                     }
             }
+        } ?: run {
+            Log.e("Firebase", "User is not authenticated")
         }
     }
 
     /**
      * Function to toggle the favorite status of an event in the Firebase Realtime Database.
      */
-    /*
+
     fun toggleFavorite(event: Event) {
-
-        // Get a reference to Firebase Realtime Database
-        val databaseReference = FirebaseDatabase.getInstance().reference
-
         auth.currentUser?.let { user ->
-            // If the event is already liked, remove it from the favorites
+            // Get a reference to Firebase Realtime Database
+            val databaseReference = FirebaseDatabase.getInstance().reference
+
+            // Reference to the user's favorites
+            val favoritesRef = databaseReference.child("favorites").child(user.uid)
+
             if (event.liked) {
-                databaseReference.orderByChild("eventId").equalTo(event.eventId).get()
-                    .addOnSuccessListener { snapshot ->
-                        for (child in snapshot.children) {
-                            child.ref.removeValue() // Remove the event from the "favorites" table
-                        }
+                // If the event is already liked, remove it from favorites
+                favoritesRef.child(event.eventID).removeValue()
+                    .addOnSuccessListener {
+                        Log.d("Firebase", "Event removed from favorites")
+                        event.liked = false // Update the local state
                     }
                     .addOnFailureListener { exception ->
-                        // Handle failure (e.g., log or show a message)
-                        exception.printStackTrace()
+                        Log.e("Firebase", "Error removing event from favorites", exception)
                     }
             } else {
-                // If the event is not liked, add it to the favorites
-                val eventReference = favoritesRef.push()
-
-                eventReference.key?.let { uid ->
-                    // Insert the event object in the database
-                    eventReference.setValue(event)
-                        .addOnSuccessListener {
-                            // Optionally handle success here
-                        }
-                        .addOnFailureListener { exception ->
-                            // Handle failure (e.g., log or show a message)
-                            exception.printStackTrace()
-                        }
-                }
+                // If the event is not liked, add it to favorites
+                favoritesRef.child(event.eventID).setValue(event)
+                    .addOnSuccessListener {
+                        Log.d("Firebase", "Event added to favorites")
+                        event.liked = true // Update the local state
+                    }
+                    .addOnFailureListener { exception ->
+                        Log.e("Firebase", "Error adding event to favorites", exception)
+                    }
             }
-
-            // Toggle the 'liked' state of the event
-            event.liked = !event.liked
+        } ?: run {
+            Log.e("Firebase", "User is not authenticated")
         }
     }
-     */
+
 
 
 }

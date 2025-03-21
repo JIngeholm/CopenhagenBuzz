@@ -25,6 +25,7 @@ SOFTWARE.
 package dk.itu.moapd.copenhagenbuzz.jing
 
 import android.app.Application
+import android.util.Log
 import com.google.android.material.color.DynamicColors
 import com.google.firebase.database.FirebaseDatabase
 import io.github.cdimascio.dotenv.dotenv
@@ -51,6 +52,8 @@ class MyApplication: Application() {
         // Retrieve DATABASE_URL from the .env file, or fallback to default value if not present
         DATABASE_URL = dotenv["DATABASE_URL"]
             ?: "https://copenhagenbuzz-7eb2a-default-rtdb.europe-west1.firebasedatabase.app/"
+
+        Log.d("MyApplication", "DB URL = $DATABASE_URL")
 
         if (DATABASE_URL.isNullOrEmpty()) {
             throw IllegalArgumentException("DATABASE_URL is not set or is empty in the .env file!")

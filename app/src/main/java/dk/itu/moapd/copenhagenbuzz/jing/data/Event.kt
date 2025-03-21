@@ -34,12 +34,15 @@ package dk.itu.moapd.copenhagenbuzz.jing.data
  * @author Johan Ingeholm
  */
 data class Event(
-    var eventName: String,
-    var eventLocation: String,
-    var eventDate: String,
-    var eventType: String,
-    var eventDescription: String,
-    var eventPhoto: String,
-    var liked: Boolean,
-    var userId: String
-)
+    var eventName: String = "",
+    var eventLocation: String = "",
+    var eventDate: String = "",
+    var eventType: String = "",
+    var eventDescription: String = "",
+    var eventPhoto: String = "",
+    var liked: Boolean = false,
+    var userId: String = "",
+    var eventID: String = ""
+){
+    constructor() : this("","","","","","",false,"","")
+}

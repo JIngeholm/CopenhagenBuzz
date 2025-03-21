@@ -106,11 +106,12 @@
             <ImageView
                 android:id="@+id/event_photo"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
+                android:layout_height="@dimen/_200dp"
                 android:scaleType="centerCrop"
                 android:src="@drawable/event_photo_placeholder"
                 android:layout_marginTop="@dimen/_8dp"
-                android:layout_marginBottom="@dimen/_8dp"/>
+                android:layout_marginBottom="@dimen/_8dp"
+                />
 
             <!-- Event Location -->
             <TextView

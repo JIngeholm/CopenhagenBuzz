@@ -51,7 +51,6 @@ dependencies {
     implementation(libs.circleimageview)
     implementation(libs.androidx.recyclerview)
     implementation(libs.picasso)
-    annotationProcessor(libs.compiler)
 
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.appcompat)
