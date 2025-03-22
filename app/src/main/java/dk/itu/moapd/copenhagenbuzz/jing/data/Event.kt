@@ -41,7 +41,8 @@ data class Event(
     var eventDescription: String = "",
     var eventPhoto: String = "",
     var userId: String = "",
-    var eventID: String = ""
+    var eventID: String = "",
+    var favoritedBy: MutableMap<String, Boolean> = mutableMapOf()
 ){
     constructor() : this("","","","","","","","")
 }

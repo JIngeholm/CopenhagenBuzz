@@ -24,7 +24,6 @@ SOFTWARE.
 
 package dk.itu.moapd.copenhagenbuzz.jing.fragments
 
-import DataViewModel
 import android.app.Activity
 import android.content.Intent
 import android.net.Uri
@@ -45,6 +44,7 @@ import java.text.SimpleDateFormat
 import java.util.Date
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
+import dk.itu.moapd.copenhagenbuzz.jing.models.DataViewModel
 
 /**
  * Fragment responsible for adding a new event.

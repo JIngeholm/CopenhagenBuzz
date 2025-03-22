@@ -1,6 +1,5 @@
 package dk.itu.moapd.copenhagenbuzz.jing.dialogs
 
-import DataViewModel
 import android.app.Dialog
 import android.os.Bundle
 import androidx.fragment.app.DialogFragment
@@ -8,6 +7,7 @@ import androidx.fragment.app.activityViewModels
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import dk.itu.moapd.copenhagenbuzz.jing.data.Event
 import dk.itu.moapd.copenhagenbuzz.jing.databinding.DialogDeleteEventBinding
+import dk.itu.moapd.copenhagenbuzz.jing.models.DataViewModel
 
 class DeleteEventDialog(val event: Event) : DialogFragment() {
 

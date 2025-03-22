@@ -24,7 +24,6 @@ SOFTWARE.
 
 package dk.itu.moapd.copenhagenbuzz.jing.activities
 
-import DataViewModel
 import android.content.Intent
 import android.content.res.Configuration
 import android.os.Bundle
@@ -43,6 +42,7 @@ import com.google.firebase.auth.FirebaseAuth
 import com.squareup.picasso.Picasso
 import dk.itu.moapd.copenhagenbuzz.jing.R
 import dk.itu.moapd.copenhagenbuzz.jing.databinding.ActivityMainBinding
+import dk.itu.moapd.copenhagenbuzz.jing.models.DataViewModel
 
 
 /**

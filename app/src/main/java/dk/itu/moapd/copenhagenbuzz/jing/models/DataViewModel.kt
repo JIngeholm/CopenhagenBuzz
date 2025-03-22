@@ -1,3 +1,29 @@
+/*
+MIT License
+
+Copyright (c) [2025] [Johan Ingeholm]
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+ */
+
+package dk.itu.moapd.copenhagenbuzz.jing.models
+
 import android.util.Log
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -10,6 +36,7 @@ import com.google.firebase.database.ValueEventListener
 import com.google.firebase.database.database
 import dk.itu.moapd.copenhagenbuzz.jing.MyApplication.Companion.DATABASE_URL
 import dk.itu.moapd.copenhagenbuzz.jing.data.Event
+
 
 /**
  * ViewModel that handles the business logic for managing events and favorites.
@@ -57,23 +84,30 @@ class DataViewModel : ViewModel() {
         }
     }
 
-    /**
-     * Function to toggle the favorite status of an event in the Firebase Realtime Database.
-     */
-
-    fun toggleFavorite(event: Event, liked: Boolean) : Boolean {
+    fun toggleFavorite(event: Event, liked: Boolean): Boolean {
         auth.currentUser?.let { user ->
-            // Get a reference to Firebase Realtime Database
-            val databaseReference = FirebaseDatabase.getInstance().reference
+            val databaseRef = Firebase.database(DATABASE_URL).reference
 
             // Reference to the user's favorites
-            val favoritesRef = databaseReference.child("favorites").child(user.uid)
+            val favoritesRef = databaseRef.child("favorites").child(user.uid)
+
+            // Reference to the event's 'favoritedBy' node
+            val favoritedByRef = databaseRef.child("events").child(event.eventID).child("favoritedBy")
 
             if (liked) {
                 // If the event is already liked, remove it from favorites
                 favoritesRef.child(event.eventID).removeValue()
                     .addOnSuccessListener {
                         Log.d("Firebase", "Event removed from favorites")
+
+                        // Remove the user from the event's 'favoritedBy' node
+                        favoritedByRef.child(user.uid).removeValue()
+                            .addOnSuccessListener {
+                                Log.d("Firebase", "User removed from favoritedBy")
+                            }
+                            .addOnFailureListener { exception ->
+                                Log.e("Firebase", "Error removing user from favoritedBy", exception)
+                            }
                     }
                     .addOnFailureListener { exception ->
                         Log.e("Firebase", "Error removing event from favorites", exception)
@@ -83,6 +117,15 @@ class DataViewModel : ViewModel() {
                 favoritesRef.child(event.eventID).setValue(event)
                     .addOnSuccessListener {
                         Log.d("Firebase", "Event added to favorites")
+
+                        // Add the user to the event's 'favoritedBy' node
+                        favoritedByRef.child(user.uid).setValue(true)
+                            .addOnSuccessListener {
+                                Log.d("Firebase", "User added to favoritedBy")
+                            }
+                            .addOnFailureListener { exception ->
+                                Log.e("Firebase", "Error adding user to favoritedBy", exception)
+                            }
                     }
                     .addOnFailureListener { exception ->
                         Log.e("Firebase", "Error adding event to favorites", exception)
@@ -95,104 +138,89 @@ class DataViewModel : ViewModel() {
         return !liked
     }
 
-    fun deleteEvent(event: Event){
-        // Get a reference to the Firebase database
+    fun deleteEvent(event: Event) {
         val databaseRef = Firebase.database(DATABASE_URL).reference
 
-        // Step 1: Delete the event from the 'events' table
-        databaseRef.child("events").child(event.eventID).removeValue()
-            .addOnSuccessListener {
-                Log.d("DeleteEvent", "Event deleted from events table")
-
-                // Step 2: Delete the event from the 'favorites' table for all users
-                databaseRef.child("favorites").addListenerForSingleValueEvent(object : ValueEventListener {
-                    override fun onDataChange(dataSnapshot: DataSnapshot) {
-                        // Iterate through all users in the 'favorites' table
+        // Step 1: Retrieve the list of users who have favorited the event
+        databaseRef.child("events").child(event.eventID).child("favoritedBy")
+            .addListenerForSingleValueEvent(object : ValueEventListener {
+                override fun onDataChange(dataSnapshot: DataSnapshot) {
+                    if (dataSnapshot.exists()) {
+                        // Step 2: Iterate through the users in the 'favoritedBy' node
                         for (userSnapshot in dataSnapshot.children) {
-                            val userId = userSnapshot.key // Get the user ID
-                            val userFavoritesRef = databaseRef.child("favorites").child(userId ?: "")
-
-                            // Check if the event exists in the user's favorites
-                            userFavoritesRef.child(event.eventID).addListenerForSingleValueEvent(object : ValueEventListener {
-                                override fun onDataChange(favoriteSnapshot: DataSnapshot) {
-                                    if (favoriteSnapshot.exists()) {
-                                        // Delete the event from the user's favorites
-                                        userFavoritesRef.child(event.eventID).removeValue()
-                                            .addOnSuccessListener {
-                                                Log.d("DeleteEvent", "Event deleted from favorites for user: $userId")
-                                            }
-                                            .addOnFailureListener { error ->
-                                                Log.e("DeleteEvent", "Failed to delete event from favorites for user: $userId", error)
-                                            }
+                            val userId = userSnapshot.key
+                            if (userId != null) {
+                                // Delete the event from the user's favorites
+                                databaseRef.child("favorites").child(userId).child(event.eventID).removeValue()
+                                    .addOnSuccessListener {
+                                        Log.d("DeleteEvent", "Event deleted from favorites for user: $userId")
                                     }
-                                }
-
-                                override fun onCancelled(error: DatabaseError) {
-                                    Log.e("DeleteEvent", "Failed to check favorites for user: $userId", error.toException())
-                                }
-                            })
+                                    .addOnFailureListener { error ->
+                                        Log.e("DeleteEvent", "Failed to delete event from favorites for user: $userId", error)
+                                    }
+                            }
                         }
                     }
 
-                    override fun onCancelled(error: DatabaseError) {
-                        Log.e("DeleteEvent", "Failed to fetch favorites table", error.toException())
-                    }
-                })
-            }
-            .addOnFailureListener { error ->
-                Log.e("DeleteEvent", "Failed to delete event from events table", error)
-            }
+                    // Step 3: Delete the event from the 'events' table
+                    databaseRef.child("events").child(event.eventID).removeValue()
+                        .addOnSuccessListener {
+                            Log.d("DeleteEvent", "Event deleted from events table")
+                        }
+                        .addOnFailureListener { error ->
+                            Log.e("DeleteEvent", "Failed to delete event from events table", error)
+                        }
+                }
+
+                override fun onCancelled(error: DatabaseError) {
+                    Log.e("DeleteEvent", "Failed to fetch favoritedBy list", error.toException())
+                }
+            })
     }
 
     fun editEvent(editedEvent: Event) {
-        // Get a reference to the Firebase database
         val databaseRef = Firebase.database(DATABASE_URL).reference
 
-        // Step 1: Update the event in the 'events' table
-        databaseRef.child("events").child(editedEvent.eventID).setValue(editedEvent)
-            .addOnSuccessListener {
-                Log.d("EditEvent", "Event updated in events table")
+        // Step 1: Retrieve the existing event data, including the 'favoritedBy' node
+        databaseRef.child("events").child(editedEvent.eventID)
+            .addListenerForSingleValueEvent(object : ValueEventListener {
+                override fun onDataChange(dataSnapshot: DataSnapshot) {
+                    if (dataSnapshot.exists()) {
+                        // Step 2: Get the existing 'favoritedBy' node
+                        val favoritedBy = dataSnapshot.child("favoritedBy").value as? MutableMap<String, Boolean>
+                            ?: mutableMapOf()
 
-                // Step 2: Update the event in the 'favorites' table for all users
-                databaseRef.child("favorites").addListenerForSingleValueEvent(object : ValueEventListener {
-                    override fun onDataChange(dataSnapshot: DataSnapshot) {
-                        // Iterate through all users in the 'favorites' table
-                        for (userSnapshot in dataSnapshot.children) {
-                            val userId = userSnapshot.key // Get the user ID
-                            val userFavoritesRef = databaseRef.child("favorites").child(userId ?: "")
+                        // Step 3: Merge the 'favoritedBy' node into the editedEvent
+                        editedEvent.favoritedBy = favoritedBy
 
-                            // Check if the event exists in the user's favorites
-                            userFavoritesRef.child(editedEvent.eventID).addListenerForSingleValueEvent(object : ValueEventListener {
-                                override fun onDataChange(favoriteSnapshot: DataSnapshot) {
-                                    if (favoriteSnapshot.exists()) {
-                                        // Update the event in the user's favorites
-                                        userFavoritesRef.child(editedEvent.eventID).setValue(editedEvent)
-                                            .addOnSuccessListener {
-                                                Log.d("EditEvent", "Event updated in favorites for user: $userId")
-                                            }
-                                            .addOnFailureListener { error ->
-                                                Log.e("EditEvent", "Failed to update event in favorites for user: $userId", error)
-                                            }
-                                    }
+                        // Step 4: Update the event in the 'events' table
+                        databaseRef.child("events").child(editedEvent.eventID).setValue(editedEvent)
+                            .addOnSuccessListener {
+                                Log.d("EditEvent", "Event updated in events table")
+
+                                // Step 5: Update the event in the 'favorites' table for all users in 'favoritedBy'
+                                for ((userId, _) in favoritedBy) {
+                                    databaseRef.child("favorites").child(userId).child(editedEvent.eventID).setValue(editedEvent)
+                                        .addOnSuccessListener {
+                                            Log.d("EditEvent", "Event updated in favorites for user: $userId")
+                                        }
+                                        .addOnFailureListener { error ->
+                                            Log.e("EditEvent", "Failed to update event in favorites for user: $userId", error)
+                                        }
                                 }
-
-                                override fun onCancelled(error: DatabaseError) {
-                                    Log.e("EditEvent", "Failed to check favorites for user: $userId", error.toException())
-                                }
-                            })
-                        }
+                            }
+                            .addOnFailureListener { error ->
+                                Log.e("EditEvent", "Failed to update event in events table", error)
+                            }
+                    } else {
+                        Log.e("EditEvent", "Event not found in events table")
                     }
+                }
 
-                    override fun onCancelled(error: DatabaseError) {
-                        Log.e("EditEvent", "Failed to fetch favorites table", error.toException())
-                    }
-                })
-            }
-            .addOnFailureListener { error ->
-                Log.e("EditEvent", "Failed to update event in events table", error)
-            }
+                override fun onCancelled(error: DatabaseError) {
+                    Log.e("EditEvent", "Failed to fetch event data", error.toException())
+                }
+            })
     }
-
-
 
 }

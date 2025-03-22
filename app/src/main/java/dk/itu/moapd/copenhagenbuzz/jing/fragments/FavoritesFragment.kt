@@ -38,7 +38,7 @@ import dk.itu.moapd.copenhagenbuzz.jing.MyApplication.Companion.DATABASE_URL
 import dk.itu.moapd.copenhagenbuzz.jing.adapters.FavoriteAdapter
 import dk.itu.moapd.copenhagenbuzz.jing.data.Event
 import dk.itu.moapd.copenhagenbuzz.jing.databinding.FragmentFavoritesBinding
-import DataViewModel
+import dk.itu.moapd.copenhagenbuzz.jing.models.DataViewModel
 
 /**
  * A fragment that displays a timeline of events.

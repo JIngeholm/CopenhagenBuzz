@@ -37,10 +37,10 @@ import dk.itu.moapd.copenhagenbuzz.jing.MyApplication.Companion.DATABASE_URL
 import dk.itu.moapd.copenhagenbuzz.jing.adapters.TimeLineAdapter
 import dk.itu.moapd.copenhagenbuzz.jing.data.Event
 import dk.itu.moapd.copenhagenbuzz.jing.databinding.FragmentTimelineBinding
-import DataViewModel
 import com.firebase.ui.database.FirebaseListOptions
 import dk.itu.moapd.copenhagenbuzz.jing.R
 import dk.itu.moapd.copenhagenbuzz.jing.databinding.EventRowItemBinding
+import dk.itu.moapd.copenhagenbuzz.jing.models.DataViewModel
 
 /**
  * A fragment that displays a timeline of events.
@@ -112,7 +112,7 @@ class TimelineFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        dataViewModel.auth.currentUser?.let { _ ->
+        dataViewModel.auth.currentUser?.let {
             val query = Firebase.database(DATABASE_URL).reference
                 .child("events")
                 .orderByChild("eventDate")

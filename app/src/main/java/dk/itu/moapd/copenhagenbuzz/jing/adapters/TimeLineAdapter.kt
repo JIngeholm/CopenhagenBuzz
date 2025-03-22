@@ -1,6 +1,5 @@
 package dk.itu.moapd.copenhagenbuzz.jing.adapters
 
-import DataViewModel
 import android.graphics.Bitmap
 import android.graphics.Matrix
 import android.util.Log
@@ -25,6 +24,7 @@ import dk.itu.moapd.copenhagenbuzz.jing.data.Event
 import dk.itu.moapd.copenhagenbuzz.jing.databinding.EventRowItemBinding
 import dk.itu.moapd.copenhagenbuzz.jing.dialogs.DeleteEventDialog
 import dk.itu.moapd.copenhagenbuzz.jing.dialogs.EditEventDialog
+import dk.itu.moapd.copenhagenbuzz.jing.models.DataViewModel
 
 class TimeLineAdapter(options: FirebaseListOptions<Event>, private val dataViewModel: DataViewModel, private val fragmentManager: FragmentManager) : FirebaseListAdapter<Event>(options) {
 

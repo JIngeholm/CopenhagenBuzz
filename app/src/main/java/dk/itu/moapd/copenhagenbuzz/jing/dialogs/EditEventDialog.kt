@@ -1,6 +1,5 @@
 package dk.itu.moapd.copenhagenbuzz.jing.dialogs
 
-import DataViewModel
 import android.app.Activity
 import android.app.Dialog
 import android.content.Intent
@@ -9,6 +8,7 @@ import android.graphics.Matrix
 import android.net.Uri
 import android.os.Bundle
 import android.provider.MediaStore
+import android.view.ViewGroup
 import android.widget.ArrayAdapter
 import android.widget.Toast
 import androidx.activity.result.ActivityResultLauncher
@@ -22,6 +22,7 @@ import com.squareup.picasso.Transformation
 import dk.itu.moapd.copenhagenbuzz.jing.R
 import dk.itu.moapd.copenhagenbuzz.jing.data.Event
 import dk.itu.moapd.copenhagenbuzz.jing.databinding.DialogEditEventBinding
+import dk.itu.moapd.copenhagenbuzz.jing.models.DataViewModel
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
@@ -61,7 +62,17 @@ class EditEventDialog(val event: Event) : DialogFragment() {
             .create()
     }
 
+    override fun onStart() {
+        super.onStart()
 
+        // Set the dialog width and height
+        val dialog = dialog
+        if (dialog != null) {
+            val width = ViewGroup.LayoutParams.MATCH_PARENT // Use full screen width
+            val height = ViewGroup.LayoutParams.MATCH_PARENT // Use full screen width
+            dialog.window?.setLayout(width, height)
+        }
+    }
 
     override fun onDestroyView() {
         super.onDestroyView()
