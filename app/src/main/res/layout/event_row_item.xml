@@ -39,6 +39,7 @@
                     android:layout_width="@dimen/_55dp"
                     android:layout_height="@dimen/_55dp"
                     android:background="@drawable/circle_background"
+                    android:backgroundTint="?attr/colorAccent"
                     app:layout_constraintTop_toTopOf="parent"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintStart_toStartOf="parent">
@@ -50,7 +51,7 @@
                         android:gravity="center"
                         android:text="@string/e"
                         android:textSize="@dimen/_18sp"
-                        android:textColor="?attr/colorOnPrimary"
+                        android:textColor="?attr/colorOnSecondary"
                         android:fontFamily="sans-serif-medium"/>
                 </FrameLayout>
 
@@ -90,11 +91,13 @@
 
                 <Button
                     android:id="@+id/like"
-                    android:layout_width="@dimen/_25dp"
-                    android:layout_height="@dimen/_25dp"
+                    android:layout_width="@dimen/_30dp"
+                    android:layout_height="@dimen/_30dp"
                     android:focusable="false"
                     android:background="@drawable/baseline_favorite_border_24"
-                    android:backgroundTint="?attr/colorPrimary"
+                    android:backgroundTint="?attr/colorAccent"
+                    android:drawableTint="?attr/colorAccent"
+                    android:foregroundTint="?attr/colorAccent"
                     app:layout_constraintTop_toTopOf="parent"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintEnd_toEndOf="parent" />
@@ -170,10 +173,10 @@
                     android:layout_height="wrap_content"
                     android:text="@string/edit"
                     android:backgroundTint="@android:color/transparent"
-                    android:textColor="?attr/colorPrimary"
+                    android:textColor="?attr/colorAccent"
                     android:layout_marginEnd="@dimen/_8dp"
                     android:focusable="false"
-                    app:strokeColor="?attr/colorPrimary"
+                    app:strokeColor="?attr/colorAccent"
                     app:strokeWidth="@dimen/thin_outline"
                     />
 
@@ -183,6 +186,7 @@
                     android:layout_height="wrap_content"
                     android:text="@string/delete"
                     android:focusable="false"
+                    android:backgroundTint="?attr/colorAccent"
                     />
             </LinearLayout>
 

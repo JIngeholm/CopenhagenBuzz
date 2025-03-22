@@ -114,6 +114,8 @@ class TimeLineAdapter(options: FirebaseListOptions<Event>, private val dataViewM
             }
 
             fun changeLikeIcon(liked: Boolean){
+                if(dataViewModel.auth.currentUser?.isAnonymous == true) binding.like.isVisible = false
+
                 // Update the like button background based on the 'liked' state
                 if (liked) {
                     binding.like.setBackgroundResource(R.drawable.baseline_favorite_24)

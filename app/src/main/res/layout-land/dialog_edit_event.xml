@@ -215,12 +215,11 @@
                 android:id="@+id/cancel_edit_button"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="@string/cancel"
-                android:padding="0dp"
-                android:focusable="false"
                 android:layout_marginEnd="@dimen/_16dp"
-                app:backgroundTint="?attr/colorAccent"
-                />
+                android:focusable="false"
+                android:padding="0dp"
+                android:text="@string/cancel"
+                app:backgroundTint="?attr/colorAccent" />
 
         </LinearLayout>
 

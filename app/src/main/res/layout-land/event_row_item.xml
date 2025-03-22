@@ -38,6 +38,7 @@
                     android:layout_width="@dimen/_55dp"
                     android:layout_height="@dimen/_55dp"
                     android:background="@drawable/circle_background"
+                    android:backgroundTint="?attr/colorAccent"
                     app:layout_constraintTop_toTopOf="parent"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintStart_toStartOf="parent">
@@ -49,7 +50,7 @@
                         android:gravity="center"
                         android:text="@string/e"
                         android:textSize="@dimen/_18sp"
-                        android:textColor="?attr/colorOnPrimary"
+                        android:textColor="?attr/colorOnSecondary"
                         android:fontFamily="sans-serif-medium"/>
                 </FrameLayout>
 
@@ -139,6 +140,7 @@
                 android:text="@string/event_description"
                 android:textSize="@dimen/_12sp"
                 android:layout_marginTop="@dimen/_16dp"
+                android:layout_marginBottom="@dimen/_15dp"
                 android:layout_marginStart="@dimen/_15dp"
                 android:padding="@dimen/_1dp"
                 android:maxLines="2"
@@ -166,15 +168,16 @@
                     android:layout_height="wrap_content"
                     android:text="@string/edit"
                     android:backgroundTint="@android:color/transparent"
-                    app:strokeColor="?attr/colorPrimary"
+                    app:strokeColor="?attr/colorAccent"
                     app:strokeWidth="@dimen/thin_outline"
-                    android:textColor="?attr/colorPrimary"
+                    android:textColor="?attr/colorAccent"
                     android:layout_marginEnd="@dimen/_8dp" />
 
                 <com.google.android.material.button.MaterialButton
                     android:id="@+id/delete_button"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:backgroundTint="?attr/colorAccent"
                     android:text="@string/delete" />
             </LinearLayout>
 
