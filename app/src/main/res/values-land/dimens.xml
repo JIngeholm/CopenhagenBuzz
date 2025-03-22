@@ -36,4 +36,6 @@
     <dimen name="_20dp">20dp</dimen>
     <dimen name="_16dp">16dp</dimen>
     <dimen name="_25sp">25sp</dimen>
+    <dimen name="_60dp">60dp</dimen>
+    <dimen name="_0_5dp">0.5dp</dimen>
 </resources>

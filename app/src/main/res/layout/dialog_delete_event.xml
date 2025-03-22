@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:context=".dialogs.DeleteEventDialog"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:padding="@dimen/_8dp"
+    >
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAlignment="center"
+        android:layout_gravity="center"
+        android:paddingEnd="@dimen/_4dp"
+        android:paddingStart="@dimen/_4dp"
+        android:text="@string/delete_event_prompt"
+        android:textAppearance="@style/CustomToolbarTitleTextAppearance"/>
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_gravity="center"
+        android:layout_marginTop="@dimen/_10dp">
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/cancel_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/cancel"
+            android:backgroundTint="@android:color/transparent"
+            android:textColor="?attr/colorAccent"
+            android:layout_marginEnd="@dimen/_8dp"
+            android:focusable="false"
+            app:strokeColor="?attr/colorAccent"
+            app:strokeWidth="@dimen/thin_outline"/>
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/delete_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/delete"
+            android:focusable="false"
+            android:backgroundTint="?attr/colorAccent"/>
+    </LinearLayout>
+</LinearLayout>

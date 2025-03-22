@@ -31,8 +31,6 @@ import android.view.View
 import android.view.ViewGroup
 
 import androidx.fragment.app.activityViewModels
-import androidx.recyclerview.widget.LinearLayoutManager
-import com.firebase.ui.database.FirebaseRecyclerOptions
 import com.google.firebase.Firebase
 import com.google.firebase.database.database
 import dk.itu.moapd.copenhagenbuzz.jing.MyApplication.Companion.DATABASE_URL
@@ -40,6 +38,9 @@ import dk.itu.moapd.copenhagenbuzz.jing.adapters.TimeLineAdapter
 import dk.itu.moapd.copenhagenbuzz.jing.data.Event
 import dk.itu.moapd.copenhagenbuzz.jing.databinding.FragmentTimelineBinding
 import DataViewModel
+import com.firebase.ui.database.FirebaseListOptions
+import dk.itu.moapd.copenhagenbuzz.jing.R
+import dk.itu.moapd.copenhagenbuzz.jing.databinding.EventRowItemBinding
 
 /**
  * A fragment that displays a timeline of events.
@@ -61,6 +62,14 @@ class TimelineFragment : Fragment() {
      */
     private val binding
         get() = requireNotNull(_binding) {
+            "Cannot access binding because it is null. Is the view visible?"
+        }
+
+
+    private var _eventBinding: EventRowItemBinding? = null
+
+    private val eventBinding
+        get() = requireNotNull(_eventBinding) {
             "Cannot access binding because it is null. Is the view visible?"
         }
 
@@ -103,27 +112,26 @@ class TimelineFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        dataViewModel.auth.currentUser?.let { user ->
+        dataViewModel.auth.currentUser?.let { _ ->
             val query = Firebase.database(DATABASE_URL).reference
                 .child("events")
-                .child(user.uid)
-                .orderByChild("createdAt")
+                .orderByChild("eventDate")
 
-            val options = FirebaseRecyclerOptions.Builder<Event>()
+            val options = FirebaseListOptions.Builder<Event>()
                 .setQuery(query, Event::class.java)
+                .setLayout(R.layout.event_row_item)
                 .setLifecycleOwner(this)
                 .build()
 
             // Create the custom adapter to bind a list of strings.
-            val adapter = TimeLineAdapter(options,dataViewModel)
+            val adapter = TimeLineAdapter(options,dataViewModel, parentFragmentManager)
 
-            binding.recyclerView?.apply{
-                layoutManager = LinearLayoutManager(requireContext())
+            binding.listView.apply{
                 this.adapter = adapter
             }
+
+
         }
-
-
     }
 
     /**

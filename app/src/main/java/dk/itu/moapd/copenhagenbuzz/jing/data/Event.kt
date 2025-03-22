@@ -40,9 +40,8 @@ data class Event(
     var eventType: String = "",
     var eventDescription: String = "",
     var eventPhoto: String = "",
-    var liked: Boolean = false,
     var userId: String = "",
     var eventID: String = ""
 ){
-    constructor() : this("","","","","","",false,"","")
+    constructor() : this("","","","","","","","")
 }

@@ -1,0 +1,224 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<ScrollView
+    android:id="@+id/top_guideline"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:context=".dialogs.EditEventDialog"
+    android:padding="@dimen/_8dp"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:fillViewport="true"
+    app:cardCornerRadius="@dimen/_16dp"
+    >
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:layout_margin="@dimen/_5dp"
+        android:paddingBottom="@dimen/_16dp">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textAlignment="center"
+            android:layout_gravity="center"
+            android:text="@string/edit_event"
+            android:textAppearance="@style/CustomToolbarTitleTextAppearance"/>
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <com.google.android.material.textfield.TextInputLayout
+                android:id="@+id/text_field_event_name"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="@dimen/_16dp"
+                android:layout_marginStart="@dimen/_16dp"
+                android:layout_marginTop="@dimen/_24dp"
+                android:hint="@string/event_name"
+                app:startIconDrawable="@drawable/baseline_festival_24"
+                app:endIconMode="clear_text"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent">
+
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/edit_text_event_name"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:inputType="text"
+                    android:paddingStart="@dimen/_48dp"
+                    android:paddingEnd="@dimen/_0dp"
+                    />
+            </com.google.android.material.textfield.TextInputLayout>
+
+            <com.google.android.material.textfield.TextInputLayout
+                android:id="@+id/text_field_event_location"
+                android:layout_width="@dimen/_0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="@dimen/_16dp"
+                android:layout_marginStart="@dimen/_16dp"
+                android:layout_marginTop="@dimen/_8dp"
+                android:hint="@string/event_location"
+                app:startIconDrawable="@drawable/baseline_add_location_alt_24"
+                app:endIconMode="clear_text"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/text_field_event_name">
+
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/edit_text_event_location"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:inputType="text"
+                    android:paddingStart="48dp"
+                    android:paddingEnd="0dp"
+                    />
+            </com.google.android.material.textfield.TextInputLayout>
+
+            <com.google.android.material.textfield.TextInputLayout
+                android:id="@+id/text_field_event_date_range"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="@dimen/_16dp"
+                android:layout_marginStart="@dimen/_16dp"
+                android:layout_marginTop="@dimen/_8dp"
+                android:hint="@string/event_date"
+                app:startIconDrawable="@drawable/baseline_calendar_24"
+                app:endIconMode="clear_text"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/text_field_event_location">
+
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/edit_text_event_date_range"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:focusable="false"
+                    android:inputType="none"
+                    android:paddingStart="@dimen/_48dp"
+                    android:paddingEnd="0dp"
+                    />
+            </com.google.android.material.textfield.TextInputLayout>
+
+            <com.google.android.material.textfield.TextInputLayout
+                android:id="@+id/text_field_event_type"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="@dimen/_16dp"
+                android:layout_marginStart="@dimen/_16dp"
+                android:layout_marginTop="@dimen/_8dp"
+                android:hint="@string/event_type"
+                app:startIconDrawable="@drawable/baseline_celebration_24"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/text_field_event_date_range">
+
+                <com.google.android.material.textfield.MaterialAutoCompleteTextView
+                    android:id="@+id/spinner_event_type"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:paddingStart="@dimen/_48dp"
+                    android:paddingEnd="0dp"
+                    android:textSize="@dimen/_16sp"
+                    android:inputType="none"
+                    android:focusable="true"
+                    android:focusableInTouchMode="true"
+                    />
+            </com.google.android.material.textfield.TextInputLayout>
+
+            <com.google.android.material.textfield.TextInputLayout
+                android:id="@+id/text_field_event_description"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="@dimen/_16dp"
+                android:layout_marginStart="@dimen/_16dp"
+                android:layout_marginTop="@dimen/_8dp"
+                android:hint="@string/event_description"
+                app:endIconMode="clear_text"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/text_field_event_type"
+                app:layout_constraintHeight_percent="0.8">
+
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/edit_text_event_description"
+                    android:layout_width="match_parent"
+                    android:layout_height="@dimen/_130dp"
+                    android:minHeight="@dimen/_80dp"
+                    android:inputType="text"
+                    android:gravity="top|start"
+                    android:scrollbars="vertical"
+                    android:maxLines="5"
+                    android:lineSpacingExtra="@dimen/_4dp"
+                    />
+            </com.google.android.material.textfield.TextInputLayout>
+
+            <!-- Image selection button -->
+            <Button
+                android:id="@+id/select_image_button"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/_16dp"
+                android:textColor="?attr/colorOnSecondary"
+                android:layout_marginStart="@dimen/_16dp"
+                android:layout_marginEnd="@dimen/_16dp"
+                android:text="@string/select_image"
+                app:backgroundTint="?attr/colorAccent"
+                app:layout_constraintTop_toBottomOf="@id/text_field_event_description"
+                app:layout_constraintStart_toStartOf="parent"
+                />
+
+            <com.google.android.material.imageview.ShapeableImageView
+                android:id="@+id/imageView_event_picture"
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                android:layout_marginTop="@dimen/_16dp"
+                android:layout_marginStart="@dimen/_16dp"
+                android:layout_marginBottom="@dimen/_16dp"
+                android:scaleType="centerCrop"
+                app:layout_constraintWidth_percent="0.5"
+                app:layout_constraintHeight_percent="0.2"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/select_image_button"
+                app:strokeColor="?attr/colorAccent"
+                app:strokeWidth="@dimen/_2dp"
+                />
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_marginTop="@dimen/_25dp"
+            android:gravity="center">
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/save_button"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="@dimen/_60dp"
+                android:text="@string/save"
+                android:focusable="false"
+                app:backgroundTint="?attr/colorAccent"
+                />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/cancel_edit_button"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/cancel"
+                android:padding="0dp"
+                android:focusable="false"
+                app:backgroundTint="?attr/colorAccent"
+                />
+
+        </LinearLayout>
+
+    </LinearLayout>
+</ScrollView>

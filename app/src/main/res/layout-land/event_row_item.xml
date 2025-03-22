@@ -145,6 +145,7 @@
 
             <!-- Buttons Anchored to the Right -->
             <LinearLayout
+                android:id="@+id/mod_buttons"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal"
@@ -170,10 +171,10 @@
                     android:layout_marginEnd="@dimen/_8dp" />
 
                 <com.google.android.material.button.MaterialButton
-                    android:id="@+id/info_button"
+                    android:id="@+id/delete_button"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="@string/info" />
+                    android:text="@string/delete" />
             </LinearLayout>
 
         </LinearLayout>

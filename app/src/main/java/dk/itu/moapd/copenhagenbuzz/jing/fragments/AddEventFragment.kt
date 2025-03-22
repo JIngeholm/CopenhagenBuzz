@@ -38,13 +38,11 @@ import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.findNavController
-import com.github.javafaker.Faker
 import dk.itu.moapd.copenhagenbuzz.jing.R
 import dk.itu.moapd.copenhagenbuzz.jing.data.Event
 import dk.itu.moapd.copenhagenbuzz.jing.databinding.FragmentAddEventBinding
 import java.text.SimpleDateFormat
 import java.util.Date
-import android.app.Activity.RESULT_OK
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 
@@ -60,9 +58,8 @@ import androidx.activity.result.contract.ActivityResultContracts
 class AddEventFragment : Fragment() {
 
     private var _binding: FragmentAddEventBinding? = null
-    private val faker = Faker()
 
-    private val event: Event = Event("", "", "", "", "", faker.internet().image(), false, "")
+    private val event: Event = Event("", "", "", "", "", "", "")
     private val dataViewModel: DataViewModel by activityViewModels()
 
     companion object {
