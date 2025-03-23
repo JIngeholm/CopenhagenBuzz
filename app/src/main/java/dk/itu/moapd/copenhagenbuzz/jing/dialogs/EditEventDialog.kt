@@ -44,7 +44,7 @@ import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.squareup.picasso.Picasso
 import com.squareup.picasso.Transformation
 import dk.itu.moapd.copenhagenbuzz.jing.R
-import dk.itu.moapd.copenhagenbuzz.jing.data.Event
+import dk.itu.moapd.copenhagenbuzz.jing.objects.Event
 import dk.itu.moapd.copenhagenbuzz.jing.databinding.DialogEditEventBinding
 import dk.itu.moapd.copenhagenbuzz.jing.models.DataViewModel
 import java.text.SimpleDateFormat
@@ -80,16 +80,17 @@ class EditEventDialog(val event: Event) : DialogFragment() {
         _binding = DialogEditEventBinding.inflate(layoutInflater)
 
         // Initialize ActivityResultLauncher for image picking
-        imagePickerLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
-            if (result.resultCode == Activity.RESULT_OK) {
-                val data: Intent? = result.data
-                val imageUri: Uri? = data?.data
-                imageUri?.let {
-                    binding.imageViewEventPicture.setImageURI(it)
-                    event.eventPhoto = it.toString() // Update the event's photo
+        imagePickerLauncher =
+            registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+                if (result.resultCode == Activity.RESULT_OK) {
+                    val data: Intent? = result.data
+                    val imageUri: Uri? = data?.data
+                    imageUri?.let {
+                        binding.imageViewEventPicture.setImageURI(it)
+                        event.eventPhoto = it.toString() // Update the event's photo
+                    }
                 }
             }
-        }
 
         setInitialEventInfo(event)
         initializeViews()
@@ -138,7 +139,8 @@ class EditEventDialog(val event: Event) : DialogFragment() {
                 dataViewModel.editEvent(getEditedEvent(event))
                 Toast.makeText(requireContext(), "Event saved! 🎉", Toast.LENGTH_SHORT).show()
             } else {
-                Toast.makeText(requireContext(), "Please fill all fields!", Toast.LENGTH_SHORT).show()
+                Toast.makeText(requireContext(), "Please fill all fields!", Toast.LENGTH_SHORT)
+                    .show()
             }
             dismiss()
         }
@@ -159,8 +161,10 @@ class EditEventDialog(val event: Event) : DialogFragment() {
 
         editedEvent.eventName = binding.editTextEventName.text.toString().trim()
         editedEvent.eventLocation = binding.editTextEventLocation.text.toString().trim()
-        editedEvent.eventStartDate = binding.editTextEventDateRange.text.toString().substringBefore(" to ").trim()
-        editedEvent.eventEndDate = binding.editTextEventDateRange.text.toString().substringAfter(" to ").trim()
+        editedEvent.eventStartDate =
+            binding.editTextEventDateRange.text.toString().substringBefore(" to ").trim()
+        editedEvent.eventEndDate =
+            binding.editTextEventDateRange.text.toString().substringAfter(" to ").trim()
         editedEvent.eventType = binding.spinnerEventType.text.toString().trim()
         editedEvent.eventDescription = binding.editTextEventDescription.text.toString().trim()
 
@@ -215,7 +219,10 @@ class EditEventDialog(val event: Event) : DialogFragment() {
             datePicker.show(parentFragmentManager, "DATE_PICKER")
 
             datePicker.addOnPositiveButtonClickListener { startDateMillis ->
-                val startDate = SimpleDateFormat("dd-MM-yyyy", Locale.getDefault()).format(Date(startDateMillis))
+                val startDate = SimpleDateFormat(
+                    "dd-MM-yyyy",
+                    Locale.getDefault()
+                ).format(Date(startDateMillis))
                 event.eventStartDate = startDate
 
                 val endDatePicker = MaterialDatePicker.Builder.datePicker()
@@ -226,11 +233,14 @@ class EditEventDialog(val event: Event) : DialogFragment() {
                 endDatePicker.show(parentFragmentManager, "END_DATE_PICKER")
 
                 endDatePicker.addOnPositiveButtonClickListener { endDateMillis ->
-                    val endDate = SimpleDateFormat("dd-MM-yyyy", Locale.getDefault()).format(Date(endDateMillis))
+                    val endDate = SimpleDateFormat("dd-MM-yyyy", Locale.getDefault()).format(
+                        Date(endDateMillis)
+                    )
 
                     event.eventEndDate = endDate
 
-                    val formattedDateRange = getString(R.string.event_date_range_format, startDate, endDate)
+                    val formattedDateRange =
+                        getString(R.string.event_date_range_format, startDate, endDate)
                     binding.editTextEventDateRange.setText(formattedDateRange)
                 }
             }

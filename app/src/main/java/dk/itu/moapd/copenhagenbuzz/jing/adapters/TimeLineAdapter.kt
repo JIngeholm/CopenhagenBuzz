@@ -1,5 +1,6 @@
 package dk.itu.moapd.copenhagenbuzz.jing.adapters
 
+import android.annotation.SuppressLint
 import android.graphics.Bitmap
 import android.graphics.Matrix
 import android.util.Log
@@ -20,10 +21,12 @@ import com.squareup.picasso.Picasso
 import com.squareup.picasso.Transformation
 import dk.itu.moapd.copenhagenbuzz.jing.MyApplication.Companion.DATABASE_URL
 import dk.itu.moapd.copenhagenbuzz.jing.R
-import dk.itu.moapd.copenhagenbuzz.jing.data.Event
+import dk.itu.moapd.copenhagenbuzz.jing.objects.Event
 import dk.itu.moapd.copenhagenbuzz.jing.databinding.EventRowItemBinding
 import dk.itu.moapd.copenhagenbuzz.jing.dialogs.DeleteEventDialog
 import dk.itu.moapd.copenhagenbuzz.jing.dialogs.EditEventDialog
+import dk.itu.moapd.copenhagenbuzz.jing.dialogs.InviteDialog
+import dk.itu.moapd.copenhagenbuzz.jing.dialogs.InvitedUsersDialog
 import dk.itu.moapd.copenhagenbuzz.jing.models.DataViewModel
 
 class TimeLineAdapter(options: FirebaseListOptions<Event>, private val dataViewModel: DataViewModel, private val fragmentManager: FragmentManager) : FirebaseListAdapter<Event>(options) {
@@ -55,6 +58,7 @@ class TimeLineAdapter(options: FirebaseListOptions<Event>, private val dataViewM
         return binding.root
     }
 
+    @SuppressLint("SetTextI18n")
     private fun bindEvent(binding: EventRowItemBinding, event: Event) {
         val formattedDate = event.eventStartDate + " to " + event.eventEndDate
 
@@ -86,9 +90,13 @@ class TimeLineAdapter(options: FirebaseListOptions<Event>, private val dataViewM
             })
             .into(binding.eventPhoto)
 
+        var invitedUsersListSize = event.invitedUsers.size.toString()
+
+        binding.invited.text = "$invitedUsersListSize invited"
+
         like(binding,event)
 
-        editOrDelete(binding,event)
+        editDeleteOrInvite(binding,event)
     }
 
 
@@ -140,9 +148,14 @@ class TimeLineAdapter(options: FirebaseListOptions<Event>, private val dataViewM
         })
     }
 
-    private fun editOrDelete(binding: EventRowItemBinding, event: Event){
+    private fun editDeleteOrInvite(binding: EventRowItemBinding, event: Event){
         if (event.userId != dataViewModel.auth.uid){
             binding.modButtons.isVisible = false
+        }
+
+        binding.inviteButton.setOnClickListener{
+            val inviteDialog = InviteDialog(event)
+            inviteDialog.show(fragmentManager,"InviteDialog")
         }
 
         binding.deleteButton.setOnClickListener{
@@ -154,5 +167,11 @@ class TimeLineAdapter(options: FirebaseListOptions<Event>, private val dataViewM
             val editEventDialog = EditEventDialog(event)
             editEventDialog.show(fragmentManager, "EditEventDialog")
         }
+
+        binding.invited.setOnClickListener{
+            val invitedUsersDialog = InvitedUsersDialog(event)
+            invitedUsersDialog.show(fragmentManager,"InvitedUsersDialog")
+        }
+
     }
 }

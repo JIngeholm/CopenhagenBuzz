@@ -52,6 +52,13 @@
     <string name="cancel">Cancel</string>
     <string name="edit_event">Edit Event</string>
     <string name="save">Save</string>
+    <string name="invite">Invite</string>
+    <string name="username">Username</string>
+    <string name="x_invited">x invited</string>
+    <string name="invite_status">invite status</string>
+    <string name="invited_users">Invited Users</string>
+    <string name="close">Close</string>
+    <string name="attending">Attending</string>
 
 
     <string-array name="event_types">

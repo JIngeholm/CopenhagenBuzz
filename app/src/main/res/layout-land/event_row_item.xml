@@ -107,6 +107,27 @@
                 app:layout_constraintHeight_default="percent"
                 app:layout_constraintHeight_percent="1"/>
 
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/invited"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:minHeight="32dp"
+                android:minWidth="64dp"
+                android:paddingVertical="4dp"
+                android:paddingHorizontal="8dp"
+                android:backgroundTint="?attr/colorAccent"
+                android:text="@string/x_invited"
+                android:textSize="12sp"
+                android:drawablePadding="2dp"
+                android:layout_marginTop="@dimen/_16dp"
+                android:layout_marginStart="@dimen/_20dp"
+                android:layout_marginEnd="@dimen/_8dp"
+                app:icon="@drawable/guest_24"
+                app:iconSize="16dp"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/event_info"
+                />
+
             <!-- Event Location -->
             <TextView
                 android:id="@+id/event_location"
@@ -114,10 +135,10 @@
                 android:layout_height="wrap_content"
                 android:text="@string/event_location"
                 android:textSize="@dimen/_16sp"
-                android:layout_marginTop="@dimen/_16dp"
+                android:layout_marginTop="@dimen/_8dp"
                 android:layout_marginStart="@dimen/_20dp"
                 android:layout_marginEnd="@dimen/_8dp"
-                app:layout_constraintTop_toBottomOf="@id/event_info"
+                app:layout_constraintTop_toBottomOf="@id/invited"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintEnd_toStartOf="@id/event_photo"/>
 
@@ -144,7 +165,6 @@
                 android:layout_marginBottom="@dimen/_15dp"
                 android:layout_marginStart="@dimen/_20dp"
                 android:layout_marginEnd="@dimen/_8dp"
-                android:padding="@dimen/_1dp"
                 android:maxLines="2"
                 android:ellipsize="end"
                 app:layout_constraintTop_toBottomOf="@id/event_date"
@@ -159,15 +179,22 @@
                 android:orientation="horizontal"
                 android:layout_marginTop="@dimen/_8dp"
                 android:padding="@dimen/_10dp"
+                android:gravity="center"
                 app:layout_constraintTop_toBottomOf="@id/event_description"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintEnd_toStartOf="@id/event_photo">
 
-                <!-- Spacer to push buttons to the right -->
-                <View
-                    android:layout_width="0dp"
-                    android:layout_height="0dp"
-                    android:layout_weight="1"/>
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/invite_button"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/invite"
+                    android:backgroundTint="@android:color/transparent"
+                    android:textColor="?attr/colorAccent"
+                    android:layout_marginEnd="@dimen/_8dp"
+                    android:focusable="false"
+                    app:strokeColor="?attr/colorAccent"
+                    app:strokeWidth="@dimen/thin_outline" />
 
                 <com.google.android.material.button.MaterialButton
                     android:id="@+id/edit_button"

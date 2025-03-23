@@ -38,7 +38,7 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.findNavController
 import dk.itu.moapd.copenhagenbuzz.jing.R
-import dk.itu.moapd.copenhagenbuzz.jing.data.Event
+import dk.itu.moapd.copenhagenbuzz.jing.objects.Event
 import dk.itu.moapd.copenhagenbuzz.jing.databinding.FragmentAddEventBinding
 import java.text.SimpleDateFormat
 import java.util.Date

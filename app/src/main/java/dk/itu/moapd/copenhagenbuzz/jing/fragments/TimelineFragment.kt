@@ -35,7 +35,7 @@ import com.google.firebase.Firebase
 import com.google.firebase.database.database
 import dk.itu.moapd.copenhagenbuzz.jing.MyApplication.Companion.DATABASE_URL
 import dk.itu.moapd.copenhagenbuzz.jing.adapters.TimeLineAdapter
-import dk.itu.moapd.copenhagenbuzz.jing.data.Event
+import dk.itu.moapd.copenhagenbuzz.jing.objects.Event
 import dk.itu.moapd.copenhagenbuzz.jing.databinding.FragmentTimelineBinding
 import com.firebase.ui.database.FirebaseListOptions
 import dk.itu.moapd.copenhagenbuzz.jing.R

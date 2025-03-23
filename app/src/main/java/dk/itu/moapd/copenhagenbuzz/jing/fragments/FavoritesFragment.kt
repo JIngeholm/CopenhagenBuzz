@@ -36,7 +36,7 @@ import com.google.firebase.Firebase
 import com.google.firebase.database.database
 import dk.itu.moapd.copenhagenbuzz.jing.MyApplication.Companion.DATABASE_URL
 import dk.itu.moapd.copenhagenbuzz.jing.adapters.FavoriteAdapter
-import dk.itu.moapd.copenhagenbuzz.jing.data.Event
+import dk.itu.moapd.copenhagenbuzz.jing.objects.Event
 import dk.itu.moapd.copenhagenbuzz.jing.databinding.FragmentFavoritesBinding
 import dk.itu.moapd.copenhagenbuzz.jing.models.DataViewModel
 

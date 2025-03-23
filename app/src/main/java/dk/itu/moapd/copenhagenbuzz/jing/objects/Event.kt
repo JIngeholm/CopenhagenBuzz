@@ -22,7 +22,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
  */
 
-package dk.itu.moapd.copenhagenbuzz.jing.data
+package dk.itu.moapd.copenhagenbuzz.jing.objects
 
 /**
  * @constructor A constructor for a kotlin data class for social events
@@ -43,7 +43,8 @@ data class Event(
     var eventPhoto: String = "",
     var userId: String = "",
     var eventID: String = "",
-    var favoritedBy: MutableMap<String, Boolean> = mutableMapOf()
+    var favoritedBy: MutableMap<String, Boolean> = mutableMapOf(),
+    var invitedUsers: Map<String, String> = emptyMap()
 ){
     constructor() : this("","","","","","","","","")
 }

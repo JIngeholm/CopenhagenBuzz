@@ -35,7 +35,7 @@ import com.firebase.ui.database.FirebaseRecyclerOptions
 import com.squareup.picasso.Picasso
 import com.squareup.picasso.Transformation
 import dk.itu.moapd.copenhagenbuzz.jing.R
-import dk.itu.moapd.copenhagenbuzz.jing.data.Event
+import dk.itu.moapd.copenhagenbuzz.jing.objects.Event
 import dk.itu.moapd.copenhagenbuzz.jing.databinding.FavoriteRowItemBinding
 import dk.itu.moapd.copenhagenbuzz.jing.models.DataViewModel
 

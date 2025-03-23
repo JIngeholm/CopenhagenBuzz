@@ -38,11 +38,19 @@ import androidx.navigation.findNavController
 import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.ui.setupWithNavController
 import com.google.android.material.button.MaterialButton
+import com.google.firebase.Firebase
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.FirebaseUser
+import com.google.firebase.database.DataSnapshot
+import com.google.firebase.database.DatabaseError
+import com.google.firebase.database.ValueEventListener
+import com.google.firebase.database.database
 import com.squareup.picasso.Picasso
+import dk.itu.moapd.copenhagenbuzz.jing.MyApplication.Companion.DATABASE_URL
 import dk.itu.moapd.copenhagenbuzz.jing.R
 import dk.itu.moapd.copenhagenbuzz.jing.databinding.ActivityMainBinding
 import dk.itu.moapd.copenhagenbuzz.jing.models.DataViewModel
+import dk.itu.moapd.copenhagenbuzz.jing.objects.buzzUser
 
 
 /**
@@ -105,6 +113,9 @@ class MainActivity : AppCompatActivity() {
         // Initialize navigation and drawer components
         setupNavigation()
         setupDrawer()
+
+        // Add user to db, if it's not already in it
+        auth.currentUser?.let { addUserToDB(it) }
     }
 
     /**
@@ -277,6 +288,36 @@ class MainActivity : AppCompatActivity() {
         intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
         startActivity(intent)
         finish()
+    }
+
+    private fun addUserToDB(fbUser: FirebaseUser) {
+        val databaseReference = Firebase.database(DATABASE_URL).reference
+        val userRef = databaseReference.child("users").child(fbUser.uid)
+
+        // Check if the user already exists in the database
+        userRef.addListenerForSingleValueEvent(object : ValueEventListener {
+            override fun onDataChange(snapshot: DataSnapshot) {
+                if (snapshot.exists()) {
+                    // User already exists in the database
+                    Log.d("addUserToDB", "User already exists: ${fbUser.uid}")
+                } else {
+                    // User does not exist, add them to the database
+                    val newUser = buzzUser(fbUser.displayName.toString(),fbUser.email.toString(),fbUser.photoUrl.toString(),fbUser.uid)
+
+                    userRef.setValue(newUser)
+                        .addOnSuccessListener {
+                            Log.d("addUserToDB", "User added to database: ${fbUser.uid}")
+                        }
+                        .addOnFailureListener { e ->
+                            Log.e("addUserToDB", "Failed to add user to database", e)
+                        }
+                }
+            }
+
+            override fun onCancelled(error: DatabaseError) {
+                Log.e("addUserToDB", "Database query failed", error.toException())
+            }
+        })
     }
 
 }
