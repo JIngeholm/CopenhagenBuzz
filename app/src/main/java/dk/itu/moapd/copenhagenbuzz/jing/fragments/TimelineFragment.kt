@@ -115,7 +115,7 @@ class TimelineFragment : Fragment() {
         dataViewModel.auth.currentUser?.let {
             val query = Firebase.database(DATABASE_URL).reference
                 .child("events")
-                .orderByChild("eventDate")
+                .orderByChild("eventStartDate")
 
             val options = FirebaseListOptions.Builder<Event>()
                 .setQuery(query, Event::class.java)

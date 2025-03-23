@@ -37,11 +37,8 @@ import com.google.firebase.database.database
 import dk.itu.moapd.copenhagenbuzz.jing.MyApplication.Companion.DATABASE_URL
 import dk.itu.moapd.copenhagenbuzz.jing.data.Event
 
-
 /**
- * ViewModel that handles the business logic for managing events and favorites.
- *
- * This ViewModel is responsible for fetching, adding, and managing events, as well as toggling favorites.
+ * ViewModel responsible for handling event-related operations and user authentication state.
  */
 class DataViewModel : ViewModel() {
 
@@ -50,27 +47,25 @@ class DataViewModel : ViewModel() {
      */
     val isLoggedIn = MutableLiveData<Boolean>()
 
-    // Initialize FirebaseAuth
+    /**
+     * Firebase Authentication instance used to manage user authentication.
+     */
     lateinit var auth: FirebaseAuth
 
     /**
-     * Function to insert an event into the Firebase Realtime Database.
+     * Adds a new event to Firebase Realtime Database.
+     *
+     * @param event The [Event] object to be added.
      */
     fun addEvent(event: Event) {
         auth.currentUser?.let { _ ->
-            // Get a reference to Firebase Realtime Database
             val databaseReference = FirebaseDatabase.getInstance().reference
-
             Log.d("DataViewModel", "db reference = $databaseReference")
 
-            // Push a new event to the database under the user's UID
-            val eventReference = databaseReference.child("events")
-                .push()
-
+            val eventReference = databaseReference.child("events").push()
             event.eventID = eventReference.key.toString()
 
             eventReference.key?.let { _ ->
-                // Insert the event object in the database
                 eventReference.setValue(event)
                     .addOnSuccessListener {
                         Log.d("Firebase", "Event added successfully!")
@@ -84,23 +79,23 @@ class DataViewModel : ViewModel() {
         }
     }
 
+    /**
+     * Toggles the favorite status of an event.
+     *
+     * @param event The [Event] whose favorite status is to be toggled.
+     * @param liked The current like status of the event.
+     * @return The updated favorite status.
+     */
     fun toggleFavorite(event: Event, liked: Boolean): Boolean {
         auth.currentUser?.let { user ->
             val databaseRef = Firebase.database(DATABASE_URL).reference
-
-            // Reference to the user's favorites
             val favoritesRef = databaseRef.child("favorites").child(user.uid)
-
-            // Reference to the event's 'favoritedBy' node
             val favoritedByRef = databaseRef.child("events").child(event.eventID).child("favoritedBy")
 
             if (liked) {
-                // If the event is already liked, remove it from favorites
                 favoritesRef.child(event.eventID).removeValue()
                     .addOnSuccessListener {
                         Log.d("Firebase", "Event removed from favorites")
-
-                        // Remove the user from the event's 'favoritedBy' node
                         favoritedByRef.child(user.uid).removeValue()
                             .addOnSuccessListener {
                                 Log.d("Firebase", "User removed from favoritedBy")
@@ -113,12 +108,9 @@ class DataViewModel : ViewModel() {
                         Log.e("Firebase", "Error removing event from favorites", exception)
                     }
             } else {
-                // If the event is not liked, add it to favorites
                 favoritesRef.child(event.eventID).setValue(event)
                     .addOnSuccessListener {
                         Log.d("Firebase", "Event added to favorites")
-
-                        // Add the user to the event's 'favoritedBy' node
                         favoritedByRef.child(user.uid).setValue(true)
                             .addOnSuccessListener {
                                 Log.d("Firebase", "User added to favoritedBy")
@@ -134,23 +126,24 @@ class DataViewModel : ViewModel() {
         } ?: run {
             Log.e("Firebase", "User is not authenticated")
         }
-
         return !liked
     }
 
+    /**
+     * Deletes an event from Firebase, ensuring it is also removed from all users' favorites.
+     *
+     * @param event The [Event] object to be deleted.
+     */
     fun deleteEvent(event: Event) {
         val databaseRef = Firebase.database(DATABASE_URL).reference
 
-        // Step 1: Retrieve the list of users who have favorited the event
         databaseRef.child("events").child(event.eventID).child("favoritedBy")
             .addListenerForSingleValueEvent(object : ValueEventListener {
                 override fun onDataChange(dataSnapshot: DataSnapshot) {
                     if (dataSnapshot.exists()) {
-                        // Step 2: Iterate through the users in the 'favoritedBy' node
                         for (userSnapshot in dataSnapshot.children) {
                             val userId = userSnapshot.key
                             if (userId != null) {
-                                // Delete the event from the user's favorites
                                 databaseRef.child("favorites").child(userId).child(event.eventID).removeValue()
                                     .addOnSuccessListener {
                                         Log.d("DeleteEvent", "Event deleted from favorites for user: $userId")
@@ -162,7 +155,6 @@ class DataViewModel : ViewModel() {
                         }
                     }
 
-                    // Step 3: Delete the event from the 'events' table
                     databaseRef.child("events").child(event.eventID).removeValue()
                         .addOnSuccessListener {
                             Log.d("DeleteEvent", "Event deleted from events table")
@@ -178,27 +170,26 @@ class DataViewModel : ViewModel() {
             })
     }
 
+    /**
+     * Edits an existing event in Firebase, ensuring the update reflects in all users' favorites.
+     *
+     * @param editedEvent The modified [Event] object.
+     */
     fun editEvent(editedEvent: Event) {
         val databaseRef = Firebase.database(DATABASE_URL).reference
 
-        // Step 1: Retrieve the existing event data, including the 'favoritedBy' node
         databaseRef.child("events").child(editedEvent.eventID)
             .addListenerForSingleValueEvent(object : ValueEventListener {
                 override fun onDataChange(dataSnapshot: DataSnapshot) {
                     if (dataSnapshot.exists()) {
-                        // Step 2: Get the existing 'favoritedBy' node
                         val favoritedBy = dataSnapshot.child("favoritedBy").value as? MutableMap<String, Boolean>
                             ?: mutableMapOf()
 
-                        // Step 3: Merge the 'favoritedBy' node into the editedEvent
                         editedEvent.favoritedBy = favoritedBy
 
-                        // Step 4: Update the event in the 'events' table
                         databaseRef.child("events").child(editedEvent.eventID).setValue(editedEvent)
                             .addOnSuccessListener {
                                 Log.d("EditEvent", "Event updated in events table")
-
-                                // Step 5: Update the event in the 'favorites' table for all users in 'favoritedBy'
                                 for ((userId, _) in favoritedBy) {
                                     databaseRef.child("favorites").child(userId).child(editedEvent.eventID).setValue(editedEvent)
                                         .addOnSuccessListener {
@@ -222,5 +213,4 @@ class DataViewModel : ViewModel() {
                 }
             })
     }
-
 }

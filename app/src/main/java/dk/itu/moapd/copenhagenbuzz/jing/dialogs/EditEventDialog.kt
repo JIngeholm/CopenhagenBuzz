@@ -1,3 +1,27 @@
+/*
+MIT License
+
+Copyright (c) [2025] [Johan Ingeholm]
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+ */
+
 package dk.itu.moapd.copenhagenbuzz.jing.dialogs
 
 import android.app.Activity
@@ -27,6 +51,14 @@ import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
 
+/**
+ * A dialog fragment for editing an existing event.
+ *
+ * This dialog allows users to modify event details such as name, location,
+ * date range, type, description, and event photo. Changes can be saved or canceled.
+ *
+ * @property event The event to be edited.
+ */
 class EditEventDialog(val event: Event) : DialogFragment() {
 
     private var _binding: DialogEditEventBinding? = null
@@ -36,6 +68,14 @@ class EditEventDialog(val event: Event) : DialogFragment() {
 
     private val dataViewModel: DataViewModel by activityViewModels()
 
+    /**
+     * Creates and returns the dialog for editing an event.
+     *
+     * Initializes the UI components, sets event information, and handles user interactions.
+     *
+     * @param savedInstanceState The saved instance state bundle.
+     * @return The created dialog.
+     */
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
         _binding = DialogEditEventBinding.inflate(layoutInflater)
 
@@ -52,34 +92,43 @@ class EditEventDialog(val event: Event) : DialogFragment() {
         }
 
         setInitialEventInfo(event)
-
-        intializeViews()
-
-        handleModButtuns()
+        initializeViews()
+        handleModButtons()
 
         return MaterialAlertDialogBuilder(requireContext())
             .setView(binding.root)
             .create()
     }
 
+    /**
+     * Adjusts the dialog dimensions when it starts.
+     */
     override fun onStart() {
         super.onStart()
 
-        // Set the dialog width and height
         val dialog = dialog
         if (dialog != null) {
-            val width = ViewGroup.LayoutParams.MATCH_PARENT // Use full screen width
-            val height = ViewGroup.LayoutParams.MATCH_PARENT // Use full screen width
+            val width = ViewGroup.LayoutParams.MATCH_PARENT
+            val height = ViewGroup.LayoutParams.MATCH_PARENT
             dialog.window?.setLayout(width, height)
         }
     }
 
+    /**
+     * Cleans up resources when the view is destroyed.
+     */
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null
     }
 
-    fun handleModButtuns(){
+    /**
+     * Handles modification buttons (save and cancel).
+     *
+     * - The cancel button dismisses the dialog.
+     * - The save button validates input, updates the event, and saves changes.
+     */
+    fun handleModButtons() {
         binding.cancelEditButton.setOnClickListener {
             dismiss()
         }
@@ -87,20 +136,22 @@ class EditEventDialog(val event: Event) : DialogFragment() {
         binding.saveButton.setOnClickListener {
             if (isInputValid()) {
                 dataViewModel.editEvent(getEditedEvent(event))
-                Toast.makeText(requireContext(), "Event edited! 🎉", Toast.LENGTH_SHORT).show()
-            }else{
+                Toast.makeText(requireContext(), "Event saved! 🎉", Toast.LENGTH_SHORT).show()
+            } else {
                 Toast.makeText(requireContext(), "Please fill all fields!", Toast.LENGTH_SHORT).show()
             }
-
             dismiss()
         }
     }
 
-
-
-
-    fun getEditedEvent(event: Event) : Event {
-        var editedEvent = Event("", "", "", "", "", "", "")
+    /**
+     * Retrieves the modified event data from input fields.
+     *
+     * @param event The original event to be updated.
+     * @return A new [Event] object with updated details.
+     */
+    fun getEditedEvent(event: Event): Event {
+        val editedEvent = Event("", "", "", "", "", "", "")
 
         editedEvent.userId = event.userId
         editedEvent.eventID = event.eventID
@@ -108,20 +159,25 @@ class EditEventDialog(val event: Event) : DialogFragment() {
 
         editedEvent.eventName = binding.editTextEventName.text.toString().trim()
         editedEvent.eventLocation = binding.editTextEventLocation.text.toString().trim()
-        editedEvent.eventDate = binding.editTextEventDateRange.text.toString().trim()
+        editedEvent.eventStartDate = binding.editTextEventDateRange.text.toString().substringBefore(" to ").trim()
+        editedEvent.eventEndDate = binding.editTextEventDateRange.text.toString().substringAfter(" to ").trim()
         editedEvent.eventType = binding.spinnerEventType.text.toString().trim()
         editedEvent.eventDescription = binding.editTextEventDescription.text.toString().trim()
 
         return editedEvent
     }
 
+    /**
+     * Populates the input fields with the event's existing data.
+     *
+     * @param event The event whose data is displayed.
+     */
+    fun setInitialEventInfo(event: Event) {
+        val formattedDate = "${event.eventStartDate} to ${event.eventEndDate}"
 
-
-
-    fun setInitialEventInfo(event: Event){
         binding.editTextEventName.setText(event.eventName)
         binding.editTextEventLocation.setText(event.eventLocation)
-        binding.editTextEventDateRange.setText(event.eventDate)
+        binding.editTextEventDateRange.setText(formattedDate)
         binding.spinnerEventType.setText(event.eventType)
         binding.editTextEventDescription.setText(event.eventDescription)
 
@@ -145,10 +201,10 @@ class EditEventDialog(val event: Event) : DialogFragment() {
             .into(binding.imageViewEventPicture)
     }
 
-
-
-
-    fun intializeViews(){
+    /**
+     * Initializes view elements such as date picker, image picker, and event type dropdown.
+     */
+    fun initializeViews() {
         // Set up date range picker
         binding.editTextEventDateRange.setOnClickListener {
             val datePicker = MaterialDatePicker.Builder.datePicker()
@@ -159,7 +215,8 @@ class EditEventDialog(val event: Event) : DialogFragment() {
             datePicker.show(parentFragmentManager, "DATE_PICKER")
 
             datePicker.addOnPositiveButtonClickListener { startDateMillis ->
-                val startDate = SimpleDateFormat("MM-dd-yyyy", Locale.getDefault()).format(Date(startDateMillis))
+                val startDate = SimpleDateFormat("dd-MM-yyyy", Locale.getDefault()).format(Date(startDateMillis))
+                event.eventStartDate = startDate
 
                 val endDatePicker = MaterialDatePicker.Builder.datePicker()
                     .setTitleText("Select event end date")
@@ -169,7 +226,10 @@ class EditEventDialog(val event: Event) : DialogFragment() {
                 endDatePicker.show(parentFragmentManager, "END_DATE_PICKER")
 
                 endDatePicker.addOnPositiveButtonClickListener { endDateMillis ->
-                    val endDate = SimpleDateFormat("MM-dd-yyyy", Locale.getDefault()).format(Date(endDateMillis))
+                    val endDate = SimpleDateFormat("dd-MM-yyyy", Locale.getDefault()).format(Date(endDateMillis))
+
+                    event.eventEndDate = endDate
+
                     val formattedDateRange = getString(R.string.event_date_range_format, startDate, endDate)
                     binding.editTextEventDateRange.setText(formattedDateRange)
                 }
@@ -184,18 +244,28 @@ class EditEventDialog(val event: Event) : DialogFragment() {
 
         // Set up spinner for event types
         val eventTypes = resources.getStringArray(R.array.event_types)
-        val adapter = ArrayAdapter(requireContext(), android.R.layout.simple_dropdown_item_1line, eventTypes)
-        binding.spinnerEventType.setAdapter(adapter)
+        val adapter = ArrayAdapter(
+            requireContext(),
+            android.R.layout.simple_dropdown_item_1line,
+            eventTypes
+        )
+
+        binding.spinnerEventType.apply {
+            setAdapter(adapter)
+            isFocusable = false
+            isFocusableInTouchMode = false
+        }
+
+        // Open dropdown when the spinner is clicked
+        binding.spinnerEventType.setOnClickListener {
+            binding.spinnerEventType.showDropDown()
+        }
     }
 
-
     /**
-     * Checks if all input fields are valid.
+     * Validates whether all required input fields are filled.
      *
-     * This method validates the user input by checking if all required fields (event name, location,
-     * date range, type, and description) are filled out.
-     *
-     * @return true if all fields are filled, false otherwise.
+     * @return `true` if all fields contain valid data, `false` otherwise.
      */
     private fun isInputValid(): Boolean {
         return binding.editTextEventName.text.toString().isNotEmpty() &&

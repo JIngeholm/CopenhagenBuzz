@@ -36,7 +36,8 @@ package dk.itu.moapd.copenhagenbuzz.jing.data
 data class Event(
     var eventName: String = "",
     var eventLocation: String = "",
-    var eventDate: String = "",
+    var eventStartDate:  String = "",
+    var eventEndDate:  String = "",
     var eventType: String = "",
     var eventDescription: String = "",
     var eventPhoto: String = "",
@@ -44,5 +45,5 @@ data class Event(
     var eventID: String = "",
     var favoritedBy: MutableMap<String, Boolean> = mutableMapOf()
 ){
-    constructor() : this("","","","","","","","")
+    constructor() : this("","","","","","","","","")
 }

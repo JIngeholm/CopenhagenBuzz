@@ -56,10 +56,12 @@ class TimeLineAdapter(options: FirebaseListOptions<Event>, private val dataViewM
     }
 
     private fun bindEvent(binding: EventRowItemBinding, event: Event) {
+        val formattedDate = event.eventStartDate + " to " + event.eventEndDate
+
         binding.eventName.text = event.eventName
         binding.eventType.text = event.eventType
         binding.eventLocation.text = event.eventLocation
-        binding.eventDate.text = event.eventDate
+        binding.eventDate.text = formattedDate
         binding.eventDescription.text = event.eventDescription
         binding.circleText.text = event.eventType.firstOrNull()?.toString() ?: ""
 
@@ -91,7 +93,7 @@ class TimeLineAdapter(options: FirebaseListOptions<Event>, private val dataViewM
 
 
 
-    fun like(binding: EventRowItemBinding, event: Event){
+    private fun like(binding: EventRowItemBinding, event: Event){
         // Query the favorites table for the current user
         val favoritesRef = Firebase.database(DATABASE_URL).reference
             .child("favorites")
@@ -138,7 +140,7 @@ class TimeLineAdapter(options: FirebaseListOptions<Event>, private val dataViewM
         })
     }
 
-    fun editOrDelete(binding: EventRowItemBinding, event: Event){
+    private fun editOrDelete(binding: EventRowItemBinding, event: Event){
         if (event.userId != dataViewModel.auth.uid){
             binding.modButtons.isVisible = false
         }

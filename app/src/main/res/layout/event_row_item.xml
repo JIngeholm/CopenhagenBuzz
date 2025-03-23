@@ -8,7 +8,7 @@
 
     <com.google.android.material.card.MaterialCardView
         android:id="@+id/event_card"
-        android:layout_width="@dimen/_0dp"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_margin="@dimen/_8dp"
         app:cardCornerRadius="@dimen/_16dp"
@@ -20,18 +20,20 @@
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintBottom_toBottomOf="parent">
 
-        <!-- Inner Layout for Event Details -->
-        <LinearLayout
+        <!-- Inner ConstraintLayout for Event Details -->
+        <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="vertical"
-            >
+            android:layout_height="wrap_content">
 
             <!-- Horizontal Layout for Event Name, Type, and Circle -->
             <androidx.constraintlayout.widget.ConstraintLayout
-                android:layout_width="match_parent"
+                android:id="@+id/top_section"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:padding="@dimen/_16dp">
+                android:padding="@dimen/_16dp"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent">
 
                 <!-- Circle with Letter -->
                 <FrameLayout
@@ -57,7 +59,7 @@
 
                 <!-- Vertical Layout for Event Name and Type -->
                 <LinearLayout
-                    android:layout_width="wrap_content"
+                    android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:orientation="vertical"
                     android:layout_marginStart="@dimen/_8dp"
@@ -65,7 +67,7 @@
                     app:layout_constraintStart_toEndOf="@id/circle"
                     app:layout_constraintTop_toTopOf="parent"
                     app:layout_constraintBottom_toBottomOf="parent"
-                    >
+                    app:layout_constraintEnd_toStartOf="@id/like">
 
                     <!-- Event Name -->
                     <TextView
@@ -77,7 +79,6 @@
                         android:textStyle="bold"
                         android:layout_marginTop="@dimen/_4dp"
                         android:layout_marginBottom="@dimen/_4dp"/>
-
 
                     <!-- Event Type -->
                     <TextView
@@ -107,23 +108,30 @@
             <!-- Event Photo -->
             <ImageView
                 android:id="@+id/event_photo"
-                android:layout_width="match_parent"
-                android:layout_height="@dimen/_200dp"
+                android:layout_width="0dp"
+                android:layout_height="0dp"
                 android:scaleType="centerCrop"
                 android:src="@drawable/event_photo_placeholder"
                 android:layout_marginTop="@dimen/_8dp"
                 android:layout_marginBottom="@dimen/_8dp"
-                />
+                app:layout_constraintTop_toBottomOf="@id/top_section"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHeight_percent="0.5" />
 
             <!-- Event Location -->
             <TextView
                 android:id="@+id/event_location"
-                android:layout_width="wrap_content"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:text="@string/event_location"
                 android:textSize="@dimen/_16sp"
-                android:layout_marginTop="@dimen/_4dp"
+                android:layout_marginTop="@dimen/_12dp"
                 android:layout_marginStart="@dimen/_15dp"
+                android:layout_marginEnd="@dimen/_15dp"
+                app:layout_constraintTop_toBottomOf="@id/event_photo"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
                 />
 
             <!-- Event Date -->
@@ -135,37 +143,45 @@
                 android:textSize="@dimen/_12sp"
                 android:layout_marginStart="@dimen/_15dp"
                 android:layout_marginTop="@dimen/_2dp"
-                />
+                app:layout_constraintTop_toBottomOf="@id/event_location"
+                app:layout_constraintStart_toStartOf="parent" />
 
             <!-- Event Description -->
             <TextView
                 android:id="@+id/event_description"
-                android:layout_width="wrap_content"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:text="@string/event_description"
-                android:textSize="@dimen/_12sp"
+                android:textSize="@dimen/_14sp"
                 android:layout_marginTop="@dimen/_16dp"
                 android:layout_marginBottom="@dimen/_15dp"
                 android:layout_marginStart="@dimen/_15dp"
+                android:layout_marginEnd="@dimen/_15dp"
                 android:padding="@dimen/_1dp"
                 android:maxLines="2"
-                android:ellipsize="end" />
+                android:ellipsize="end"
+                app:layout_constraintTop_toBottomOf="@id/event_date"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                />
 
             <!-- Buttons Anchored to the Right -->
             <LinearLayout
                 android:id="@+id/mod_buttons"
-                android:layout_width="match_parent"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal"
                 android:layout_marginTop="@dimen/_8dp"
-                android:padding="@dimen/_10dp">
+                android:padding="@dimen/_10dp"
+                app:layout_constraintTop_toBottomOf="@id/event_description"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent">
 
                 <!-- Spacer to push buttons to the right -->
                 <View
                     android:layout_width="0dp"
                     android:layout_height="0dp"
-                    android:layout_weight="1"
-                    />
+                    android:layout_weight="1" />
 
                 <com.google.android.material.button.MaterialButton
                     android:id="@+id/edit_button"
@@ -177,8 +193,7 @@
                     android:layout_marginEnd="@dimen/_8dp"
                     android:focusable="false"
                     app:strokeColor="?attr/colorAccent"
-                    app:strokeWidth="@dimen/thin_outline"
-                    />
+                    app:strokeWidth="@dimen/thin_outline" />
 
                 <com.google.android.material.button.MaterialButton
                     android:id="@+id/delete_button"
@@ -186,12 +201,10 @@
                     android:layout_height="wrap_content"
                     android:text="@string/delete"
                     android:focusable="false"
-                    android:backgroundTint="?attr/colorAccent"
-                    />
+                    android:backgroundTint="?attr/colorAccent" />
             </LinearLayout>
 
-
-        </LinearLayout>
+        </androidx.constraintlayout.widget.ConstraintLayout>
 
     </com.google.android.material.card.MaterialCardView>
 

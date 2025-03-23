@@ -38,4 +38,5 @@
     <dimen name="_25sp">25sp</dimen>
     <dimen name="_60dp">60dp</dimen>
     <dimen name="_0_5dp">0.5dp</dimen>
+    <dimen name="_12dp">12dp</dimen>
 </resources>

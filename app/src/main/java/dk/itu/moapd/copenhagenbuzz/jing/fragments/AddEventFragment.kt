@@ -149,9 +149,11 @@ class AddEventFragment : Fragment() {
             datePicker.show(parentFragmentManager, "DATE_PICKER")
 
             datePicker.addOnPositiveButtonClickListener { startDateMillis ->
-                val startDate = SimpleDateFormat("MM-dd-yyyy", java.util.Locale.getDefault()).format(
+                val startDate = SimpleDateFormat("dd-MM-yyyy", java.util.Locale.getDefault()).format(
                     Date(startDateMillis)
                 )
+
+                event.eventStartDate = startDate
 
                 // Set up end date picker after selecting start date
                 val endDatePicker = com.google.android.material.datepicker.MaterialDatePicker.Builder.datePicker()
@@ -162,9 +164,12 @@ class AddEventFragment : Fragment() {
                 endDatePicker.show(parentFragmentManager, "END_DATE_PICKER")
 
                 endDatePicker.addOnPositiveButtonClickListener { endDateMillis ->
-                    val endDate = SimpleDateFormat("MM-dd-yyyy", java.util.Locale.getDefault()).format(
+                    val endDate = SimpleDateFormat("dd-MM-yyyy", java.util.Locale.getDefault()).format(
                         Date(endDateMillis)
                     )
+
+                    event.eventEndDate = endDate
+
                     val formattedDateRange = getString(R.string.event_date_range_format, startDate, endDate)
                     binding.editTextEventDateRange.setText(formattedDateRange)
                 }
@@ -201,10 +206,8 @@ class AddEventFragment : Fragment() {
             if (isInputValid()) {
                 event.eventName = binding.editTextEventName.text.toString().trim()
                 event.eventLocation = binding.editTextEventLocation.text.toString().trim()
-                event.eventDate = binding.editTextEventDateRange.text.toString().trim()
                 event.eventType = binding.spinnerEventType.text.toString().trim()
                 event.eventDescription = binding.editTextEventDescription.text.toString().trim()
-
 
                 dataViewModel.addEvent(event)
 

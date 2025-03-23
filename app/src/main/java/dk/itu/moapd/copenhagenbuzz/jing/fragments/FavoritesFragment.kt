@@ -91,7 +91,7 @@ class FavoritesFragment : Fragment() {
             val query = Firebase.database(DATABASE_URL).reference
                 .child("favorites")
                 .child(user.uid)
-                .orderByChild("eventDate")
+                .orderByChild("eventStartDate")
 
             val options = FirebaseRecyclerOptions.Builder<Event>()
                 .setQuery(query, Event::class.java)
@@ -99,7 +99,7 @@ class FavoritesFragment : Fragment() {
                 .build()
 
             // Create the custom adapter to bind a list of strings.
-            val adapter = FavoriteAdapter(options)
+            val adapter = FavoriteAdapter(options, dataViewModel)
 
             binding.recyclerView.apply{
                 layoutManager = LinearLayoutManager(requireContext())
