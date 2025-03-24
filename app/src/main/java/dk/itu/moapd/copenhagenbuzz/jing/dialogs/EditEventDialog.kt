@@ -136,7 +136,7 @@ class EditEventDialog(val event: Event) : DialogFragment() {
 
         binding.saveButton.setOnClickListener {
             if (isInputValid()) {
-                dataViewModel.editEvent(getEditedEvent(event))
+                dataViewModel.updateEvent(getEditedEvent(event))
                 Toast.makeText(requireContext(), "Event saved! 🎉", Toast.LENGTH_SHORT).show()
             } else {
                 Toast.makeText(requireContext(), "Please fill all fields!", Toast.LENGTH_SHORT)

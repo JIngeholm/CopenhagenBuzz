@@ -175,28 +175,32 @@ class DataViewModel : ViewModel() {
      *
      * @param editedEvent The modified [Event] object.
      */
-    fun editEvent(editedEvent: Event) {
+    fun updateEvent(editedEvent: Event) {
         val databaseRef = Firebase.database(DATABASE_URL).reference
 
         databaseRef.child("events").child(editedEvent.eventID)
             .addListenerForSingleValueEvent(object : ValueEventListener {
                 override fun onDataChange(dataSnapshot: DataSnapshot) {
                     if (dataSnapshot.exists()) {
+                        // Get existing data
                         val favoritedBy = dataSnapshot.child("favoritedBy").value as? MutableMap<String, Boolean>
                             ?: mutableMapOf()
 
                         editedEvent.favoritedBy = favoritedBy
 
+                        // Perform update
                         databaseRef.child("events").child(editedEvent.eventID).setValue(editedEvent)
                             .addOnSuccessListener {
                                 Log.d("EditEvent", "Event updated in events table")
-                                for ((userId, _) in favoritedBy) {
-                                    databaseRef.child("favorites").child(userId).child(editedEvent.eventID).setValue(editedEvent)
+                                // Update favorites
+                                favoritedBy.forEach { (userId, _) ->
+                                    databaseRef.child("favorites").child(userId)
+                                        .child(editedEvent.eventID).setValue(editedEvent)
                                         .addOnSuccessListener {
                                             Log.d("EditEvent", "Event updated in favorites for user: $userId")
                                         }
                                         .addOnFailureListener { error ->
-                                            Log.e("EditEvent", "Failed to update event in favorites for user: $userId", error)
+                                            Log.e("EditEvent", "Failed to update favorites for user: $userId", error)
                                         }
                                 }
                             }
@@ -212,5 +216,54 @@ class DataViewModel : ViewModel() {
                     Log.e("EditEvent", "Failed to fetch event data", error.toException())
                 }
             })
+    }
+
+    fun updateInvite(event: Event, unInvitedUsers: MutableList<String>) {
+        val invitesRef = Firebase.database(DATABASE_URL).reference.child("invites")
+
+        // Convert Event to a simplified map for invites
+        val inviteData = mapOf(
+            "eventId" to event.eventID,
+            "eventName" to event.eventName,
+            "eventStartDate" to event.eventStartDate,
+            "eventLocation" to event.eventLocation,
+            "eventPhoto" to event.eventPhoto,
+            "eventType" to event.eventType
+        )
+
+        // Handle sending invites to new users
+        event.invitedUsers.forEach { (userId, _) ->
+            invitesRef.child(userId).child(event.eventID)
+                .addListenerForSingleValueEvent(object : ValueEventListener {
+                    override fun onDataChange(snapshot: DataSnapshot) {
+                        if (!snapshot.exists()) {
+                            // Store invite data
+                            invitesRef.child(userId).child(event.eventID)
+                                .setValue(inviteData)
+                                .addOnSuccessListener {
+                                    Log.d("Firebase", "Invite sent to $userId")
+                                }
+                                .addOnFailureListener { e ->
+                                    Log.e("Firebase", "Failed to invite $userId", e)
+                                }
+                        }
+                    }
+
+                    override fun onCancelled(error: DatabaseError) {
+                        Log.e("Firebase", "Check invite failed", error.toException())
+                    }
+                })
+        }
+
+        // Handle removing invites from uninvited users
+        unInvitedUsers.forEach { userId ->
+            invitesRef.child(userId).child(event.eventID).removeValue()
+                .addOnSuccessListener {
+                    Log.d("Firebase", "Invite removed from $userId")
+                }
+                .addOnFailureListener { e ->
+                    Log.e("Firebase", "Failed to remove invite", e)
+                }
+        }
     }
 }

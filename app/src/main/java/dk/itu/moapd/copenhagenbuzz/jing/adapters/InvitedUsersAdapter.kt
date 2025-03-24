@@ -19,8 +19,8 @@ class InvitedUsersAdapter(
 
             Picasso.get()
                 .load(user.profilePicture)
-                .placeholder(R.drawable.baseline_image_not_supported_24)
-                .error(R.drawable.event_photo_placeholder)
+                .placeholder(R.drawable.guest_24)
+                .error(R.drawable.guest_24)
                 .into(binding.profilePicture)
 
             // Update the invite status and icon based on the status

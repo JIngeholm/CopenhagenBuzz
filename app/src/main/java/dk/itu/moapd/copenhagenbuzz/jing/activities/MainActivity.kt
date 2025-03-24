@@ -49,6 +49,8 @@ import com.squareup.picasso.Picasso
 import dk.itu.moapd.copenhagenbuzz.jing.MyApplication.Companion.DATABASE_URL
 import dk.itu.moapd.copenhagenbuzz.jing.R
 import dk.itu.moapd.copenhagenbuzz.jing.databinding.ActivityMainBinding
+import dk.itu.moapd.copenhagenbuzz.jing.dialogs.DeleteEventDialog
+import dk.itu.moapd.copenhagenbuzz.jing.dialogs.InboxDialog
 import dk.itu.moapd.copenhagenbuzz.jing.models.DataViewModel
 import dk.itu.moapd.copenhagenbuzz.jing.objects.buzzUser
 
@@ -113,6 +115,11 @@ class MainActivity : AppCompatActivity() {
         // Initialize navigation and drawer components
         setupNavigation()
         setupDrawer()
+
+        binding.inboxButton.setOnClickListener {
+            val inboxDialog = InboxDialog()
+            inboxDialog.show(supportFragmentManager, "InboxDialog")  // Use supportFragmentManager
+        }
 
         // Add user to db, if it's not already in it
         auth.currentUser?.let { addUserToDB(it) }

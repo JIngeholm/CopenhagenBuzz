@@ -25,7 +25,22 @@
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
-            app:titleTextAppearance="@style/CustomToolbarTitleTextAppearance" />
+            app:titleTextAppearance="@style/CustomToolbarTitleTextAppearance">
+
+            <!-- Add this menu item for your right button -->
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/inbox_button"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="end"
+                android:layout_marginEnd="@dimen/_8dp"
+                app:icon="@drawable/baseline_inbox_24"
+                app:iconTint="?attr/colorAccent"
+                app:iconGravity="end"
+                style="@style/Widget.Material3.Button.TextButton"
+                />
+
+        </com.google.android.material.appbar.MaterialToolbar>
 
         <include
             android:id="@+id/content_main"

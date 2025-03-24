@@ -27,6 +27,8 @@ class InviteDialog(private val event: Event) : DialogFragment() {
     // Map to store selected users (UID -> Status)
     private val selectedUsers = mutableMapOf<String, String>()
 
+    private val unInvitedUsers = mutableListOf<String>()
+
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
         _binding = DialogInviteBinding.inflate(layoutInflater)
 
@@ -46,9 +48,17 @@ class InviteDialog(private val event: Event) : DialogFragment() {
                 if (isChecked) {
                     // Add user to the map with status "Undecided"
                     selectedUsers[buzzUser.uid] = "Undecided"
+                    // If the user is in the unInvited list remove it
+                    if (unInvitedUsers.contains(buzzUser.uid)){
+                        unInvitedUsers.remove(buzzUser.uid)
+                    }
                 } else {
                     // Remove user from the map
                     selectedUsers.remove(buzzUser.uid)
+                    // Add the user to the list of unInvited users
+                    if (!unInvitedUsers.contains(buzzUser.uid)){
+                        unInvitedUsers.add(buzzUser.uid)
+                    }
                 }
             }
 
@@ -73,28 +83,40 @@ class InviteDialog(private val event: Event) : DialogFragment() {
     }
 
     private fun updateEventWithInvitedUsers() {
-        // Create a mutable copy of the existing invited users
+        // Create a copy of the existing invited users
         val updatedInvitedUsers = event.invitedUsers.toMutableMap()
 
-        // Add or update UIDs of selected users (checked users)
+        // Add newly selected users
         selectedUsers.forEach { (uid, status) ->
             updatedInvitedUsers[uid] = status
         }
 
-        // Remove UIDs of users not in selectedUsers (unchecked users)
-        updatedInvitedUsers.keys.removeAll { uid ->
-            !selectedUsers.containsKey(uid)
+        // Remove uninvited users
+        unInvitedUsers.forEach { uid ->
+            updatedInvitedUsers.remove(uid)
         }
 
-        // Create a copy of the event with the updated map of invited users
-        val updatedEvent = event.copy(invitedUsers = updatedInvitedUsers)
+        // Create updated event while preserving all other fields
+        val updatedEvent = event.copy(
+            invitedUsers = updatedInvitedUsers,
+            eventName = event.eventName,
+            eventLocation = event.eventLocation,
+            eventStartDate  = event.eventStartDate,
+            eventEndDate  = event.eventEndDate,
+            eventType  = event.eventType,
+            eventDescription  = event.eventDescription,
+            eventPhoto  = event.eventPhoto,
+            userId  = event.userId,
+            eventID  = event.eventID,
+            favoritedBy  = event.favoritedBy
+        )
 
-        // Call the editEvent method in the ViewModel
-        dataViewModel.editEvent(updatedEvent)
+        dataViewModel.updateEvent(updatedEvent)
 
-        // Dismiss the dialog
+        dataViewModel.updateInvite(updatedEvent, unInvitedUsers)
         dismiss()
     }
+
 
     override fun onStart() {
         super.onStart()
