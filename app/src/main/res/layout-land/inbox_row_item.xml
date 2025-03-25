@@ -22,37 +22,26 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
 
-            <FrameLayout
-                android:id="@+id/circle"
-                android:layout_width="@dimen/_55dp"
-                android:layout_height="@dimen/_55dp"
-                android:background="@drawable/circle_background"
-                android:layout_marginStart="@dimen/_10dp"
-                app:layout_constraintTop_toTopOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintBottom_toBottomOf="parent">
-
-                <TextView
-                    android:id="@+id/circle_text"
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:gravity="center"
-                    android:text="@string/e"
-                    android:textSize="@dimen/_18sp"
-                    android:textColor="?attr/colorOnPrimary"
-                    android:fontFamily="sans-serif-medium"/>
-            </FrameLayout>
-
             <LinearLayout
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
                 android:gravity="center"
                 android:padding="@dimen/_10dp"
-                app:layout_constraintStart_toEndOf="@id/circle"
+                app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
                 app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toStartOf="@id/event_photo">
+                app:layout_constraintEnd_toEndOf="parent">
+
+                <TextView
+                    android:id="@+id/event_invitation_text"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/x_invited_you_to_an_event"
+                    android:textSize="@dimen/_14sp"
+                    android:textStyle="bold"
+                    android:layout_marginTop="@dimen/_4dp"
+                    android:layout_marginBottom="@dimen/_4dp"/>
 
                 <TextView
                     android:id="@+id/event_name"
@@ -61,8 +50,7 @@
                     android:text="@string/event_name"
                     android:textSize="@dimen/_18sp"
                     android:textStyle="bold"
-                    android:layout_marginTop="@dimen/_4dp"
-                    android:layout_marginBottom="@dimen/_4dp"/>
+                    android:layout_marginTop="@dimen/_4dp" />
 
                 <TextView
                     android:id="@+id/event_type"
@@ -77,7 +65,7 @@
                     android:layout_height="wrap_content"
                     android:orientation="horizontal"
                     android:layout_marginTop="@dimen/_20dp"
-                    android:gravity="center">
+                    >
 
                     <!-- Attend TextView -->
                     <TextView
@@ -87,7 +75,7 @@
                         android:text="@string/attend"
                         android:textSize="@dimen/_12sp"
                         android:textColor="?attr/colorPrimary"
-                        android:paddingHorizontal="@dimen/_20dp"
+                        android:paddingHorizontal="@dimen/_12dp"
                         android:paddingVertical="@dimen/_8dp"
                         android:clickable="true"
                         android:focusable="true"
@@ -102,7 +90,7 @@
                         android:text="@string/maybe"
                         android:textSize="@dimen/_12sp"
                         android:textColor="?attr/colorPrimary"
-                        android:paddingHorizontal="@dimen/_20dp"
+                        android:paddingHorizontal="@dimen/_12dp"
                         android:paddingVertical="@dimen/_8dp"
                         android:clickable="true"
                         android:focusable="true"
@@ -117,7 +105,7 @@
                         android:text="@string/decline"
                         android:textSize="@dimen/_12sp"
                         android:textColor="?attr/colorPrimary"
-                        android:paddingHorizontal="@dimen/_20dp"
+                        android:paddingHorizontal="@dimen/_12dp"
                         android:paddingVertical="@dimen/_8dp"
                         android:clickable="true"
                         android:focusable="true"
@@ -125,18 +113,6 @@
 
                 </LinearLayout>
             </LinearLayout>
-
-            <ImageView
-                android:id="@+id/event_photo"
-                android:layout_width="0dp"
-                android:layout_height="0dp"
-                android:contentDescription="@string/event_name"
-                android:scaleType="centerCrop"
-                android:src="@drawable/event_photo_placeholder"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintTop_toTopOf="parent"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintWidth_percent="0.2" />
 
         </androidx.constraintlayout.widget.ConstraintLayout>
     </com.google.android.material.card.MaterialCardView>

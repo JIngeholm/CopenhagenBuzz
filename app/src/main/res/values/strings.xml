@@ -65,6 +65,7 @@
     <string name="maybe">Maybe</string>
     <string name="attend">Attend</string>
     <string name="open_inbox">Open Inbox</string>
+    <string name="x_invited_you_to_an_event">X Invited you to an event!</string>
 
 
     <string-array name="event_types">

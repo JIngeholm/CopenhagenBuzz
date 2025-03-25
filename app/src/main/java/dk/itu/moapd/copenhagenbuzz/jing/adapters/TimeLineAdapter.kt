@@ -90,6 +90,10 @@ class TimeLineAdapter(options: FirebaseListOptions<Event>, private val dataViewM
             })
             .into(binding.eventPhoto)
 
+        if(!event.invitedUsers.containsKey(dataViewModel.auth.uid) && event.userId != dataViewModel.auth.currentUser?.uid){
+            binding.invited.isVisible = false
+        }
+
         var invitedUsersListSize = event.invitedUsers.size.toString()
 
         binding.invited.text = "$invitedUsersListSize invited"

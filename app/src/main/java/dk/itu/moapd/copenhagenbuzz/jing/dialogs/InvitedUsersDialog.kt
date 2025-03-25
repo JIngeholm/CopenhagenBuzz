@@ -94,7 +94,7 @@ class InvitedUsersDialog(private val event: Event) : DialogFragment() {
 
     private fun setupRecyclerView() {
         // Create the adapter with the final map (buzzUser -> invite status)
-        val adapter = InvitedUsersAdapter(invitedUsersMap)
+        val adapter = InvitedUsersAdapter(invitedUsersMap, event, dataViewModel.auth.currentUser)
 
         binding.usersRecyclerView.apply {
             layoutManager = LinearLayoutManager(requireContext())

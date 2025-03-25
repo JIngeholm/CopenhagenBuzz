@@ -31,7 +31,17 @@
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
                 app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toStartOf="@id/event_photo">
+                app:layout_constraintEnd_toEndOf="parent">
+
+                <TextView
+                    android:id="@+id/event_invitation_text"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/x_invited_you_to_an_event"
+                    android:textSize="@dimen/_14sp"
+                    android:textStyle="bold"
+                    android:layout_marginTop="@dimen/_4dp"
+                    android:layout_marginBottom="@dimen/_4dp"/>
 
                 <TextView
                     android:id="@+id/event_name"
@@ -40,8 +50,7 @@
                     android:text="@string/event_name"
                     android:textSize="@dimen/_18sp"
                     android:textStyle="bold"
-                    android:layout_marginTop="@dimen/_4dp"
-                    android:layout_marginBottom="@dimen/_4dp"/>
+                    android:layout_marginTop="@dimen/_4dp" />
 
                 <TextView
                     android:id="@+id/event_type"
@@ -104,18 +113,6 @@
 
                 </LinearLayout>
             </LinearLayout>
-
-            <ImageView
-                android:id="@+id/event_photo"
-                android:layout_width="0dp"
-                android:layout_height="0dp"
-                android:contentDescription="@string/event_name"
-                android:scaleType="centerCrop"
-                android:src="@drawable/event_photo_placeholder"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintTop_toTopOf="parent"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintWidth_percent="0.1" />
 
         </androidx.constraintlayout.widget.ConstraintLayout>
     </com.google.android.material.card.MaterialCardView>

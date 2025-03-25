@@ -3,8 +3,9 @@ package dk.itu.moapd.copenhagenbuzz.jing.adapters
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
-import com.squareup.picasso.Picasso
-import dk.itu.moapd.copenhagenbuzz.jing.R
+import com.google.firebase.Firebase
+import com.google.firebase.database.database
+import dk.itu.moapd.copenhagenbuzz.jing.MyApplication.Companion.DATABASE_URL
 import dk.itu.moapd.copenhagenbuzz.jing.databinding.InboxRowItemBinding
 import dk.itu.moapd.copenhagenbuzz.jing.objects.Event
 
@@ -18,6 +19,19 @@ class InboxAdapter(
 
     inner class ViewHolder(private val binding: InboxRowItemBinding) : RecyclerView.ViewHolder(binding.root) {
         fun bind(event: Event) {
+
+            // Get reference to the user in Firebase
+            val userRef = Firebase.database(DATABASE_URL).reference
+                .child("users")
+                .child(event.userId)
+
+            // Fetch the user data
+            userRef.get().addOnSuccessListener { snapshot ->
+                val username =
+                    snapshot.child("username").getValue(String::class.java) ?: "Unknown user"
+                    binding.eventInvitationText.text = "$username invited you to an event!"
+            }
+
             binding.eventName.text = event.eventName
             binding.eventType.text = event.eventType
 
@@ -30,12 +44,6 @@ class InboxAdapter(
             binding.decline.setOnClickListener {
                 declineClickListener?.invoke(event)
             }
-
-            Picasso.get()
-                .load(event.eventPhoto)
-                .placeholder(R.drawable.baseline_image_not_supported_24)
-                .error(R.drawable.event_photo_placeholder)
-                .into(binding.eventPhoto)
         }
     }
 
