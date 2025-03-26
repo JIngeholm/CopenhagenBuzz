@@ -47,6 +47,5 @@
             android:text="@string/delete"
             android:focusable="false"
             android:backgroundTint="?attr/colorAccent"/>
-
     </LinearLayout>
 </LinearLayout>

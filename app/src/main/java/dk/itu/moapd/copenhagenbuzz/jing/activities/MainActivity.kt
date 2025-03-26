@@ -53,7 +53,6 @@ import dk.itu.moapd.copenhagenbuzz.jing.dialogs.InboxDialog
 import dk.itu.moapd.copenhagenbuzz.jing.models.DataViewModel
 import dk.itu.moapd.copenhagenbuzz.jing.objects.buzzUser
 
-
 /**
  * Main activity for the CopenhagenBuzz application.
  *
@@ -86,14 +85,8 @@ class MainActivity : AppCompatActivity() {
         private val TAG = MainActivity::class.qualifiedName
     }
 
-    /**
-     * Called when the activity is created.
-     *
-     * Initializes the UI, sets up navigation, and configures authentication-related UI elements.
-     * Shares the `isLoggedIn` state with a shared ViewModel.
-     *
-     * @param savedInstanceState A [Bundle] containing the activity's previously saved state.
-     */
+
+
     override fun onCreate(savedInstanceState: Bundle?) {
         WindowCompat.setDecorFitsSystemWindows(window, true)
         super.onCreate(savedInstanceState)
@@ -124,45 +117,24 @@ class MainActivity : AppCompatActivity() {
         auth.currentUser?.let { addUserToDB(it) }
     }
 
-    /**
-     * Called when the activity is starting or restarting. This is where the activity
-     * checks if the user is logged in. If the user is not logged in (i.e., `auth.currentUser` is null),
-     * the user is redirected to the [LoginActivity].
-     *
-     * This method ensures that the user is authenticated before proceeding to the main functionality
-     * of the app. If the user is not authenticated, they are taken to the login screen.
-     *
-     * @see android.app.Activity.onStart
-     */
+
+
     override fun onStart() {
         super.onStart()
         // Redirect the user to the LoginActivity if they are not logged in.
         auth.currentUser ?: startLoginActivity()
     }
 
-    /**
-     * Starts the [LoginActivity] and clears the back stack, ensuring that the user cannot navigate back
-     * to the previous activity using the back button.
-     *
-     * This method is typically called when the user is not logged in and needs to be redirected
-     * to the login screen. The [Intent.FLAG_ACTIVITY_NEW_TASK] and [Intent.FLAG_ACTIVITY_CLEAR_TASK]
-     * flags are used to clear the back stack, ensuring a clean navigation flow.
-     *
-     * @see android.content.Intent
-     */
+
+
     private fun startLoginActivity() {
         Intent(this, LoginActivity::class.java).apply {
             flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
         }.let(::startActivity)
     }
 
-    /**
-     * Configures navigation components based on the screen orientation.
-     *
-     * This method handles setting up the navigation bar and configuring the app to adapt to both
-     * portrait and landscape orientations. It adjusts the visibility and configuration of
-     * navigation elements like the AppBar and BottomNavigationView or NavigationRail.
-     */
+
+
     private fun setupNavigation() {
         val navHostFragment = supportFragmentManager
             .findFragmentById(R.id.fragment_container_view) as NavHostFragment
@@ -171,43 +143,34 @@ class MainActivity : AppCompatActivity() {
         if (resources.configuration.orientation == Configuration.ORIENTATION_PORTRAIT) {
             setSupportActionBar(binding.topAppBar)
             binding.topAppBar?.setOverflowIcon(null)
-
             binding.bottomNavigation?.setupWithNavController(navController)
         } else {
             binding.navigationRail?.setupWithNavController(navController)
-
         }
 
         // Ensure the correct icon appears on each fragment
         navController.addOnDestinationChangedListener { _, destination, _ ->
-            if (destination.id == R.id.fragment_timeline) { // Change to your fragment ID
+            if (destination.id == R.id.fragment_timeline) {
                 supportActionBar?.setHomeAsUpIndicator(R.drawable.baseline_menu_24)
                 supportActionBar?.setDisplayHomeAsUpEnabled(true)
             } else {
                 supportActionBar?.setHomeAsUpIndicator(null)
-                supportActionBar?.setDisplayHomeAsUpEnabled(true) // Shows the back arrow
+                supportActionBar?.setDisplayHomeAsUpEnabled(true)
             }
         }
     }
 
-    /**
-     * Configures the navigation drawer, including handling the visibility of user-specific settings
-     * and setting up actions for menu items.
-     *
-     * This method controls the opening of the drawer, the visibility of user settings based on
-     * whether the user is a guest, and sets up the menu item actions such as navigating to the AddEvent
-     * screen.
-     */
+
+
     private fun setupDrawer() {
         // Show or hide user settings section based on login status
         binding.navigationView.menu.findItem(R.id.user_settings).isVisible = !isGuest
 
         if (resources.configuration.orientation == Configuration.ORIENTATION_PORTRAIT) {
-            // Open the drawer when the menu button is pressed
             binding.topAppBar?.setNavigationOnClickListener {
                 binding.drawerLayout.open()
             }
-        }else{
+        } else {
             binding.navButton?.setOnClickListener {
                 binding.drawerLayout.open()
             }
@@ -226,13 +189,10 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    /**
-     * Sets up the drawer header with user information, such as the profile photo and username.
-     *
-     * This method also sets the login button's text and click listener based on the guest status.
-     */
+
+
     private fun setupDrawerHeader() {
-        val headerView = binding.navigationView.getHeaderView(0) // Get the first (and only) header view
+        val headerView = binding.navigationView.getHeaderView(0)
         val loginButton = headerView?.findViewById<MaterialButton>(R.id.login_button)
 
         loginButton?.setOnClickListener {
@@ -249,10 +209,10 @@ class MainActivity : AppCompatActivity() {
 
         // Use Picasso to load the profile photo
         Picasso.get()
-            .load(auth.currentUser?.photoUrl) // Load user's photo
-            .placeholder(R.drawable.baseline_account_circle_60) // Placeholder image
-            .error(R.drawable.baseline_account_circle_60) // Error image
-            .into(profileImageView) // Into the ImageView
+            .load(auth.currentUser?.photoUrl)
+            .placeholder(R.drawable.baseline_account_circle_60)
+            .error(R.drawable.baseline_account_circle_60)
+            .into(profileImageView)
 
         // Set username and email
         headerView.findViewById<TextView>(R.id.drawer_username)?.text = auth.currentUser?.displayName
@@ -263,10 +223,8 @@ class MainActivity : AppCompatActivity() {
         loginButton?.setText(loginTextRes)
     }
 
-    /**
-     * Navigates to the AddEventFragment based on the current navigation destination.
-     * Ensures that the back stack is properly managed to prevent duplicate navigation.
-     */
+
+
     private fun navigateToAddEvent() {
         val navController = findNavController(R.id.fragment_container_view)
         val actionId = when (navController.currentDestination?.id) {
@@ -286,9 +244,6 @@ class MainActivity : AppCompatActivity() {
         )
     }
 
-    /**
-     * Navigates to the login activity and clears the back stack.
-     */
     private fun navigateToLogin() {
         val intent = Intent(this, LoginActivity::class.java)
         intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
@@ -304,11 +259,14 @@ class MainActivity : AppCompatActivity() {
         userRef.addListenerForSingleValueEvent(object : ValueEventListener {
             override fun onDataChange(snapshot: DataSnapshot) {
                 if (snapshot.exists()) {
-                    // User already exists in the database
                     Log.d("addUserToDB", "User already exists: ${fbUser.uid}")
                 } else {
-                    // User does not exist, add them to the database
-                    val newUser = buzzUser(fbUser.displayName.toString(),fbUser.email.toString(),fbUser.photoUrl.toString(),fbUser.uid)
+                    val newUser = buzzUser(
+                        fbUser.displayName.toString(),
+                        fbUser.email.toString(),
+                        fbUser.photoUrl.toString(),
+                        fbUser.uid
+                    )
 
                     userRef.setValue(newUser)
                         .addOnSuccessListener {
@@ -325,8 +283,4 @@ class MainActivity : AppCompatActivity() {
             }
         })
     }
-
 }
-
-
-

@@ -31,10 +31,12 @@ import com.google.firebase.Firebase
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
+import com.google.firebase.database.DatabaseReference
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.ValueEventListener
 import com.google.firebase.database.database
 import dk.itu.moapd.copenhagenbuzz.jing.MyApplication.Companion.DATABASE_URL
+import dk.itu.moapd.copenhagenbuzz.jing.MyApplication.Companion.database
 import dk.itu.moapd.copenhagenbuzz.jing.objects.Event
 
 /**
@@ -130,37 +132,45 @@ class DataViewModel : ViewModel() {
     }
 
     /**
-     * Deletes an event from Firebase, ensuring it is also removed from all users' favorites.
+     * Deletes an event from Firebase using its reference, ensuring it is also removed from all users' favorites.
      *
-     * @param event The [Event] object to be deleted.
+     * @param eventReference The Firebase DatabaseReference pointing to the event to be deleted.
      */
-    fun deleteEvent(event: Event) {
-        val databaseRef = Firebase.database(DATABASE_URL).reference
+    fun deleteEvent(eventReference: DatabaseReference) {
+        // Get the event ID from the reference path
+        val eventId = eventReference.key ?: run {
+            Log.e("DeleteEvent", "Event reference has no key")
+            return
+        }
 
-        databaseRef.child("events").child(event.eventID).child("favoritedBy")
+        val databaseRef = database.reference
+
+        // First handle the favorites cleanup
+        eventReference.child("favoritedBy")
             .addListenerForSingleValueEvent(object : ValueEventListener {
                 override fun onDataChange(dataSnapshot: DataSnapshot) {
                     if (dataSnapshot.exists()) {
                         for (userSnapshot in dataSnapshot.children) {
                             val userId = userSnapshot.key
-                            if (userId != null) {
-                                databaseRef.child("favorites").child(userId).child(event.eventID).removeValue()
+                            userId?.let {
+                                databaseRef.child("favorites").child(userId).child(eventId).removeValue()
                                     .addOnSuccessListener {
-                                        Log.d("DeleteEvent", "Event deleted from favorites for user: $userId")
+                                        Log.d("DeleteEvent", "Event removed from favorites of user: $userId")
                                     }
                                     .addOnFailureListener { error ->
-                                        Log.e("DeleteEvent", "Failed to delete event from favorites for user: $userId", error)
+                                        Log.e("DeleteEvent", "Failed to remove from favorites for user: $userId", error)
                                     }
                             }
                         }
                     }
 
-                    databaseRef.child("events").child(event.eventID).removeValue()
+                    // Then delete the event itself
+                    eventReference.removeValue()
                         .addOnSuccessListener {
-                            Log.d("DeleteEvent", "Event deleted from events table")
+                            Log.d("DeleteEvent", "Event successfully deleted")
                         }
                         .addOnFailureListener { error ->
-                            Log.e("DeleteEvent", "Failed to delete event from events table", error)
+                            Log.e("DeleteEvent", "Failed to delete event", error)
                         }
                 }
 

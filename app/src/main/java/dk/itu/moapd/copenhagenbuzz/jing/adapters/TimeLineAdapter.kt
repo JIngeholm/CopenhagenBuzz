@@ -1,3 +1,27 @@
+/*
+MIT License
+
+Copyright (c) [2025] [Johan Ingeholm]
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+ */
+
 package dk.itu.moapd.copenhagenbuzz.jing.adapters
 
 import android.annotation.SuppressLint
@@ -20,6 +44,7 @@ import com.google.firebase.database.database
 import com.squareup.picasso.Picasso
 import com.squareup.picasso.Transformation
 import dk.itu.moapd.copenhagenbuzz.jing.MyApplication.Companion.DATABASE_URL
+import dk.itu.moapd.copenhagenbuzz.jing.MyApplication.Companion.database
 import dk.itu.moapd.copenhagenbuzz.jing.R
 import dk.itu.moapd.copenhagenbuzz.jing.objects.Event
 import dk.itu.moapd.copenhagenbuzz.jing.databinding.EventRowItemBinding
@@ -158,24 +183,29 @@ class TimeLineAdapter(options: FirebaseListOptions<Event>, private val dataViewM
         }
 
         binding.inviteButton.setOnClickListener{
-            val inviteDialog = InviteDialog(event)
-            inviteDialog.show(fragmentManager,"InviteDialog")
+            InviteDialog.newInstance(event.eventID).show(
+                fragmentManager,
+                "InviteDialog"
+            )
         }
 
-        binding.deleteButton.setOnClickListener{
-            val deleteEventDialog = DeleteEventDialog(event)
-            deleteEventDialog.show(fragmentManager, "DeleteEventDialog")
+        binding.deleteButton.setOnClickListener {
+            DeleteEventDialog.newInstance(event.eventID).show(
+                fragmentManager,
+                "DeleteEventDialog"
+            )
         }
 
-        binding.editButton.setOnClickListener{
-            val editEventDialog = EditEventDialog(event)
-            editEventDialog.show(fragmentManager, "EditEventDialog")
+        binding.editButton.setOnClickListener {
+            EditEventDialog.newInstance(event.eventID).show(
+                fragmentManager,
+                "EditEventDialog"
+            )
         }
 
-        binding.invited.setOnClickListener{
-            val invitedUsersDialog = InvitedUsersDialog(event)
-            invitedUsersDialog.show(fragmentManager,"InvitedUsersDialog")
+        binding.invited.setOnClickListener {
+            val eventRef = database.reference.child("events").child(event.eventID)
+            InvitedUsersDialog.newInstance(eventRef).show(fragmentManager, "InvitedUsersDialog")
         }
-
     }
 }

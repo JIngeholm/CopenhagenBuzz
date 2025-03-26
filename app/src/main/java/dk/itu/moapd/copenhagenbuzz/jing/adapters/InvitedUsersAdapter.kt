@@ -1,3 +1,27 @@
+/*
+MIT License
+
+Copyright (c) [2025] [Johan Ingeholm]
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+ */
+
 package dk.itu.moapd.copenhagenbuzz.jing.adapters
 
 import android.util.Log
@@ -20,13 +44,17 @@ class InvitedUsersAdapter(
     private val currentUser: FirebaseUser?
 ) : RecyclerView.Adapter<InvitedUsersAdapter.ViewHolder>() {
 
-    inner class ViewHolder(private val binding: InvitedUserRowItemBinding) : RecyclerView.ViewHolder(binding.root) {
+    inner class ViewHolder(
+        private val binding: InvitedUserRowItemBinding
+    ) : RecyclerView.ViewHolder(binding.root) {
+
         private var currentStatus: String = "Unknown"
         private lateinit var currentBuzzUser: buzzUser
 
         fun bind(user: buzzUser, status: String) {
             currentBuzzUser = user
             currentStatus = status
+
             binding.Name.text = user.username
 
             Picasso.get()
@@ -36,17 +64,18 @@ class InvitedUsersAdapter(
                 .into(binding.profilePicture)
 
             updateStatusUI(status)
+            setupStatusClickListener(user)
+        }
 
-            // Only set click listener if this is the current user
-            if (user.uid == currentUser?.uid) {
-                binding.inviteStatusIcon.setOnClickListener {
-                    handleStatusChange()
+        private fun setupStatusClickListener(user: buzzUser) {
+            val isCurrentUser = user.uid == currentUser?.uid
+
+            binding.inviteStatusIcon.apply {
+                setOnClickListener {
+                    if (isCurrentUser) handleStatusChange()
                 }
-                binding.inviteStatusIcon.isClickable = true
-            } else {
-                binding.inviteStatusIcon.setOnClickListener(null)
-                binding.inviteStatusIcon.isClickable = false
-                binding.inviteStatusIcon.isFocusable = false
+                isClickable = isCurrentUser
+                isFocusable = isCurrentUser
             }
         }
 
@@ -66,24 +95,15 @@ class InvitedUsersAdapter(
         }
 
         private fun updateStatusUI(status: String) {
-            when (status) {
-                "Maybe" -> {
-                    binding.inviteStatus.text = "Maybe"
-                    binding.inviteStatusIcon.setBackgroundResource(R.drawable.baseline_maybe_24)
-                }
-                "Not Attending" -> {
-                    binding.inviteStatus.text = "Not Attending"
-                    binding.inviteStatusIcon.setBackgroundResource(R.drawable.baseline_cancel_24)
-                }
-                "Attending" -> {
-                    binding.inviteStatus.text = "Attending"
-                    binding.inviteStatusIcon.setBackgroundResource(R.drawable.baseline_check_circle_24)
-                }
-                else -> {
-                    binding.inviteStatus.text = "Invited"
-                    binding.inviteStatusIcon.setBackgroundResource(R.drawable.baseline_undecided_24)
-                }
+            val (textRes, iconRes) = when (status) {
+                "Maybe" -> Pair("Maybe", R.drawable.baseline_maybe_24)
+                "Not Attending" -> Pair("Not Attending", R.drawable.baseline_cancel_24)
+                "Attending" -> Pair("Attending", R.drawable.baseline_check_circle_24)
+                else -> Pair("Invited", R.drawable.baseline_undecided_24)
             }
+
+            binding.inviteStatus.text = textRes
+            binding.inviteStatusIcon.setBackgroundResource(iconRes)
         }
     }
 
@@ -114,18 +134,21 @@ class InvitedUsersAdapter(
         eventInviteRef.setValue(newStatus)
             .addOnSuccessListener {
                 Log.d("InvitedUsersAdapter", "Updated status for user $userId to $newStatus")
-
-                Firebase.database(DATABASE_URL).reference
-                    .child("invites")
-                    .child(userId)
-                    .child(event.eventID)
-                    .removeValue()
-                    .addOnSuccessListener {
-                        Log.d("InvitedUsersAdapter", "Removed invite for $userId")
-                    }
+                removeInviteFromUserNode(userId)
             }
             .addOnFailureListener { e ->
                 Log.e("InvitedUsersAdapter", "Failed to update status", e)
+            }
+    }
+
+    private fun removeInviteFromUserNode(userId: String) {
+        Firebase.database(DATABASE_URL).reference
+            .child("invites")
+            .child(userId)
+            .child(event.eventID)
+            .removeValue()
+            .addOnSuccessListener {
+                Log.d("InvitedUsersAdapter", "Removed invite for $userId")
             }
     }
 }

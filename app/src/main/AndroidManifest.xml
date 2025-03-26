@@ -21,6 +21,7 @@
 
         <activity
             android:name=".activities.LoginActivity"
+            android:configChanges="orientation|screenSize|screenLayout"
             android:exported="true" >
 
             <intent-filter>

@@ -29,52 +29,73 @@ import android.os.Bundle
 import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.activityViewModels
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
-import dk.itu.moapd.copenhagenbuzz.jing.objects.Event
+import com.google.firebase.database.DatabaseReference
+import dk.itu.moapd.copenhagenbuzz.jing.MyApplication.Companion.database
 import dk.itu.moapd.copenhagenbuzz.jing.databinding.DialogDeleteEventBinding
 import dk.itu.moapd.copenhagenbuzz.jing.models.DataViewModel
 
-/**
- * A dialog fragment for confirming the deletion of an event.
- *
- * @property event The event to be deleted.
- */
-class DeleteEventDialog(val event: Event) : DialogFragment() {
+class DeleteEventDialog : DialogFragment() {
 
-    // View binding for the delete event dialog
+    // View binding properties
     private var _binding: DialogDeleteEventBinding? = null
     private val binding get() = _binding!!
 
-    // Shared ViewModel for handling event data
+    // ViewModel
     private val dataViewModel: DataViewModel by activityViewModels()
 
-    /**
-     * Creates and returns a dialog for confirming event deletion.
-     *
-     * @param savedInstanceState The saved instance state bundle.
-     * @return A configured [Dialog] instance.
-     */
+    // Dialog arguments
+    private var eventId: String = ""
+
+    companion object {
+        /**
+         * Creates a new instance of DeleteEventDialog with the specified event ID.
+         *
+         * @param eventId The ID of the event to be deleted
+         * @return A new instance of DeleteEventDialog
+         */
+        fun newInstance(eventId: String): DeleteEventDialog {
+            return DeleteEventDialog().apply {
+                arguments = Bundle().apply {
+                    putString(ARG_EVENT_ID, eventId)
+                }
+            }
+        }
+
+        private const val ARG_EVENT_ID = "event_id"
+    }
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        eventId = arguments?.getString(ARG_EVENT_ID).orEmpty()
+    }
+
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
+        // Initialize view binding
         _binding = DialogDeleteEventBinding.inflate(layoutInflater)
 
-        // Cancel button dismisses the dialog
-        binding.cancelButton.setOnClickListener {
-            dismiss()
-        }
+        // Get Firebase reference for the event
+        val eventRef = database.reference
+            .child("events")
+            .child(eventId)
 
-        // Delete button removes the event via ViewModel and dismisses the dialog
-        binding.deleteButton.setOnClickListener {
-            dataViewModel.deleteEvent(event)
-            dismiss()
-        }
+        setupButtonListeners(eventRef)
 
         return MaterialAlertDialogBuilder(requireContext())
             .setView(binding.root)
             .create()
     }
 
-    /**
-     * Cleans up view binding when the view is destroyed.
-     */
+    private fun setupButtonListeners(eventRef: DatabaseReference) {
+        binding.apply {
+            cancelButton.setOnClickListener { dismiss() }
+
+            deleteButton.setOnClickListener {
+                dataViewModel.deleteEvent(eventRef)
+                dismiss()
+            }
+        }
+    }
+
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null
