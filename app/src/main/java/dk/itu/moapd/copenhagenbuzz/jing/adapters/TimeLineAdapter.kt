@@ -89,7 +89,7 @@ class TimeLineAdapter(options: FirebaseListOptions<Event>, private val dataViewM
 
         binding.eventName.text = event.eventName
         binding.eventType.text = event.eventType
-        binding.eventLocation.text = event.eventLocation
+        binding.eventLocation.text = event.eventLocation.address
         binding.eventDate.text = formattedDate
         binding.eventDescription.text = event.eventDescription
         binding.circleText.text = event.eventType.firstOrNull()?.toString() ?: ""

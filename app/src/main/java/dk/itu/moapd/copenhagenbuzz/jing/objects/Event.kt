@@ -27,7 +27,7 @@ package dk.itu.moapd.copenhagenbuzz.jing.objects
 /**
  * @constructor A constructor for a kotlin data class for social events
  * @param[eventName] the name of the event of type string.
- * @param[eventLocation] the location of the event of type string.
+ * @param[eventLocation] the location of the event of type EventLocation
  * @param[eventDate] the start and the end date of the event of type string.
  * @param[eventType] the type of event of type string.
  * @param[eventDescription] the description of the event of type string
@@ -35,9 +35,9 @@ package dk.itu.moapd.copenhagenbuzz.jing.objects
  */
 data class Event(
     var eventName: String = "",
-    var eventLocation: String = "",
-    var eventStartDate:  String = "",
-    var eventEndDate:  String = "",
+    var eventLocation: EventLocation = EventLocation(),
+    var eventStartDate: String = "",
+    var eventEndDate: String = "",
     var eventType: String = "",
     var eventDescription: String = "",
     var eventPhoto: String = "",
@@ -45,6 +45,6 @@ data class Event(
     var eventID: String = "",
     var favoritedBy: MutableMap<String, Boolean> = mutableMapOf(),
     var invitedUsers: Map<String, String> = emptyMap()
-){
-    constructor() : this("","","","","","","","","")
+) {
+    constructor() : this("", EventLocation(),"","","","","","","")
 }

@@ -1,84 +1,295 @@
-/*
-MIT License
-
-Copyright (c) [2025] [Johan Ingeholm]
-
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following conditions:
-
-The above copyright notice and this permission notice shall be included in all
-copies or substantial portions of the Software.
-
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-SOFTWARE.
- */
-
 package dk.itu.moapd.copenhagenbuzz.jing.fragments
 
+import android.Manifest
+import android.content.BroadcastReceiver
+import android.content.Context
+import android.content.Intent
+import android.content.IntentFilter
+import android.content.pm.PackageManager
+import android.location.Location
 import android.os.Bundle
-import androidx.fragment.app.Fragment
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.core.app.ActivityCompat
+import androidx.core.content.ContextCompat
+import androidx.fragment.app.Fragment
+import com.google.android.gms.maps.CameraUpdateFactory
+import com.google.android.gms.maps.GoogleMap
+import com.google.android.gms.maps.OnMapReadyCallback
+import com.google.android.gms.maps.SupportMapFragment
+import com.google.android.gms.maps.model.BitmapDescriptorFactory
+import com.google.android.gms.maps.model.LatLng
+import com.google.android.gms.maps.model.MarkerOptions
+import com.google.firebase.database.DataSnapshot
+import com.google.firebase.database.DatabaseError
+import com.google.firebase.database.ValueEventListener
+import dk.itu.moapd.copenhagenbuzz.jing.MyApplication.Companion.database
 import dk.itu.moapd.copenhagenbuzz.jing.R
+import dk.itu.moapd.copenhagenbuzz.jing.objects.Event
+import dk.itu.moapd.copenhagenbuzz.jing.services.LocationService
 
-// TODO: Rename parameter arguments, choose names that match
-// the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-private const val ARG_PARAM1 = "param1"
-private const val ARG_PARAM2 = "param2"
+class MapsFragment : Fragment(), OnMapReadyCallback {
 
-/**
- * A simple [Fragment] subclass.
- * Use the [MapsFragment.newInstance] factory method to
- * create an instance of this fragment.
- */
-class MapsFragment : Fragment() {
-    // TODO: Rename and change types of parameters
-    private var param1: String? = null
-    private var param2: String? = null
+    private var map: GoogleMap? = null
+    private var locationReceiver: BroadcastReceiver? = null
+    private var isReceiverRegistered = false
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        arguments?.let {
-            param1 = it.getString(ARG_PARAM1)
-            param2 = it.getString(ARG_PARAM2)
+    private lateinit var eventsListener: ValueEventListener
+    // Add this as a class-level property
+    private lateinit var infoWindowAdapter: GoogleMap.InfoWindowAdapter
+
+    companion object {
+        const val REQUEST_FOREGROUND_ONLY_PERMISSIONS_REQUEST_CODE = 34
+        private const val TAG = "MapsFragment"
+    }
+
+    @Suppress("DEPRECATION")
+    private inner class LocationReceiver : BroadcastReceiver() {
+        override fun onReceive(context: Context, intent: Intent) {
+            if (intent.action == LocationService.ACTION_LOCATION_UPDATE) {
+                val location = intent.getParcelableExtra<Location>(LocationService.EXTRA_LOCATION)
+                location?.let {
+                    Log.d(TAG, "New location update: (${it.latitude}, ${it.longitude})")
+                    updateMapLocation(it)
+                }
+            }
         }
     }
 
     override fun onCreateView(
-        inflater: LayoutInflater, container: ViewGroup?,
+        inflater: LayoutInflater,
+        container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
-        // Inflate the layout for this fragment
+    ): View {
         return inflater.inflate(R.layout.fragment_maps, container, false)
     }
 
-    companion object {
-        /**
-         * Use this factory method to create a new instance of
-         * this fragment using the provided parameters.
-         *
-         * @param param1 Parameter 1.
-         * @param param2 Parameter 2.
-         * @return A new instance of fragment MapFragment.
-         */
-        // TODO: Rename and change types and number of parameters
-        @JvmStatic
-        fun newInstance(param1: String, param2: String) =
-            MapsFragment().apply {
-                arguments = Bundle().apply {
-                    putString(ARG_PARAM1, param1)
-                    putString(ARG_PARAM2, param2)
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        Log.d(TAG, "Initializing map and location services")
+        initializeMap()
+        setupLocationReceiver()
+        setupEventsListener()
+    }
+
+    private fun initializeMap() {
+        (childFragmentManager.findFragmentById(R.id.map) as? SupportMapFragment)?.let {
+            it.getMapAsync(this)
+        } ?: run {
+            Log.w(TAG, "Creating new map fragment instance")
+            SupportMapFragment.newInstance().also { fragment ->
+                childFragmentManager.beginTransaction()
+                    .replace(R.id.map, fragment)
+                    .commit()
+                fragment.getMapAsync(this)
+            }
+        }
+    }
+
+    override fun onMapReady(googleMap: GoogleMap) {
+        map = googleMap
+        try {
+            // Basic map setup
+            googleMap.uiSettings.apply {
+                isZoomControlsEnabled = true
+                isCompassEnabled = true
+                isMyLocationButtonEnabled = true
+            }
+
+            // Default Copenhagen view
+            val copenhagen = LatLng(55.6761, 12.5683)
+            googleMap.addMarker(MarkerOptions().position(copenhagen).title("Copenhagen"))
+            googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(copenhagen, 12f))
+
+            googleMap.setOnMarkerClickListener { marker ->
+                // Show info window when marker is clicked
+                marker.showInfoWindow()
+                true
+            }
+
+            enableMyLocation()
+            Log.d(TAG, "Map initialized successfully")
+        } catch (e: Exception) {
+            Log.e(TAG, "Map initialization failed", e)
+            Toast.makeText(context, "Map error: ${e.localizedMessage}", Toast.LENGTH_SHORT).show()
+        }
+    }
+
+    private fun setupLocationReceiver() {
+        locationReceiver = LocationReceiver()
+        if (checkPermission()) {
+            startLocationService()
+        } else {
+            Log.d(TAG, "Requesting location permission")
+            requestUserPermissions()
+        }
+        registerReceiver()
+    }
+
+    private fun updateMapLocation(location: Location) {
+        map?.let {
+            val latLng = LatLng(location.latitude, location.longitude)
+            it.clear()
+            it.addMarker(MarkerOptions().position(latLng).title("Current Location"))
+            it.animateCamera(CameraUpdateFactory.newLatLngZoom(latLng, 15f))
+        }
+    }
+
+    private fun registerReceiver() {
+        if (!isReceiverRegistered) {
+            try {
+                ContextCompat.registerReceiver(
+                    requireActivity(),
+                    locationReceiver,
+                    IntentFilter(LocationService.ACTION_LOCATION_UPDATE),
+                    ContextCompat.RECEIVER_NOT_EXPORTED
+                )
+                isReceiverRegistered = true
+                Log.d(TAG, "Location receiver registered")
+            } catch (e: Exception) {
+                Log.e(TAG, "Receiver registration failed", e)
+            }
+        }
+    }
+
+    private fun unregisterReceiver() {
+        locationReceiver?.let {
+            try {
+                requireActivity().unregisterReceiver(it)
+                isReceiverRegistered = false
+            } catch (e: IllegalArgumentException) {
+                Log.w(TAG, "Receiver already unregistered")
+            }
+        }
+    }
+
+    private fun startLocationService() {
+        try {
+            ContextCompat.startForegroundService(
+                requireContext(),
+                Intent(requireContext(), LocationService::class.java)
+            )
+            Log.d(TAG, "Location service started")
+        } catch (e: Exception) {
+            Log.e(TAG, "Failed to start location service", e)
+        }
+    }
+
+    private fun stopLocationService() {
+        try {
+            requireContext().stopService(Intent(requireContext(), LocationService::class.java))
+        } catch (e: Exception) {
+            Log.e(TAG, "Failed to stop location service", e)
+        }
+    }
+
+    private val locationPermissionRequest = registerForActivityResult(
+        ActivityResultContracts.RequestPermission()
+    ) { isGranted ->
+        if (isGranted) {
+            Log.d(TAG, "Location permission granted")
+            enableMyLocation()
+            startLocationService()
+        } else {
+            Toast.makeText(
+                requireContext(),
+                "Location features disabled",
+                Toast.LENGTH_LONG
+            ).show()
+        }
+    }
+
+    private fun enableMyLocation() {
+        if (ActivityCompat.checkSelfPermission(
+                requireContext(),
+                Manifest.permission.ACCESS_FINE_LOCATION
+            ) == PackageManager.PERMISSION_GRANTED
+        ) {
+            try {
+                map?.isMyLocationEnabled = true
+            } catch (e: SecurityException) {
+                Log.e(TAG, "Location layer enablement failed", e)
+            }
+        }
+    }
+
+    override fun onDestroyView() {
+        Log.d(TAG, "Cleaning up resources")
+        database.getReference("events").removeEventListener(eventsListener)
+        unregisterReceiver()
+        stopLocationService()
+        super.onDestroyView()
+    }
+
+    private fun checkPermission() = ActivityCompat.checkSelfPermission(
+        requireContext(),
+        Manifest.permission.ACCESS_FINE_LOCATION
+    ) == PackageManager.PERMISSION_GRANTED
+
+    private fun requestUserPermissions() {
+        if (!checkPermission()) {
+            locationPermissionRequest.launch(Manifest.permission.ACCESS_FINE_LOCATION)
+        }
+    }
+
+    private fun setupEventsListener() {
+        val eventsRef = database.getReference("events")
+
+        eventsListener = object : ValueEventListener {
+            override fun onDataChange(snapshot: DataSnapshot) {
+                val events = mutableListOf<Event>()
+                for (eventSnapshot in snapshot.children) {
+                    eventSnapshot.getValue(Event::class.java)?.let { event ->
+                        events.add(event)
+                    }
+                }
+                Log.d(TAG, "Loaded ${events.size} events from database")
+                displayEventsOnMap(events)
+            }
+
+            override fun onCancelled(error: DatabaseError) {
+                Log.e(TAG, "Failed to load events: ${error.message}")
+            }
+        }
+        eventsRef.addValueEventListener(eventsListener)
+    }
+
+    private fun displayEventsOnMap(events: List<Event>) {
+        map?.let { googleMap ->
+            googleMap.clear()
+
+            for (event in events) {
+                try {
+                    if (event.eventLocation.latitude != 0.0 && event.eventLocation.longitude != 0.0) {
+                        val location = LatLng(event.eventLocation.latitude, event.eventLocation.longitude)
+
+                        // Create marker with fallback to default if icon fails
+                        try {
+                            googleMap.addMarker(
+                                MarkerOptions()
+                                    .position(location)
+                                    .title(event.eventName)
+                                    .snippet("${event.eventType}\n${event.eventStartDate}")
+                            )
+                        } catch (e: Exception) {
+                            Log.e(TAG, "Failed to create custom marker, using default", e)
+                            googleMap.addMarker(
+                                MarkerOptions()
+                                    .position(location)
+                                    .title(event.eventName)
+                                    .snippet("${event.eventType}\n${event.eventStartDate}")
+                            )
+                        }
+                    }
+                } catch (e: Exception) {
+                    Log.e(TAG, "Error processing event: ${event.eventName}", e)
                 }
             }
+        }
     }
+
 }

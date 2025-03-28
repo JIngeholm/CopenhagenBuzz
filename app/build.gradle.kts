@@ -1,8 +1,8 @@
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
-    alias(libs.plugins.google.android.libraries.mapsplatform.secrets.gradle.plugin)
     alias(libs.plugins.google.services)
+    alias(libs.plugins.secrets.gradle)
 }
 
 android {
@@ -37,13 +37,14 @@ android {
     }
     buildFeatures {
         viewBinding = true
+        buildConfig = true
     }
 }
 
 dependencies {
-    implementation (platform(libs.firebase.bom))
-    implementation (libs.google.firebase.auth.ktx)
-    implementation (libs.firebaseui.firebase.ui.auth)
+    implementation(platform(libs.firebase.bom))
+    implementation(libs.google.firebase.auth.ktx)
+    implementation(libs.firebaseui.firebase.ui.auth)
     implementation(libs.google.firebase.database.ktx)
     implementation(libs.firebaseui.firebase.ui.database)
     implementation(libs.dotenv.kotlin)
@@ -52,16 +53,18 @@ dependencies {
     implementation(libs.androidx.recyclerview)
     implementation(libs.picasso)
 
-    implementation(libs.androidx.core.ktx)
-    implementation(libs.androidx.appcompat)
-
-    implementation(libs.material)
-    implementation(libs.androidx.constraintlayout)
+    implementation(libs.play.services.location)
+    implementation(libs.play.services.maps)
     implementation(libs.androidx.navigation.fragment.ktx)
     implementation(libs.androidx.navigation.ui.ktx)
+
+    implementation(libs.androidx.core.ktx)
+    implementation(libs.androidx.appcompat)
+    implementation(libs.material)
+    implementation(libs.androidx.constraintlayout)
     implementation(libs.androidx.activity)
-    implementation(libs.play.services.maps)
     implementation(libs.kotlinx.coroutines.android)
+
     implementation(libs.javafaker)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)

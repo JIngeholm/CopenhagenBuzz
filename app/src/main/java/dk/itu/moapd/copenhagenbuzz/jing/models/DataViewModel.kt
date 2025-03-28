@@ -61,7 +61,7 @@ class DataViewModel : ViewModel() {
      */
     fun addEvent(event: Event) {
         auth.currentUser?.let { _ ->
-            val databaseReference = FirebaseDatabase.getInstance().reference
+            val databaseReference = database.reference
             Log.d("DataViewModel", "db reference = $databaseReference")
 
             val eventReference = databaseReference.child("events").push()

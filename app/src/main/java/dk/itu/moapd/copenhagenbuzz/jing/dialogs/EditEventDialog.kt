@@ -50,6 +50,7 @@ import dk.itu.moapd.copenhagenbuzz.jing.R
 import dk.itu.moapd.copenhagenbuzz.jing.objects.Event
 import dk.itu.moapd.copenhagenbuzz.jing.databinding.DialogEditEventBinding
 import dk.itu.moapd.copenhagenbuzz.jing.models.DataViewModel
+import dk.itu.moapd.copenhagenbuzz.jing.objects.EventLocation
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
@@ -91,7 +92,7 @@ class EditEventDialog : DialogFragment() {
             return
         }
         eventRef = database.reference.child("events").child(eventId)
-        event = Event("", "", "", "", "", "", "") // Initialize default event
+        event = Event("", EventLocation(), "", "", "", "", "") // Initialize default event
 
         // Initialize image picker launcher
         imagePickerLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
@@ -191,16 +192,19 @@ class EditEventDialog : DialogFragment() {
     }
 
     private fun getEditedEvent(event: Event): Event {
-        val editedEvent = Event("", "", "", "", "", "", "")
+        val editedEvent = Event("", EventLocation(), "", "", "", "", "")
 
         editedEvent.userId = event.userId
         editedEvent.eventID = event.eventID
         editedEvent.eventPhoto = event.eventPhoto
         editedEvent.favoritedBy = event.favoritedBy
         editedEvent.invitedUsers = event.invitedUsers
+        editedEvent.eventLocation = event.eventLocation
 
         editedEvent.eventName = binding.editTextEventName.text.toString().trim()
-        editedEvent.eventLocation = binding.editTextEventLocation.text.toString().trim()
+
+        editedEvent.eventLocation.address = binding.editTextEventLocation.text.toString().trim()
+
         editedEvent.eventStartDate = binding.editTextEventDateRange.text.toString().substringBefore(" to ").trim()
         editedEvent.eventEndDate = binding.editTextEventDateRange.text.toString().substringAfter(" to ").trim()
         editedEvent.eventType = binding.spinnerEventType.text.toString().trim()
@@ -213,7 +217,7 @@ class EditEventDialog : DialogFragment() {
         val formattedDate = "${event.eventStartDate} to ${event.eventEndDate}"
 
         binding.editTextEventName.setText(event.eventName)
-        binding.editTextEventLocation.setText(event.eventLocation)
+        binding.editTextEventLocation.setText(event.eventLocation.address)
         binding.editTextEventDateRange.setText(formattedDate)
         binding.spinnerEventType.setText(event.eventType)
         binding.editTextEventDescription.setText(event.eventDescription)

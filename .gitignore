@@ -15,4 +15,5 @@
 # Ignore .env file to prevent leaking secrets
 .env
 local.properties
+secrets.properties
 google-services.json

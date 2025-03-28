@@ -26,9 +26,12 @@ package dk.itu.moapd.copenhagenbuzz.jing.fragments
 
 import android.app.Activity
 import android.content.Intent
+import android.location.Geocoder
 import android.net.Uri
+import android.os.Build
 import android.os.Bundle
 import android.provider.MediaStore
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -44,7 +47,10 @@ import java.text.SimpleDateFormat
 import java.util.Date
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
+import com.google.android.gms.maps.model.LatLng
 import dk.itu.moapd.copenhagenbuzz.jing.models.DataViewModel
+import dk.itu.moapd.copenhagenbuzz.jing.objects.EventLocation
+import java.util.Locale
 
 /**
  * Fragment responsible for adding a new event.
@@ -58,9 +64,10 @@ import dk.itu.moapd.copenhagenbuzz.jing.models.DataViewModel
 class AddEventFragment : Fragment() {
 
     private var _binding: FragmentAddEventBinding? = null
-
-    private val event: Event = Event("", "", "", "", "", "", "")
+    private val event: Event = Event("", EventLocation(), "", "", "", "", "", "")
     private val dataViewModel: DataViewModel by activityViewModels()
+    private val geocoder by lazy { Geocoder(requireContext(), Locale.getDefault()) }
+    private var currentLatLng: LatLng? = null
 
     companion object {
         private const val IMAGE_REQUEST_CODE = 100
@@ -73,73 +80,38 @@ class AddEventFragment : Fragment() {
 
     private lateinit var imagePickerLauncher: ActivityResultLauncher<Intent>
 
-    /**
-     * Inflates the fragment's layout and sets up the binding.
-     *
-     * This method initializes the view by inflating the layout and binding it to the fragment.
-     *
-     * @param inflater The LayoutInflater object that can be used to inflate the view.
-     * @param container The parent container that the fragment's UI will be attached to.
-     * @param savedInstanceState A bundle containing saved state information, if available.
-     * @return The root view of the fragment.
-     */
     override fun onCreateView(
-        inflater: LayoutInflater, container: ViewGroup?,
+        inflater: LayoutInflater,
+        container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
         _binding = FragmentAddEventBinding.inflate(inflater, container, false)
 
-        // Initialize ActivityResultLauncher
         imagePickerLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
             if (result.resultCode == Activity.RESULT_OK) {
                 val data: Intent? = result.data
                 val imageUri: Uri? = data?.data
-                // Handle the selected image URI (e.g., display it in an ImageView)
                 imageUri?.let {
                     binding.imageViewEventPicture.setImageURI(it)
-                    event.eventPhoto = it.toString() // Update the event's photo
+                    event.eventPhoto = it.toString()
                 }
             }
         }
         return binding.root
     }
 
-    /**
-     * Initializes the UI components and sets up event listeners for user interactions.
-     *
-     * This method is responsible for initializing the views, setting up date range pickers,
-     * image selection, event type selection, and handling the Add Event button click.
-     *
-     * @param view The root view of the fragment.
-     * @param savedInstanceState A bundle containing saved state information, if available.
-     */
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-
         event.userId = dataViewModel.auth.currentUser?.uid ?: "unknown user"
-
         initializeViews()
     }
 
-    /**
-     * Cleans up the binding when the view is destroyed.
-     *
-     * This method is called when the view is destroyed. It releases the binding to avoid memory leaks.
-     */
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null
     }
 
-    /**
-     * Initializes UI components and sets their listeners.
-     *
-     * This method configures the UI components, including setting up the date range pickers,
-     * image selection, event type spinner, and the Add Event button's click listener.
-     */
     private fun initializeViews() {
-
-        // Set up date range picker for event start and end dates
         binding.editTextEventDateRange.setOnClickListener {
             val datePicker = com.google.android.material.datepicker.MaterialDatePicker.Builder.datePicker()
                 .setTitleText("Select event start date")
@@ -149,13 +121,11 @@ class AddEventFragment : Fragment() {
             datePicker.show(parentFragmentManager, "DATE_PICKER")
 
             datePicker.addOnPositiveButtonClickListener { startDateMillis ->
-                val startDate = SimpleDateFormat("dd-MM-yyyy", java.util.Locale.getDefault()).format(
+                val startDate = SimpleDateFormat("dd-MM-yyyy", Locale.getDefault()).format(
                     Date(startDateMillis)
                 )
-
                 event.eventStartDate = startDate
 
-                // Set up end date picker after selecting start date
                 val endDatePicker = com.google.android.material.datepicker.MaterialDatePicker.Builder.datePicker()
                     .setTitleText("Select event end date")
                     .setSelection(startDateMillis)
@@ -164,25 +134,22 @@ class AddEventFragment : Fragment() {
                 endDatePicker.show(parentFragmentManager, "END_DATE_PICKER")
 
                 endDatePicker.addOnPositiveButtonClickListener { endDateMillis ->
-                    val endDate = SimpleDateFormat("dd-MM-yyyy", java.util.Locale.getDefault()).format(
+                    val endDate = SimpleDateFormat("dd-MM-yyyy", Locale.getDefault()).format(
                         Date(endDateMillis)
                     )
-
                     event.eventEndDate = endDate
-
-                    val formattedDateRange = getString(R.string.event_date_range_format, startDate, endDate)
-                    binding.editTextEventDateRange.setText(formattedDateRange)
+                    binding.editTextEventDateRange.setText(
+                        getString(R.string.event_date_range_format, startDate, endDate)
+                    )
                 }
             }
         }
 
-        // Set up image selection button
         binding.selectImageButton.setOnClickListener {
             val intent = Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI)
             imagePickerLauncher.launch(intent)
         }
 
-        // Set up spinner for event types
         val eventTypes = resources.getStringArray(R.array.event_types)
         val adapter = ArrayAdapter(
             requireContext(),
@@ -194,39 +161,66 @@ class AddEventFragment : Fragment() {
             setAdapter(adapter)
             isFocusable = false
             isFocusableInTouchMode = false
+            setOnClickListener { showDropDown() }
         }
 
-        // Open dropdown when the spinner is clicked
-        binding.spinnerEventType.setOnClickListener {
-            binding.spinnerEventType.showDropDown()
-        }
-
-        // Set up the Add Event button click listener
         binding.addEventButton.setOnClickListener {
             if (isInputValid()) {
-                event.eventName = binding.editTextEventName.text.toString().trim()
-                event.eventLocation = binding.editTextEventLocation.text.toString().trim()
-                event.eventType = binding.spinnerEventType.text.toString().trim()
-                event.eventDescription = binding.editTextEventDescription.text.toString().trim()
-
-                dataViewModel.addEvent(event)
-
-                Toast.makeText(requireContext(), "Event shared! 🎉", Toast.LENGTH_SHORT).show()
-                findNavController().navigate(R.id.action_add_event_to_timeline)
+                val locationName = binding.editTextEventLocation.text.toString().trim()
+                geocodeLocation(locationName) { success ->
+                    if (success) {
+                        saveEvent()
+                    } else {
+                        Toast.makeText(
+                            requireContext(),
+                            "Could not find location. Please try again.",
+                            Toast.LENGTH_SHORT
+                        ).show()
+                    }
+                }
             } else {
                 Toast.makeText(requireContext(), "Please fill all fields!", Toast.LENGTH_SHORT).show()
             }
         }
     }
 
-    /**
-     * Checks if all input fields are valid.
-     *
-     * This method validates the user input by checking if all required fields (event name, location,
-     * date range, type, and description) are filled out.
-     *
-     * @return true if all fields are filled, false otherwise.
-     */
+    @Suppress("DEPRECATION")
+    private fun geocodeLocation(locationName: String, callback: (Boolean) -> Unit) {
+        try {
+            if (Geocoder.isPresent()) {
+                val addresses = geocoder.getFromLocationName(locationName, 1)
+                if (addresses?.isNotEmpty() == true) {
+                    val address = addresses[0]
+                    currentLatLng = LatLng(address.latitude, address.longitude)
+                    event.eventLocation = EventLocation(
+                        latitude = address.latitude,
+                        longitude = address.longitude,
+                        address = address.getAddressLine(0) ?: locationName
+                    )
+                    callback(true)
+                } else {
+                    callback(false)
+                }
+            } else {
+                callback(false)
+            }
+        } catch (e: Exception) {
+            Log.e("Geocoding", "Error: ${e.message}")
+            callback(false)
+        }
+    }
+
+    private fun saveEvent() {
+        event.apply {
+            eventName = binding.editTextEventName.text.toString().trim()
+            eventType = binding.spinnerEventType.text.toString().trim()
+            eventDescription = binding.editTextEventDescription.text.toString().trim()
+        }
+        dataViewModel.addEvent(event)
+        Toast.makeText(requireContext(), "Event shared! 🎉", Toast.LENGTH_SHORT).show()
+        findNavController().navigate(R.id.action_add_event_to_timeline)
+    }
+
     private fun isInputValid(): Boolean {
         return binding.editTextEventName.text.toString().isNotEmpty() &&
                 binding.editTextEventLocation.text.toString().isNotEmpty() &&

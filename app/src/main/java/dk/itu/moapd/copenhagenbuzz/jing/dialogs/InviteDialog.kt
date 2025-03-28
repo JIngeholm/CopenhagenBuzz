@@ -16,6 +16,7 @@ import dk.itu.moapd.copenhagenbuzz.jing.adapters.InviteAdapter
 import dk.itu.moapd.copenhagenbuzz.jing.databinding.DialogInviteBinding
 import dk.itu.moapd.copenhagenbuzz.jing.models.DataViewModel
 import dk.itu.moapd.copenhagenbuzz.jing.objects.Event
+import dk.itu.moapd.copenhagenbuzz.jing.objects.EventLocation
 import dk.itu.moapd.copenhagenbuzz.jing.objects.buzzUser
 
 class InviteDialog : DialogFragment() {
@@ -42,7 +43,7 @@ class InviteDialog : DialogFragment() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        event = Event("", "", "", "", "", "", "") // Initialize default event
+        event = Event("", EventLocation(), "", "", "", "", "") // Initialize default event
     }
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
