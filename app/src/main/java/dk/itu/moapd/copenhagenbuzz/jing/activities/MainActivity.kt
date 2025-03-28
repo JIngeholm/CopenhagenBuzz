@@ -182,7 +182,8 @@ class MainActivity : AppCompatActivity() {
         // Actions for pressing menu items
         binding.navigationView.setNavigationItemSelectedListener { menuItem ->
             when (menuItem.itemId) {
-                R.id.new_event -> navigateToAddEvent()
+                R.id.new_event -> navigateToFragment(R.id.action_timeline_to_add_event)
+                R.id.account -> navigateToFragment(R.id.action_timeline_to_account)
             }
             binding.drawerLayout.close()
             true
@@ -225,13 +226,13 @@ class MainActivity : AppCompatActivity() {
 
 
 
-    private fun navigateToAddEvent() {
+    private fun navigateToFragment(destination: Int) {
         val navController = findNavController(R.id.fragment_container_view)
         val actionId = when (navController.currentDestination?.id) {
-            R.id.fragment_timeline -> R.id.action_timeline_to_add_event
-            R.id.fragment_favorites -> R.id.action_favorites_to_add_event
-            R.id.fragment_maps -> R.id.action_maps_to_add_event
-            R.id.fragment_calendar -> R.id.action_calendar_to_add_event
+            R.id.fragment_timeline -> destination
+            R.id.fragment_favorites -> destination
+            R.id.fragment_maps -> destination
+            R.id.fragment_calendar -> destination
             else -> return
         }
 

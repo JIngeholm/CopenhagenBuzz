@@ -28,6 +28,7 @@ import android.app.Application
 import android.util.Log
 import com.google.android.material.color.DynamicColors
 import com.google.firebase.database.FirebaseDatabase
+import com.google.firebase.storage.FirebaseStorage
 import io.github.cdimascio.dotenv.dotenv
 
 class MyApplication: Application() {
@@ -35,6 +36,7 @@ class MyApplication: Application() {
     companion object {
         lateinit var DATABASE_URL: String
         lateinit var database: FirebaseDatabase
+        lateinit var storage: FirebaseStorage
     }
 
     override fun onCreate() {
@@ -70,6 +72,12 @@ class MyApplication: Application() {
 
         // Keep data synced offline
         databaseReference.keepSynced(true)
+
+        // Initialize Firebase Storage
+        storage = FirebaseStorage.getInstance()
+
+        storage.maxDownloadRetryTimeMillis = 60000 // 1 minute retry time
+        storage.maxOperationRetryTimeMillis = 60000
     }
 }
 

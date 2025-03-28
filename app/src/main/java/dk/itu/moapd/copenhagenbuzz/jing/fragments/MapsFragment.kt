@@ -21,7 +21,6 @@ import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.SupportMapFragment
-import com.google.android.gms.maps.model.BitmapDescriptorFactory
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.MarkerOptions
 import com.google.firebase.database.DataSnapshot
@@ -39,8 +38,8 @@ class MapsFragment : Fragment(), OnMapReadyCallback {
     private var isReceiverRegistered = false
 
     private lateinit var eventsListener: ValueEventListener
-    // Add this as a class-level property
-    private lateinit var infoWindowAdapter: GoogleMap.InfoWindowAdapter
+    private var pendingEvents: List<Event>? = null
+    private var isMapReady = false
 
     companion object {
         const val REQUEST_FOREGROUND_ONLY_PERMISSIONS_REQUEST_CODE = 34
@@ -71,15 +70,16 @@ class MapsFragment : Fragment(), OnMapReadyCallback {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         Log.d(TAG, "Initializing map and location services")
+
+
         initializeMap()
         setupLocationReceiver()
         setupEventsListener()
     }
 
     private fun initializeMap() {
-        (childFragmentManager.findFragmentById(R.id.map) as? SupportMapFragment)?.let {
-            it.getMapAsync(this)
-        } ?: run {
+        (childFragmentManager.findFragmentById(R.id.map) as? SupportMapFragment)?.getMapAsync(this)
+            ?: run {
             Log.w(TAG, "Creating new map fragment instance")
             SupportMapFragment.newInstance().also { fragment ->
                 childFragmentManager.beginTransaction()
@@ -92,6 +92,7 @@ class MapsFragment : Fragment(), OnMapReadyCallback {
 
     override fun onMapReady(googleMap: GoogleMap) {
         map = googleMap
+        isMapReady = true
         try {
             // Basic map setup
             googleMap.uiSettings.apply {
@@ -102,17 +103,21 @@ class MapsFragment : Fragment(), OnMapReadyCallback {
 
             // Default Copenhagen view
             val copenhagen = LatLng(55.6761, 12.5683)
-            googleMap.addMarker(MarkerOptions().position(copenhagen).title("Copenhagen"))
             googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(copenhagen, 12f))
 
             googleMap.setOnMarkerClickListener { marker ->
-                // Show info window when marker is clicked
                 marker.showInfoWindow()
                 true
             }
 
             enableMyLocation()
             Log.d(TAG, "Map initialized successfully")
+
+            // Display any pending events now that map is ready
+            pendingEvents?.let { events ->
+                displayEventsOnMap(events)
+                pendingEvents = null
+            }
         } catch (e: Exception) {
             Log.e(TAG, "Map initialization failed", e)
             Toast.makeText(context, "Map error: ${e.localizedMessage}", Toast.LENGTH_SHORT).show()
@@ -222,6 +227,8 @@ class MapsFragment : Fragment(), OnMapReadyCallback {
         database.getReference("events").removeEventListener(eventsListener)
         unregisterReceiver()
         stopLocationService()
+        map = null
+        isMapReady = false
         super.onDestroyView()
     }
 
@@ -245,9 +252,12 @@ class MapsFragment : Fragment(), OnMapReadyCallback {
                 for (eventSnapshot in snapshot.children) {
                     eventSnapshot.getValue(Event::class.java)?.let { event ->
                         events.add(event)
+                        // Add debug logging for each event
+                        Log.d(TAG, "Loaded event: ${event.eventName} at " +
+                                "${event.eventLocation.latitude},${event.eventLocation.longitude}")
                     }
                 }
-                Log.d(TAG, "Loaded ${events.size} events from database")
+                Log.d(TAG, "Total events loaded: ${events.size}")
                 displayEventsOnMap(events)
             }
 
@@ -259,36 +269,45 @@ class MapsFragment : Fragment(), OnMapReadyCallback {
     }
 
     private fun displayEventsOnMap(events: List<Event>) {
+        if (!isMapReady) {
+            Log.d(TAG, "Map not ready yet, storing ${events.size} events for later")
+            pendingEvents = events
+            return
+        }
+
         map?.let { googleMap ->
             googleMap.clear()
+            Log.d(TAG, "Attempting to display ${events.size} events on map")
 
             for (event in events) {
                 try {
                     if (event.eventLocation.latitude != 0.0 && event.eventLocation.longitude != 0.0) {
-                        val location = LatLng(event.eventLocation.latitude, event.eventLocation.longitude)
+                        val location = LatLng(
+                            event.eventLocation.latitude,
+                            event.eventLocation.longitude
+                        )
 
-                        // Create marker with fallback to default if icon fails
-                        try {
-                            googleMap.addMarker(
-                                MarkerOptions()
-                                    .position(location)
-                                    .title(event.eventName)
-                                    .snippet("${event.eventType}\n${event.eventStartDate}")
-                            )
-                        } catch (e: Exception) {
-                            Log.e(TAG, "Failed to create custom marker, using default", e)
-                            googleMap.addMarker(
-                                MarkerOptions()
-                                    .position(location)
-                                    .title(event.eventName)
-                                    .snippet("${event.eventType}\n${event.eventStartDate}")
-                            )
+                        Log.d(TAG, "Adding marker for ${event.eventName} at $location")
+
+                        googleMap.addMarker(
+                            MarkerOptions()
+                                .position(location)
+                                .title(event.eventName)
+                                .snippet("${event.eventType}\n${event.eventStartDate}")
+                        )?.let { marker ->
+                            Log.d(TAG, "Marker added successfully: ${marker.title}")
+                        } ?: run {
+                            Log.e(TAG, "Failed to add marker for ${event.eventName}")
                         }
+                    } else {
+                        Log.w(TAG, "Skipping event with invalid coordinates: ${event.eventName}")
                     }
                 } catch (e: Exception) {
                     Log.e(TAG, "Error processing event: ${event.eventName}", e)
                 }
             }
+        } ?: run {
+            Log.e(TAG, "Map is still null when trying to display events")
         }
     }
 

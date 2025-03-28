@@ -47,8 +47,9 @@ dependencies {
     implementation(libs.firebaseui.firebase.ui.auth)
     implementation(libs.google.firebase.database.ktx)
     implementation(libs.firebaseui.firebase.ui.database)
-    implementation(libs.dotenv.kotlin)
+    implementation(libs.firebase.storage.ktx)
 
+    implementation(libs.dotenv.kotlin)
     implementation(libs.circleimageview)
     implementation(libs.androidx.recyclerview)
     implementation(libs.picasso)

@@ -54,10 +54,10 @@ class LocationService : Service() {
 
     private fun requestLocationUpdates() {
         val locationRequest = LocationRequest.Builder(
-            Priority.PRIORITY_HIGH_ACCURACY,  // New priority constant
-            10000  // Interval in milliseconds
+            Priority.PRIORITY_BALANCED_POWER_ACCURACY,  // New priority constant
+            50000  // Interval in milliseconds
         ).apply {
-            setMinUpdateIntervalMillis(5000)  // Fastest interval
+            setMinUpdateIntervalMillis(25000)  // Fastest interval
             setWaitForAccurateLocation(true)  // Optional: wait for accurate location
         }.build()
 

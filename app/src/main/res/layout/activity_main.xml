@@ -18,7 +18,7 @@
             android:id="@+id/top_app_bar"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="@dimen/_24dp"
+            android:layout_marginTop="@dimen/_12dp"
             tools:title="@string/app_name"
             app:navigationIcon="@drawable/baseline_menu_24"
             app:titleCentered="true"

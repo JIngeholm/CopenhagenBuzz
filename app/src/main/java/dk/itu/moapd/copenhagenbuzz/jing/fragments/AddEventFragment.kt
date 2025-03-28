@@ -48,6 +48,7 @@ import java.util.Date
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import com.google.android.gms.maps.model.LatLng
+import dk.itu.moapd.copenhagenbuzz.jing.MyApplication.Companion.storage
 import dk.itu.moapd.copenhagenbuzz.jing.models.DataViewModel
 import dk.itu.moapd.copenhagenbuzz.jing.objects.EventLocation
 import java.util.Locale
@@ -216,7 +217,49 @@ class AddEventFragment : Fragment() {
             eventType = binding.spinnerEventType.text.toString().trim()
             eventDescription = binding.editTextEventDescription.text.toString().trim()
         }
-        dataViewModel.addEvent(event)
+
+        // Check if we have an image to upload
+        if (event.eventPhoto.startsWith("content://") || event.eventPhoto.startsWith("file://")) {
+            // This is a local URI - we need to upload it
+            uploadImageAndSaveEvent(Uri.parse(event.eventPhoto))
+        } else if (event.eventPhoto.isEmpty()) {
+            // No image - save event directly
+            dataViewModel.addEvent(event)
+            showSuccessAndNavigate()
+        }
+    }
+
+    private fun uploadImageAndSaveEvent(imageUri: Uri) {
+        // Create a reference to the location in storage
+        val storageRef = storage.reference
+        val imageRef = storageRef.child("event_images/${System.currentTimeMillis()}.jpg")
+
+        binding.addEventButton.isEnabled = false
+
+        // Upload the file
+        imageRef.putFile(imageUri)
+            .addOnSuccessListener { taskSnapshot ->
+                // Get the download URL
+                imageRef.downloadUrl.addOnSuccessListener { uri ->
+                    // Update event with download URL
+                    event.eventPhoto = uri.toString()
+                    // Save event to database
+                    dataViewModel.addEvent(event)
+                    showSuccessAndNavigate()
+                }
+            }
+            .addOnFailureListener { exception ->
+                binding.addEventButton.isEnabled = true
+                Toast.makeText(
+                    requireContext(),
+                    "Failed to upload image: ${exception.message}",
+                    Toast.LENGTH_SHORT
+                ).show()
+            }
+    }
+
+    private fun showSuccessAndNavigate() {
+        binding.addEventButton.isEnabled = true
         Toast.makeText(requireContext(), "Event shared! 🎉", Toast.LENGTH_SHORT).show()
         findNavController().navigate(R.id.action_add_event_to_timeline)
     }

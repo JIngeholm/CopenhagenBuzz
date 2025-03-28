@@ -25,6 +25,7 @@ firebase-auth = "22.3.0"
 firebase-ui-auth = "8.0.2"
 firebase-database = "20.3.0"
 firebase-ui-database = "8.0.2"
+firebase-storage = "20.3.0"
 
 dotenv-kotlin = "6.4.1"
 secrets-gradle-plugin = "2.0.1"
@@ -44,13 +45,16 @@ androidx-constraintlayout = { group = "androidx.constraintlayout", name = "const
 androidx-navigation-fragment-ktx = { group = "androidx.navigation", name = "navigation-fragment-ktx", version.ref = "navigationFragmentKtx" }
 androidx-navigation-ui-ktx = { group = "androidx.navigation", name = "navigation-ui-ktx", version.ref = "navigationUiKtx" }
 androidx-activity = { group = "androidx.activity", name = "activity", version.ref = "activity" }
-picasso = { module = "com.squareup.picasso:picasso", version.ref = "picasso" }
-play-services-maps = { group = "com.google.android.gms", name = "play-services-maps", version.ref = "playServicesMaps" }
+
 firebase-bom = { group = "com.google.firebase", name = "firebase-bom", version.ref = "firebase-bom" }
 google-firebase-auth-ktx = { group = "com.google.firebase", name = "firebase-auth-ktx", version.ref = "firebase-auth" }
 firebaseui-firebase-ui-auth = { group = "com.firebaseui", name = "firebase-ui-auth", version.ref = "firebase-ui-auth" }
 google-firebase-database-ktx = { group = "com.google.firebase", name = "firebase-database-ktx", version.ref = "firebase-database" }
 firebaseui-firebase-ui-database = { group = "com.firebaseui", name = "firebase-ui-database", version.ref = "firebase-ui-database" }
+firebase-storage-ktx = { group = "com.google.firebase", name = "firebase-storage-ktx", version.ref = "firebase-storage" }
+
+picasso = { module = "com.squareup.picasso:picasso", version.ref = "picasso" }
+play-services-maps = { group = "com.google.android.gms", name = "play-services-maps", version.ref = "playServicesMaps" }
 circleimageview = { module = "de.hdodenhof:circleimageview", version = "3.1.0" }
 dotenv-kotlin = { group = "io.github.cdimascio", name = "dotenv-kotlin", version.ref = "dotenv-kotlin" }
 play-services-location = { group = "com.google.android.gms", name = "play-services-location", version.ref = "playServicesLocation" }

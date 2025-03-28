@@ -87,12 +87,24 @@ class TimeLineAdapter(options: FirebaseListOptions<Event>, private val dataViewM
     private fun bindEvent(binding: EventRowItemBinding, event: Event) {
         val formattedDate = event.eventStartDate + " to " + event.eventEndDate
 
+        // Set different icons based on event type
+        val iconResource = when (event.eventType) {
+            "Dinner" -> R.drawable.baseline_dinner_dining_24
+            "Lunch" -> R.drawable.baseline_lunch_dining_24
+            "Party" -> R.drawable.baseline_celebration_24
+            "Sport" -> R.drawable.baseline_sports_basketball_24
+            "Music" -> R.drawable.baseline_music_note_24
+            "Art" -> R.drawable.baseline_brush_24
+            "School" -> R.drawable.baseline_school_24
+            else -> R.drawable.baseline_celebration_24
+        }
+
         binding.eventName.text = event.eventName
         binding.eventType.text = event.eventType
         binding.eventLocation.text = event.eventLocation.address
         binding.eventDate.text = formattedDate
         binding.eventDescription.text = event.eventDescription
-        binding.circleText.text = event.eventType.firstOrNull()?.toString() ?: ""
+        binding.circleIcon.setImageResource(iconResource)
 
         // Load the event photo using Picasso with a 90-degree rotation
         if(event.eventPhoto == "") event.eventPhoto = R.drawable.event_photo_placeholder.toString()
@@ -132,7 +144,7 @@ class TimeLineAdapter(options: FirebaseListOptions<Event>, private val dataViewM
 
     private fun like(binding: EventRowItemBinding, event: Event){
         // Query the favorites table for the current user
-        val favoritesRef = Firebase.database(DATABASE_URL).reference
+        val favoritesRef = database.reference
             .child("favorites")
             .child(dataViewModel.auth.uid ?: "")
 

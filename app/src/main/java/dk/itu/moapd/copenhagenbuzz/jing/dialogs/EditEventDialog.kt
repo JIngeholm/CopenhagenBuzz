@@ -29,14 +29,18 @@ import android.app.Dialog
 import android.content.Intent
 import android.graphics.Bitmap
 import android.graphics.Matrix
+import android.location.Geocoder
 import android.os.Bundle
 import android.provider.MediaStore
+import android.util.Log
+import android.view.ViewGroup
 import android.widget.ArrayAdapter
 import android.widget.Toast
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.activityViewModels
+import com.google.android.gms.maps.model.LatLng
 import com.google.android.material.datepicker.MaterialDatePicker
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.firebase.database.DataSnapshot
@@ -61,6 +65,8 @@ class EditEventDialog : DialogFragment() {
     private val binding get() = _binding!!
     private val dataViewModel: DataViewModel by activityViewModels()
     private lateinit var imagePickerLauncher: ActivityResultLauncher<Intent>
+    private val geocoder by lazy { Geocoder(requireContext(), Locale.getDefault()) }
+    private var currentLatLng: LatLng? = null
 
     // State constants
     companion object {
@@ -102,6 +108,17 @@ class EditEventDialog : DialogFragment() {
                     event.eventPhoto = uri.toString()
                 }
             }
+        }
+    }
+
+    override fun onStart() {
+        super.onStart()
+
+        val dialog = dialog
+        if (dialog != null) {
+            val width = ViewGroup.LayoutParams.MATCH_PARENT
+            val height = ViewGroup.LayoutParams.MATCH_PARENT
+            dialog.window?.setLayout(width, height)
         }
     }
 
@@ -182,12 +199,49 @@ class EditEventDialog : DialogFragment() {
 
         binding.saveButton.setOnClickListener {
             if (isInputValid()) {
-                dataViewModel.updateEvent(getEditedEvent(event))
-                Toast.makeText(requireContext(), "Event saved! 🎉", Toast.LENGTH_SHORT).show()
+                val locationName = binding.editTextEventLocation.text.toString().trim()
+                geocodeLocation(locationName) { success ->
+                    if (success) {
+                        dataViewModel.updateEvent(getEditedEvent(event))
+                        Toast.makeText(requireContext(), "Event saved! 🎉", Toast.LENGTH_SHORT).show()
+                        dismiss()
+                    } else {
+                        Toast.makeText(
+                            requireContext(),
+                            "Could not find location. Please try again.",
+                            Toast.LENGTH_SHORT
+                        ).show()
+                    }
+                }
             } else {
                 Toast.makeText(requireContext(), "Please fill all fields!", Toast.LENGTH_SHORT).show()
             }
-            dismiss()
+        }
+    }
+
+    @Suppress("DEPRECATION")
+    private fun geocodeLocation(locationName: String, callback: (Boolean) -> Unit) {
+        try {
+            if (Geocoder.isPresent()) {
+                val addresses = geocoder.getFromLocationName(locationName, 1)
+                if (addresses?.isNotEmpty() == true) {
+                    val address = addresses[0]
+                    currentLatLng = LatLng(address.latitude, address.longitude)
+                    event.eventLocation = EventLocation(
+                        latitude = address.latitude,
+                        longitude = address.longitude,
+                        address = address.getAddressLine(0) ?: locationName
+                    )
+                    callback(true)
+                } else {
+                    callback(false)
+                }
+            } else {
+                callback(false)
+            }
+        } catch (e: Exception) {
+            Log.e("Geocoding", "Error: ${e.message}")
+            callback(false)
         }
     }
 
@@ -199,12 +253,11 @@ class EditEventDialog : DialogFragment() {
         editedEvent.eventPhoto = event.eventPhoto
         editedEvent.favoritedBy = event.favoritedBy
         editedEvent.invitedUsers = event.invitedUsers
+
+        // Use the updated location from geocoding
         editedEvent.eventLocation = event.eventLocation
 
         editedEvent.eventName = binding.editTextEventName.text.toString().trim()
-
-        editedEvent.eventLocation.address = binding.editTextEventLocation.text.toString().trim()
-
         editedEvent.eventStartDate = binding.editTextEventDateRange.text.toString().substringBefore(" to ").trim()
         editedEvent.eventEndDate = binding.editTextEventDateRange.text.toString().substringAfter(" to ").trim()
         editedEvent.eventType = binding.spinnerEventType.text.toString().trim()
@@ -212,6 +265,7 @@ class EditEventDialog : DialogFragment() {
 
         return editedEvent
     }
+
 
     private fun setInitialEventInfo(event: Event) {
         val formattedDate = "${event.eventStartDate} to ${event.eventEndDate}"

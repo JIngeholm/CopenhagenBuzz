@@ -33,6 +33,7 @@ import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.database.database
 import com.squareup.picasso.Picasso
 import dk.itu.moapd.copenhagenbuzz.jing.MyApplication.Companion.DATABASE_URL
+import dk.itu.moapd.copenhagenbuzz.jing.MyApplication.Companion.database
 import dk.itu.moapd.copenhagenbuzz.jing.R
 import dk.itu.moapd.copenhagenbuzz.jing.databinding.InvitedUserRowItemBinding
 import dk.itu.moapd.copenhagenbuzz.jing.objects.Event
@@ -125,7 +126,7 @@ class InvitedUsersAdapter(
     override fun getItemCount(): Int = invitedUsersMap.size
 
     private fun updateInviteStatusInFirebase(userId: String, newStatus: String) {
-        val eventInviteRef = Firebase.database(DATABASE_URL).reference
+        val eventInviteRef = database.reference
             .child("events")
             .child(event.eventID)
             .child("invitedUsers")
@@ -142,7 +143,7 @@ class InvitedUsersAdapter(
     }
 
     private fun removeInviteFromUserNode(userId: String) {
-        Firebase.database(DATABASE_URL).reference
+        database.reference
             .child("invites")
             .child(userId)
             .child(event.eventID)

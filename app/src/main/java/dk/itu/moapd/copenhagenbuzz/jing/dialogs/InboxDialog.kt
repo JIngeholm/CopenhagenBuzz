@@ -8,12 +8,10 @@ import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.activityViewModels
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
-import com.google.firebase.Firebase
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.ValueEventListener
-import com.google.firebase.database.database
-import dk.itu.moapd.copenhagenbuzz.jing.MyApplication.Companion.DATABASE_URL
+import dk.itu.moapd.copenhagenbuzz.jing.MyApplication.Companion.database
 import dk.itu.moapd.copenhagenbuzz.jing.adapters.InboxAdapter
 import dk.itu.moapd.copenhagenbuzz.jing.databinding.DialogInboxBinding
 import dk.itu.moapd.copenhagenbuzz.jing.models.DataViewModel
@@ -35,15 +33,12 @@ class InboxDialog : DialogFragment() {
             adapter = InboxAdapter(eventsList).apply {
                 setOnAttendClickListener { event ->
                     handleResponse(event, "Attending")
-                    dismiss()
                 }
                 setOnMaybeClickListener { event ->
                     handleResponse(event, "Maybe")
-                    dismiss()
                 }
                 setOnDeclineClickListener { event ->
                     handleResponse(event, "Declined")
-                    dismiss()
                 }
             }
 
@@ -68,7 +63,7 @@ class InboxDialog : DialogFragment() {
         dataViewModel.auth.currentUser?.uid?.let { userId ->
 
             // Remove event from users invites
-            Firebase.database(DATABASE_URL).reference
+            database.reference
                 .child("invites")
                 .child(userId)
                 .child(event.eventID)
@@ -81,7 +76,7 @@ class InboxDialog : DialogFragment() {
                 }
 
             // Update the user's status in the event's invitedUsers map
-            Firebase.database(DATABASE_URL).reference
+            database.reference
                 .child("events")
                 .child(event.eventID)
                 .child("invitedUsers")
@@ -97,7 +92,7 @@ class InboxDialog : DialogFragment() {
     }
 
     private fun fetchInvites(userId: String) {
-        val invitesRef = Firebase.database(DATABASE_URL).reference
+        val invitesRef = database.reference
             .child("invites")
             .child(userId)
 
@@ -118,7 +113,7 @@ class InboxDialog : DialogFragment() {
     }
 
     private fun fetchEventDetails(eventIds: List<String>) {
-        val eventsRef = Firebase.database(DATABASE_URL).reference
+        val eventsRef = database.reference
             .child("events")
 
         eventIds.forEach { eventId ->

@@ -32,9 +32,7 @@ import android.view.ViewGroup
 import androidx.fragment.app.activityViewModels
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.firebase.ui.database.FirebaseRecyclerOptions
-import com.google.firebase.Firebase
-import com.google.firebase.database.database
-import dk.itu.moapd.copenhagenbuzz.jing.MyApplication.Companion.DATABASE_URL
+import dk.itu.moapd.copenhagenbuzz.jing.MyApplication.Companion.database
 import dk.itu.moapd.copenhagenbuzz.jing.adapters.FavoriteAdapter
 import dk.itu.moapd.copenhagenbuzz.jing.objects.Event
 import dk.itu.moapd.copenhagenbuzz.jing.databinding.FragmentFavoritesBinding
@@ -88,7 +86,7 @@ class FavoritesFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         dataViewModel.auth.currentUser?.let { user ->
-            val query = Firebase.database(DATABASE_URL).reference
+            val query = database.reference
                 .child("favorites")
                 .child(user.uid)
                 .orderByChild("eventStartDate")

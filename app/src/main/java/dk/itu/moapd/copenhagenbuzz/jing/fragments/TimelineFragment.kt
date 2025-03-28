@@ -31,13 +31,11 @@ import android.view.View
 import android.view.ViewGroup
 
 import androidx.fragment.app.activityViewModels
-import com.google.firebase.Firebase
-import com.google.firebase.database.database
-import dk.itu.moapd.copenhagenbuzz.jing.MyApplication.Companion.DATABASE_URL
 import dk.itu.moapd.copenhagenbuzz.jing.adapters.TimeLineAdapter
 import dk.itu.moapd.copenhagenbuzz.jing.objects.Event
 import dk.itu.moapd.copenhagenbuzz.jing.databinding.FragmentTimelineBinding
 import com.firebase.ui.database.FirebaseListOptions
+import dk.itu.moapd.copenhagenbuzz.jing.MyApplication.Companion.database
 import dk.itu.moapd.copenhagenbuzz.jing.R
 import dk.itu.moapd.copenhagenbuzz.jing.databinding.EventRowItemBinding
 import dk.itu.moapd.copenhagenbuzz.jing.models.DataViewModel
@@ -113,7 +111,7 @@ class TimelineFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         dataViewModel.auth.currentUser?.let {
-            val query = Firebase.database(DATABASE_URL).reference
+            val query = database.reference
                 .child("events")
                 .orderByChild("eventStartDate")
 

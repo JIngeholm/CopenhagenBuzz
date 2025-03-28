@@ -27,15 +27,11 @@ package dk.itu.moapd.copenhagenbuzz.jing.models
 import android.util.Log
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import com.google.firebase.Firebase
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.DatabaseReference
-import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.ValueEventListener
-import com.google.firebase.database.database
-import dk.itu.moapd.copenhagenbuzz.jing.MyApplication.Companion.DATABASE_URL
 import dk.itu.moapd.copenhagenbuzz.jing.MyApplication.Companion.database
 import dk.itu.moapd.copenhagenbuzz.jing.objects.Event
 
@@ -90,7 +86,7 @@ class DataViewModel : ViewModel() {
      */
     fun toggleFavorite(event: Event, liked: Boolean): Boolean {
         auth.currentUser?.let { user ->
-            val databaseRef = Firebase.database(DATABASE_URL).reference
+            val databaseRef = database.reference
             val favoritesRef = databaseRef.child("favorites").child(user.uid)
             val favoritedByRef = databaseRef.child("events").child(event.eventID).child("favoritedBy")
 
@@ -186,7 +182,7 @@ class DataViewModel : ViewModel() {
      * @param editedEvent The modified [Event] object.
      */
     fun updateEvent(editedEvent: Event) {
-        val databaseRef = Firebase.database(DATABASE_URL).reference
+        val databaseRef = database.reference
 
         databaseRef.child("events").child(editedEvent.eventID)
             .addListenerForSingleValueEvent(object : ValueEventListener {
@@ -229,7 +225,7 @@ class DataViewModel : ViewModel() {
     }
 
     fun updateInvite(event: Event, unInvitedUsers: MutableList<String>) {
-        val invitesRef = Firebase.database(DATABASE_URL).reference.child("invites")
+        val invitesRef = database.reference.child("invites")
 
         // Convert Event to a simplified map for invites
         val inviteData = mapOf(

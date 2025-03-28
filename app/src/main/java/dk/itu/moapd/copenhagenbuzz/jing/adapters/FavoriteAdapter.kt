@@ -60,9 +60,21 @@ class FavoriteAdapter(options: FirebaseRecyclerOptions<Event>, private val dataV
          * @param event The event object containing the event details.
          */
         fun bind(event: Event) {
+            // Set different icons based on event type
+            val iconResource = when (event.eventType) {
+                "Dinner" -> R.drawable.baseline_dinner_dining_24
+                "Lunch" -> R.drawable.baseline_lunch_dining_24
+                "Party" -> R.drawable.baseline_celebration_24
+                "Sport" -> R.drawable.baseline_sports_basketball_24
+                "Music" -> R.drawable.baseline_music_note_24
+                "Art" -> R.drawable.baseline_brush_24
+                "School" -> R.drawable.baseline_school_24
+                else -> R.drawable.baseline_celebration_24
+            }
+
             binding.eventName.text = event.eventName
             binding.eventType.text = event.eventType
-            binding.circleText.text = event.eventType.firstOrNull()?.toString() ?: ""
+            binding.circleIcon.setImageResource(iconResource)
 
             // Load the event photo using Picasso with a 90-degree rotation
             Picasso.get()

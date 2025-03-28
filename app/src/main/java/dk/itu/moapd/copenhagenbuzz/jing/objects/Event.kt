@@ -25,12 +25,13 @@ SOFTWARE.
 package dk.itu.moapd.copenhagenbuzz.jing.objects
 
 /**
- * @constructor A constructor for a kotlin data class for social events
+ * @constructor A constructor for a kotlin data class for social events.
  * @param[eventName] the name of the event of type string.
- * @param[eventLocation] the location of the event of type EventLocation
- * @param[eventDate] the start and the end date of the event of type string.
+ * @param[eventLocation] the location of the event of type EventLocation.
+ * @param[eventStartDate] the start date of the event of type string.
+ * @param[eventEndDate] the end date of the event of type string.
  * @param[eventType] the type of event of type string.
- * @param[eventDescription] the description of the event of type string
+ * @param[eventDescription] the description of the event of type string.
  * @author Johan Ingeholm
  */
 data class Event(
