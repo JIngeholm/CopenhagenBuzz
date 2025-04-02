@@ -1,5 +1,21 @@
 <?xml version="1.0" encoding="utf-8"?>
-<shape xmlns:android="http://schemas.android.com/apk/res/android">
-    <solid android:color="#FFFFFF"/> <!-- White background -->
-    <corners android:radius="16dp"/> <!-- Corner radius -->
-</shape>
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <!-- Border Layer -->
+    <item>
+        <shape>
+            <solid android:color="?attr/colorOnPrimary"/>  <!-- Border color -->
+            <corners android:radius="16dp"/>  <!-- Ensures rounded border -->
+            <padding android:left="1dp" android:top="1dp" android:right="1dp" android:bottom="1dp"/>
+        </shape>
+    </item>
+
+    <!-- Inner Background Layer -->
+    <item android:top="1dp" android:bottom="1dp" android:left="1dp" android:right="1dp">
+        <shape>
+            <solid android:color="?attr/colorSurface"/>  <!-- Background color -->
+            <corners android:radius="16dp"/>  <!-- Ensures rounded corners -->
+        </shape>
+    </item>
+
+</layer-list>

@@ -129,6 +129,8 @@ class TimeLineAdapter(options: FirebaseListOptions<Event>, private val dataViewM
 
         if(!event.invitedUsers.containsKey(dataViewModel.auth.uid) && event.userId != dataViewModel.auth.currentUser?.uid){
             binding.invited.isVisible = false
+        } else {
+            binding.invited.isVisible = true
         }
 
         var invitedUsersListSize = event.invitedUsers.size.toString()
