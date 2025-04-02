@@ -12,6 +12,7 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.app.ActivityCompat
@@ -22,12 +23,14 @@ import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.LatLng
+import com.google.android.gms.maps.model.Marker
 import com.google.android.gms.maps.model.MarkerOptions
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.ValueEventListener
 import dk.itu.moapd.copenhagenbuzz.jing.MyApplication.Companion.database
 import dk.itu.moapd.copenhagenbuzz.jing.R
+import dk.itu.moapd.copenhagenbuzz.jing.databinding.CustomMapMarkerBinding
 import dk.itu.moapd.copenhagenbuzz.jing.objects.Event
 import dk.itu.moapd.copenhagenbuzz.jing.services.LocationService
 
@@ -109,6 +112,8 @@ class MapsFragment : Fragment(), OnMapReadyCallback {
                 marker.showInfoWindow()
                 true
             }
+
+            googleMap.setInfoWindowAdapter(CustomInfoWindowAdapter())
 
             enableMyLocation()
             Log.d(TAG, "Map initialized successfully")
@@ -268,6 +273,50 @@ class MapsFragment : Fragment(), OnMapReadyCallback {
         eventsRef.addValueEventListener(eventsListener)
     }
 
+
+    private inner class CustomInfoWindowAdapter : GoogleMap.InfoWindowAdapter {
+
+        private val window: View = layoutInflater.inflate(R.layout.custom_map_marker, null)
+        private val markerBinding = CustomMapMarkerBinding.bind(window)
+
+        override fun getInfoContents(marker: Marker): View? {
+            // Return null to use the default info window content (or return your custom view here)
+            return null
+        }
+
+        override fun getInfoWindow(marker: Marker): View {
+            val event = marker.tag as? Event
+
+            // If the marker has a valid event, bind the data to the custom info window
+            event?.let {
+                markerBinding.eventName.text = it.eventName
+                markerBinding.eventType.text = it.eventType
+                markerBinding.eventDate.text = buildString {
+                    append(it.eventStartDate)
+                    append(" to ")
+                    append(it.eventEndDate)
+                }
+
+                // Set different icons based on event type
+                val iconResource = when (event.eventType) {
+                    "Dinner" -> R.drawable.baseline_dinner_dining_24
+                    "Lunch" -> R.drawable.baseline_lunch_dining_24
+                    "Party" -> R.drawable.baseline_celebration_24
+                    "Sport" -> R.drawable.baseline_sports_basketball_24
+                    "Music" -> R.drawable.baseline_music_note_24
+                    "Art" -> R.drawable.baseline_brush_24
+                    "School" -> R.drawable.baseline_school_24
+                    else -> R.drawable.baseline_celebration_24
+                }
+
+                markerBinding.circleIcon.setImageResource(iconResource)
+            }
+
+            return window
+        }
+    }
+
+
     private fun displayEventsOnMap(events: List<Event>) {
         if (!isMapReady) {
             Log.d(TAG, "Map not ready yet, storing ${events.size} events for later")
@@ -289,16 +338,17 @@ class MapsFragment : Fragment(), OnMapReadyCallback {
 
                         Log.d(TAG, "Adding marker for ${event.eventName} at $location")
 
-                        googleMap.addMarker(
+                        val marker = googleMap.addMarker(
                             MarkerOptions()
                                 .position(location)
                                 .title(event.eventName)
                                 .snippet("${event.eventType}\n${event.eventStartDate}")
-                        )?.let { marker ->
-                            Log.d(TAG, "Marker added successfully: ${marker.title}")
-                        } ?: run {
-                            Log.e(TAG, "Failed to add marker for ${event.eventName}")
-                        }
+                        )
+
+                        // Associate the event object with the marker
+                        marker?.tag = event
+
+                        Log.d(TAG, "Marker added successfully: ${marker?.title}")
                     } else {
                         Log.w(TAG, "Skipping event with invalid coordinates: ${event.eventName}")
                     }
@@ -310,5 +360,6 @@ class MapsFragment : Fragment(), OnMapReadyCallback {
             Log.e(TAG, "Map is still null when trying to display events")
         }
     }
+
 
 }

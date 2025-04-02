@@ -125,6 +125,11 @@ class MainActivity : AppCompatActivity() {
         auth.currentUser ?: startLoginActivity()
     }
 
+    override fun onResume() {
+        super.onResume()
+        setupDrawerHeader()  // Refresh user info whenever activity is resumed
+    }
+
 
 
     private fun startLoginActivity() {
@@ -192,37 +197,34 @@ class MainActivity : AppCompatActivity() {
 
 
 
-    private fun setupDrawerHeader() {
-        val headerView = binding.navigationView.getHeaderView(0)
-        val loginButton = headerView?.findViewById<MaterialButton>(R.id.login_button)
+    fun setupDrawerHeader() {
+        auth.currentUser?.reload()?.addOnCompleteListener {
+            val user = auth.currentUser
+            val headerView = binding.navigationView.getHeaderView(0)
+            val loginButton = headerView?.findViewById<MaterialButton>(R.id.login_button)
 
-        loginButton?.setOnClickListener {
-            navigateToLogin()
+            loginButton?.setOnClickListener { navigateToLogin() }
+
+            if (isGuest) return@addOnCompleteListener
+
+            val profileImageView = headerView?.findViewById<ImageView>(R.id.drawer_profile_photo)
+            user?.let {
+                Picasso.get()
+                    .load(user.photoUrl)
+                    .placeholder(R.drawable.baseline_account_circle_60)
+                    .error(R.drawable.baseline_account_circle_60)
+                    .into(profileImageView)
+
+                headerView.findViewById<TextView>(R.id.drawer_username)?.text = user.displayName
+                headerView.findViewById<TextView>(R.id.drawer_email)?.text = user.email
+            }
+
+            val loginTextRes = if (isGuest) R.string.sign_in else R.string.sign_out
+            loginButton?.setText(loginTextRes)
         }
-
-        if (isGuest) return
-
-        val profileImageView = headerView?.findViewById<ImageView>(R.id.drawer_profile_photo)
-        if (profileImageView == null) {
-            Log.e("MainActivity", "profileImageView is null")
-            return
-        }
-
-        // Use Picasso to load the profile photo
-        Picasso.get()
-            .load(auth.currentUser?.photoUrl)
-            .placeholder(R.drawable.baseline_account_circle_60)
-            .error(R.drawable.baseline_account_circle_60)
-            .into(profileImageView)
-
-        // Set username and email
-        headerView.findViewById<TextView>(R.id.drawer_username)?.text = auth.currentUser?.displayName
-        headerView.findViewById<TextView>(R.id.drawer_email)?.text = auth.currentUser?.email
-
-        // Set login button text and click listener
-        val loginTextRes = if (isGuest) R.string.sign_in else R.string.sign_out
-        loginButton?.setText(loginTextRes)
     }
+
+
 
 
 

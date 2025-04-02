@@ -26,34 +26,24 @@ package dk.itu.moapd.copenhagenbuzz.jing.fragments
 
 import android.app.Activity
 import android.content.Intent
-import android.location.Geocoder
 import android.net.Uri
-import android.os.Build
 import android.os.Bundle
 import android.provider.MediaStore
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.ArrayAdapter
 import android.widget.Toast
+import androidx.activity.result.ActivityResultLauncher
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.findNavController
-import dk.itu.moapd.copenhagenbuzz.jing.R
-import dk.itu.moapd.copenhagenbuzz.jing.objects.Event
-import dk.itu.moapd.copenhagenbuzz.jing.databinding.FragmentAddEventBinding
-import java.text.SimpleDateFormat
-import java.util.Date
-import androidx.activity.result.ActivityResultLauncher
-import androidx.activity.result.contract.ActivityResultContracts
-import com.google.android.gms.maps.model.LatLng
 import com.squareup.picasso.Picasso
 import dk.itu.moapd.copenhagenbuzz.jing.MyApplication.Companion.storage
+import dk.itu.moapd.copenhagenbuzz.jing.R
+import dk.itu.moapd.copenhagenbuzz.jing.activities.MainActivity
 import dk.itu.moapd.copenhagenbuzz.jing.databinding.FragmentAccountBinding
 import dk.itu.moapd.copenhagenbuzz.jing.models.DataViewModel
-import dk.itu.moapd.copenhagenbuzz.jing.objects.EventLocation
-import java.util.Locale
 
 class AccountFragment : Fragment() {
     private var _binding: FragmentAccountBinding? = null
@@ -80,20 +70,6 @@ class AccountFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         initializeViews()
         setupClickListeners()
-
-        // Add auth state listener
-        dataViewModel.auth.addAuthStateListener { firebaseAuth ->
-            firebaseAuth.currentUser?.let { updatedUser ->
-                // Update UI with fresh user data
-                binding.usernameInput.setText(updatedUser.displayName ?: "")
-
-                Picasso.get()
-                    .load(updatedUser.photoUrl)
-                    .placeholder(R.drawable.guest_24)
-                    .error(R.drawable.guest_24)
-                    .into(binding.profileImage)
-            }
-        }
     }
 
     private fun setupImagePicker() {
@@ -125,14 +101,12 @@ class AccountFragment : Fragment() {
             openImagePicker()
         }
 
-        binding.profileImage.setOnClickListener{
+        binding.profileImage.setOnClickListener {
             openImagePicker()
         }
 
         binding.saveButton.setOnClickListener {
             updateUserProfile()
-            Toast.makeText(requireContext(), "Profile saved! 🎉", Toast.LENGTH_SHORT).show()
-            findNavController().navigate(R.id.action_account_to_timeline)
         }
     }
 
@@ -196,22 +170,18 @@ class AccountFragment : Fragment() {
 
         user?.updateProfile(profileUpdates)
             ?.addOnCompleteListener { task ->
-                binding.progressBar.visibility = View.GONE
                 binding.saveButton.isEnabled = true
 
                 if (task.isSuccessful) {
-                    // Force refresh of user data
-                    user?.reload()?.addOnCompleteListener { reloadTask ->
-                        if (reloadTask.isSuccessful) {
-                            Toast.makeText(
-                                requireContext(),
-                                "Profile updated successfully",
-                                Toast.LENGTH_SHORT
-                            ).show()
-                        } else {
-                            showUpdateSuccessWithPossibleDelay()
-                        }
-                    }
+                    Toast.makeText(
+                        requireContext(),
+                        "Profile updated successfully",
+                        Toast.LENGTH_SHORT
+                    ).show()
+
+                    findNavController().navigate(R.id.action_account_to_timeline)
+                    (activity as? MainActivity)?.setupDrawerHeader() // Force refresh
+
                 } else {
                     Toast.makeText(
                         requireContext(),
@@ -222,19 +192,8 @@ class AccountFragment : Fragment() {
             }
     }
 
-    private fun showUpdateSuccessWithPossibleDelay() {
-        Toast.makeText(
-            requireContext(),
-            "Profile updated! Changes may take a moment to appear",
-            Toast.LENGTH_SHORT
-        ).show()
-    }
-
     override fun onDestroyView() {
         super.onDestroyView()
-        // Remove the auth state listener when fragment is destroyed
-        dataViewModel.auth.removeAuthStateListener { /* listener will be automatically removed */ }
         _binding = null
     }
 }
-
