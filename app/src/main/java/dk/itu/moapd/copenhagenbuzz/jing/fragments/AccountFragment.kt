@@ -39,6 +39,7 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.findNavController
 import com.squareup.picasso.Picasso
+import dk.itu.moapd.copenhagenbuzz.jing.MyApplication.Companion.database
 import dk.itu.moapd.copenhagenbuzz.jing.MyApplication.Companion.storage
 import dk.itu.moapd.copenhagenbuzz.jing.R
 import dk.itu.moapd.copenhagenbuzz.jing.activities.MainActivity
@@ -144,6 +145,14 @@ class AccountFragment : Fragment() {
                     // Get download URL after upload
                     imageRef.downloadUrl.addOnSuccessListener { downloadUri ->
                         updateFirebaseProfile(newName, downloadUri.toString())
+                    }
+
+                    // Change profile picture url in realtime database
+                    user?.let { it1 ->
+                        database.reference.child("users")
+                            .child(it1.uid)
+                            .child("profilePicture")
+                            .setValue(imageRef.toString())
                     }
                 }
                 .addOnFailureListener { e ->

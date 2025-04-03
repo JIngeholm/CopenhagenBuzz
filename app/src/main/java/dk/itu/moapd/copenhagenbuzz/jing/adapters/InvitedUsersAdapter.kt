@@ -34,6 +34,7 @@ import com.google.firebase.database.database
 import com.squareup.picasso.Picasso
 import dk.itu.moapd.copenhagenbuzz.jing.MyApplication.Companion.DATABASE_URL
 import dk.itu.moapd.copenhagenbuzz.jing.MyApplication.Companion.database
+import dk.itu.moapd.copenhagenbuzz.jing.MyApplication.Companion.storage
 import dk.itu.moapd.copenhagenbuzz.jing.R
 import dk.itu.moapd.copenhagenbuzz.jing.databinding.InvitedUserRowItemBinding
 import dk.itu.moapd.copenhagenbuzz.jing.objects.Event
@@ -58,11 +59,22 @@ class InvitedUsersAdapter(
 
             binding.Name.text = user.username
 
-            Picasso.get()
-                .load(user.profilePicture)
-                .placeholder(R.drawable.guest_24)
-                .error(R.drawable.guest_24)
-                .into(binding.profilePicture)
+            // Get image reference
+            val imageRef = storage.reference.child("profile_images/${user.uid}.jpg")
+
+            // Fetch the download URL asynchronously
+            imageRef.downloadUrl
+                .addOnSuccessListener { uri ->
+                    Picasso.get()
+                        .load(uri)
+                        .placeholder(R.drawable.guest_24)
+                        .error(R.drawable.guest_24)
+                        .into(binding.profilePicture)
+                }
+                .addOnFailureListener {
+                    // If download fails, set the placeholder image
+                    binding.profilePicture.setImageResource(R.drawable.guest_24)
+                }
 
             updateStatusUI(status)
             setupStatusClickListener(user)
