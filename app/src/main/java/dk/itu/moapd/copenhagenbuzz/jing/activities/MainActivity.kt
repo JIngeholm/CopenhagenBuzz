@@ -26,8 +26,6 @@ package dk.itu.moapd.copenhagenbuzz.jing.activities
 
 import android.content.Intent
 import android.content.res.Configuration
-import android.graphics.Bitmap
-import android.graphics.Matrix
 import android.os.Bundle
 import android.util.Log
 import android.widget.ImageView
@@ -48,7 +46,6 @@ import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.ValueEventListener
 import com.google.firebase.database.database
 import com.squareup.picasso.Picasso
-import com.squareup.picasso.Transformation
 import dk.itu.moapd.copenhagenbuzz.jing.MyApplication.Companion.DATABASE_URL
 import dk.itu.moapd.copenhagenbuzz.jing.R
 import dk.itu.moapd.copenhagenbuzz.jing.databinding.ActivityMainBinding
@@ -59,9 +56,14 @@ import dk.itu.moapd.copenhagenbuzz.jing.objects.buzzUser
 /**
  * Main activity for the CopenhagenBuzz application.
  *
- * This activity manages the navigation and UI components of the app, including handling
- * user authentication (login/logout) and menu visibility. It supports both portrait and
- * landscape orientations, adapting navigation elements accordingly.
+ * This activity is responsible for managing the main user interface and navigation within the app.
+ * It handles user authentication (login/logout) and adapts the UI based on whether the user is a guest or logged in.
+ * The activity supports both portrait and landscape orientations, adjusting the navigation elements accordingly.
+ *
+ * It also manages user settings and interactions with the drawer menu, including displaying user-specific information
+ * and handling user login/logout actions.
+ *
+ * @constructor Creates an instance of the main activity for the CopenhagenBuzz application.
  */
 class MainActivity : AppCompatActivity() {
 
@@ -71,8 +73,8 @@ class MainActivity : AppCompatActivity() {
     private lateinit var binding: ActivityMainBinding
 
     /**
-     * Indicates if the user is a guest.
-     * This is used to determine whether user-specific information should be shown in the UI.
+     * Indicates whether the current user is a guest or logged in.
+     * This determines which content is displayed in the UI.
      */
     private var isGuest: Boolean = true
 
@@ -88,8 +90,10 @@ class MainActivity : AppCompatActivity() {
         private val TAG = MainActivity::class.qualifiedName
     }
 
-
-
+    /**
+     * Called when the activity is created.
+     * Initializes Firebase Auth, sets up the navigation components, and handles user login status.
+     */
     override fun onCreate(savedInstanceState: Bundle?) {
         WindowCompat.setDecorFitsSystemWindows(window, true)
         super.onCreate(savedInstanceState)
@@ -120,29 +124,37 @@ class MainActivity : AppCompatActivity() {
         auth.currentUser?.let { addUserToDB(it) }
     }
 
-
-
+    /**
+     * Called when the activity starts.
+     * Redirects the user to the LoginActivity if they are not logged in.
+     */
     override fun onStart() {
         super.onStart()
         // Redirect the user to the LoginActivity if they are not logged in.
         auth.currentUser ?: startLoginActivity()
     }
 
+    /**
+     * Called when the activity is resumed.
+     * Refreshes user information in the drawer header.
+     */
     override fun onResume() {
         super.onResume()
         setupDrawerHeader()  // Refresh user info whenever activity is resumed
     }
 
-
-
+    /**
+     * Starts the LoginActivity.
+     */
     private fun startLoginActivity() {
         Intent(this, LoginActivity::class.java).apply {
             flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
         }.let(::startActivity)
     }
 
-
-
+    /**
+     * Sets up the navigation controller for the activity.
+     */
     private fun setupNavigation() {
         val navHostFragment = supportFragmentManager
             .findFragmentById(R.id.fragment_container_view) as NavHostFragment
@@ -168,8 +180,9 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-
-
+    /**
+     * Sets up the drawer menu, including navigation actions and visibility of items.
+     */
     private fun setupDrawer() {
         // Show or hide user settings section based on login status
         binding.navigationView.menu.findItem(R.id.user_settings).isVisible = !isGuest
@@ -198,8 +211,9 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-
-
+    /**
+     * Sets up the header in the navigation drawer with user information.
+     */
     fun setupDrawerHeader() {
         auth.currentUser?.reload()?.addOnCompleteListener {
             val user = auth.currentUser
@@ -227,10 +241,9 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-
-
-
-
+    /**
+     * Navigates to the specified fragment.
+     */
     private fun navigateToFragment(destination: Int) {
         val navController = findNavController(R.id.fragment_container_view)
         val actionId = when (navController.currentDestination?.id) {
@@ -250,6 +263,9 @@ class MainActivity : AppCompatActivity() {
         )
     }
 
+    /**
+     * Navigates to the LoginActivity.
+     */
     private fun navigateToLogin() {
         val intent = Intent(this, LoginActivity::class.java)
         intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
@@ -257,6 +273,9 @@ class MainActivity : AppCompatActivity() {
         finish()
     }
 
+    /**
+     * Adds the current user to the Firebase Realtime Database if they are not already present.
+     */
     private fun addUserToDB(fbUser: FirebaseUser) {
         val databaseReference = Firebase.database(DATABASE_URL).reference
         val userRef = databaseReference.child("users").child(fbUser.uid)

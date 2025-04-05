@@ -44,6 +44,7 @@ import dk.itu.moapd.copenhagenbuzz.jing.models.DataViewModel
  * This adapter binds event data to the UI and loads event images using Picasso.
  *
  * @property options The FirebaseRecyclerOptions that provide the query for Firebase data.
+ * @property dataViewModel The DataViewModel used for managing data, particularly for handling favorites.
  */
 class FavoriteAdapter(options: FirebaseRecyclerOptions<Event>, private val dataViewModel: DataViewModel) : FirebaseRecyclerAdapter<Event, FavoriteAdapter.ViewHolder>(options) {
 
@@ -126,4 +127,3 @@ class FavoriteAdapter(options: FirebaseRecyclerOptions<Event>, private val dataV
         holder.bind(model)
     }
 }
-

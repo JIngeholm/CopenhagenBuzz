@@ -25,11 +25,9 @@ SOFTWARE.
 package dk.itu.moapd.copenhagenbuzz.jing
 
 import android.app.Application
-import android.util.Log
 import com.google.android.material.color.DynamicColors
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.storage.FirebaseStorage
-import io.github.cdimascio.dotenv.dotenv
 
 class MyApplication: Application() {
 
