@@ -24,10 +24,13 @@
         android:layout_height="wrap_content"
         android:text="@string/username"
         android:textSize="@dimen/_16sp"
+        android:maxLines="1"
+        android:ellipsize="end"
         app:layout_constraintStart_toEndOf="@id/profile_picture"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toStartOf="@id/invite_status"/>
+
 
     <TextView
         android:id="@+id/invite_status"
