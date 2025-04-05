@@ -200,6 +200,11 @@ class AccountFragment : Fragment() {
                         Toast.LENGTH_SHORT
                     ).show()
 
+                    database.reference.child("users")
+                        .child("${user?.uid}")
+                        .child("username")
+                        .setValue(name)
+
                     findNavController().navigate(R.id.action_account_to_timeline)
                     (activity as? MainActivity)?.setupDrawerHeader()
                 } else {
