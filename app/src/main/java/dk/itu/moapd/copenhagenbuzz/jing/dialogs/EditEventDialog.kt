@@ -30,6 +30,7 @@ import android.content.Intent
 import android.graphics.Bitmap
 import android.graphics.Matrix
 import android.location.Geocoder
+import android.net.Uri
 import android.os.Bundle
 import android.provider.MediaStore
 import android.util.Log
@@ -38,6 +39,8 @@ import android.widget.ArrayAdapter
 import android.widget.Toast
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.core.content.FileProvider
+import androidx.core.net.toUri
 import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.activityViewModels
 import com.google.android.gms.maps.model.LatLng
@@ -50,11 +53,13 @@ import com.google.firebase.database.ValueEventListener
 import com.squareup.picasso.Picasso
 import com.squareup.picasso.Transformation
 import dk.itu.moapd.copenhagenbuzz.jing.MyApplication.Companion.database
+import dk.itu.moapd.copenhagenbuzz.jing.MyApplication.Companion.storage
 import dk.itu.moapd.copenhagenbuzz.jing.R
 import dk.itu.moapd.copenhagenbuzz.jing.objects.Event
 import dk.itu.moapd.copenhagenbuzz.jing.databinding.DialogEditEventBinding
 import dk.itu.moapd.copenhagenbuzz.jing.models.DataViewModel
 import dk.itu.moapd.copenhagenbuzz.jing.objects.EventLocation
+import java.io.File
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
@@ -64,9 +69,17 @@ class EditEventDialog : DialogFragment() {
     private var _binding: DialogEditEventBinding? = null
     private val binding get() = _binding!!
     private val dataViewModel: DataViewModel by activityViewModels()
-    private lateinit var imagePickerLauncher: ActivityResultLauncher<Intent>
     private val geocoder by lazy { Geocoder(requireContext(), Locale.getDefault()) }
     private var currentLatLng: LatLng? = null
+
+    private var eventId: String = ""
+    private lateinit var eventRef: DatabaseReference
+    private lateinit var event: Event
+
+    private lateinit var imagePickerLauncher: ActivityResultLauncher<Intent>
+    private lateinit var cameraLauncher: ActivityResultLauncher<Intent>
+    private var photoUri: Uri? = null
+    private var initialPhotoUri: String = ""
 
     // State constants
     companion object {
@@ -87,10 +100,6 @@ class EditEventDialog : DialogFragment() {
         }
     }
 
-    private var eventId: String = ""
-    private lateinit var eventRef: DatabaseReference
-    private lateinit var event: Event
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         eventId = arguments?.getString(ARG_EVENT_ID) ?: run {
@@ -107,6 +116,13 @@ class EditEventDialog : DialogFragment() {
                     binding.imageViewEventPicture.setImageURI(uri)
                     event.eventPhoto = uri.toString()
                 }
+            }
+        }
+
+        cameraLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+            if (result.resultCode == Activity.RESULT_OK && photoUri != null) {
+                binding.imageViewEventPicture.setImageURI(photoUri)
+                event.eventPhoto = photoUri.toString()
             }
         }
     }
@@ -202,9 +218,15 @@ class EditEventDialog : DialogFragment() {
                 val locationName = binding.editTextEventLocation.text.toString().trim()
                 geocodeLocation(locationName) { success ->
                     if (success) {
-                        dataViewModel.updateEvent(getEditedEvent(event))
-                        Toast.makeText(requireContext(), "Event saved! 🎉", Toast.LENGTH_SHORT).show()
-                        dismiss()
+                        if (event.eventPhoto != initialPhotoUri) {
+                            uploadImageToFirebaseStorage(event.eventPhoto.toUri()) { imageUrl ->
+                                event.eventPhoto = imageUrl // Update the event's photo with the new URL
+                                saveEventData()
+                            }
+                        } else {
+                            // If no image is selected, just save the event data
+                            saveEventData()
+                        }
                     } else {
                         Toast.makeText(
                             requireContext(),
@@ -218,6 +240,31 @@ class EditEventDialog : DialogFragment() {
             }
         }
     }
+
+
+    private fun saveEventData() {
+        dataViewModel.updateEvent(getEditedEvent(event))
+        Toast.makeText(requireContext(), "Event saved! 🎉", Toast.LENGTH_SHORT).show()
+        dismiss()
+    }
+
+    private fun uploadImageToFirebaseStorage(imageUri: Uri, onComplete: (String) -> Unit) {
+        val storageRef = storage.reference
+        val imageRef = storageRef.child("event_images/${imageUri.lastPathSegment}")
+
+        imageRef.putFile(imageUri)
+            .addOnSuccessListener {
+                imageRef.downloadUrl.addOnSuccessListener { downloadUri ->
+                    onComplete(downloadUri.toString()) // Return the download URL
+                }.addOnFailureListener {
+                    Toast.makeText(requireContext(), "Failed to upload image", Toast.LENGTH_SHORT).show()
+                }
+            }
+            .addOnFailureListener {
+                Toast.makeText(requireContext(), "Failed to upload image", Toast.LENGTH_SHORT).show()
+            }
+    }
+
 
     @Suppress("DEPRECATION")
     private fun geocodeLocation(locationName: String, callback: (Boolean) -> Unit) {
@@ -278,6 +325,7 @@ class EditEventDialog : DialogFragment() {
 
         if (!event.eventPhoto.isNullOrEmpty()) {
             loadEventImage(event.eventPhoto)
+            initialPhotoUri = event.eventPhoto
         } else {
             binding.imageViewEventPicture.setImageResource(R.drawable.event_photo_placeholder)
         }
@@ -334,6 +382,10 @@ class EditEventDialog : DialogFragment() {
             imagePickerLauncher.launch(intent)
         }
 
+        binding.captureImageButton.setOnClickListener {
+            launchCamera()
+        }
+
         val eventTypes = resources.getStringArray(R.array.event_types)
         val adapter = ArrayAdapter(
             requireContext(),
@@ -358,5 +410,31 @@ class EditEventDialog : DialogFragment() {
                 binding.editTextEventDateRange.text.toString().isNotEmpty() &&
                 binding.spinnerEventType.text.toString().isNotEmpty() &&
                 binding.editTextEventDescription.text.toString().isNotEmpty()
+    }
+
+    private fun launchCamera() {
+        val photoFile = createImageFile()
+        if (photoFile != null) {
+            photoUri = FileProvider.getUriForFile(
+                requireContext(),
+                "dk.itu.moapd.copenhagenbuzz.jing.fileprovider",
+                photoFile
+            )
+            val intent = Intent(MediaStore.ACTION_IMAGE_CAPTURE).apply {
+                putExtra(MediaStore.EXTRA_OUTPUT, photoUri)
+            }
+            cameraLauncher.launch(intent)
+        }
+    }
+
+    private fun createImageFile(): File? {
+        return try {
+            val timeStamp = SimpleDateFormat("yyyyMMdd_HHmmss", Locale.getDefault()).format(Date())
+            val storageDir = requireContext().cacheDir
+            File.createTempFile("JPEG_${timeStamp}_", ".jpg", storageDir)
+        } catch (e: Exception) {
+            Log.e("CameraIntent", "Error creating file: ${e.message}")
+            null
+        }
     }
 }

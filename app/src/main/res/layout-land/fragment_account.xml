@@ -12,45 +12,58 @@
         android:padding="24dp"
         tools:context=".fragments.AccountFragment">
 
-        <!-- Profile Image with Edit Button -->
-        <RelativeLayout
-            android:id="@+id/profile_image_container"
+        <de.hdodenhof.circleimageview.CircleImageView
+            android:id="@+id/profile_image"
+            android:layout_width="120dp"
+            android:layout_height="120dp"
+            android:src="@drawable/baseline_account_circle_60"
+            android:layout_marginTop="32dp"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:civ_border_width="2dp"
+            app:civ_border_color="?attr/colorPrimary"/>
+
+        <LinearLayout
+            android:id="@+id/image_selection_layout"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="32dp"
-            app:layout_constraintEnd_toEndOf="parent"
+            android:layout_marginTop="@dimen/_16dp"
+            android:orientation="horizontal"
+            app:layout_constraintTop_toBottomOf="@id/profile_image"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent">
+            app:layout_constraintEnd_toEndOf="parent"
+            >
 
-            <de.hdodenhof.circleimageview.CircleImageView
-                android:id="@+id/profile_image"
-                android:layout_width="120dp"
-                android:layout_height="120dp"
-                android:src="@drawable/baseline_account_circle_60"
-                app:civ_border_color="?attr/colorPrimary"
-                app:civ_border_width="2dp" />
+            <!-- Image selection button -->
+            <Button
+                android:id="@+id/select_image_button"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textColor="?attr/colorOnSecondary"
+                android:text="@string/select_image"
+                android:drawableLeft="@drawable/baseline_image_24"
+                android:drawableTint="?attr/colorOnSecondary"
+                android:paddingStart="@dimen/_8dp"
+                android:paddingEnd="@dimen/_8dp"
+                app:backgroundTint="?attr/colorAccent"
+                />
 
-            <com.google.android.material.card.MaterialCardView
-                android:id="@+id/change_image_button"
-                android:layout_width="30dp"
-                android:layout_height="40dp"
-                android:layout_alignBottom="@id/profile_image"
-                android:layout_alignEnd="@id/profile_image"
-                android:layout_marginEnd="-8dp"
-                android:layout_marginBottom="-8dp"
-                app:cardBackgroundColor="@android:color/transparent"
-                app:cardCornerRadius="14dp"
-                app:strokeWidth="0dp">
+            <Button
+                android:id="@+id/capture_image_button"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textColor="?attr/colorOnSecondary"
+                android:layout_marginStart="@dimen/_16dp"
+                android:text="@string/capture_image"
+                android:drawableLeft="@drawable/baseline_camera_alt_24"
+                android:drawableTint="?attr/colorOnSecondary"
+                android:paddingStart="@dimen/_8dp"
+                android:paddingEnd="@dimen/_8dp"
+                app:backgroundTint="?attr/colorAccent"
+                />
 
-                <ImageView
-                    android:layout_width="20dp"
-                    android:layout_height="20dp"
-                    android:layout_gravity="center"
-                    android:src="@drawable/baseline_edit_24"
-                    app:tint="?attr/colorPrimary" />
-            </com.google.android.material.card.MaterialCardView>
-
-        </RelativeLayout>
+        </LinearLayout>
 
         <!-- Username Field -->
         <com.google.android.material.textfield.TextInputLayout
@@ -62,7 +75,7 @@
             android:hint="@string/username"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/profile_image_container">
+            app:layout_constraintTop_toBottomOf="@id/image_selection_layout">
 
             <com.google.android.material.textfield.TextInputEditText
                 android:id="@+id/username_input"

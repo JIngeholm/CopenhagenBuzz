@@ -28,7 +28,6 @@ import android.app.Activity
 import android.content.Intent
 import android.location.Geocoder
 import android.net.Uri
-import android.os.Build
 import android.os.Bundle
 import android.provider.MediaStore
 import android.util.Log
@@ -47,10 +46,12 @@ import java.text.SimpleDateFormat
 import java.util.Date
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.core.content.FileProvider
 import com.google.android.gms.maps.model.LatLng
 import dk.itu.moapd.copenhagenbuzz.jing.MyApplication.Companion.storage
 import dk.itu.moapd.copenhagenbuzz.jing.models.DataViewModel
 import dk.itu.moapd.copenhagenbuzz.jing.objects.EventLocation
+import java.io.File
 import java.util.Locale
 
 /**
@@ -70,6 +71,11 @@ class AddEventFragment : Fragment() {
     private val geocoder by lazy { Geocoder(requireContext(), Locale.getDefault()) }
     private var currentLatLng: LatLng? = null
 
+    private lateinit var imagePickerLauncher: ActivityResultLauncher<Intent>
+    private lateinit var cameraLauncher: ActivityResultLauncher<Intent>
+    private var photoUri: Uri? = null
+
+
     companion object {
         private const val IMAGE_REQUEST_CODE = 100
     }
@@ -78,8 +84,6 @@ class AddEventFragment : Fragment() {
         get() = requireNotNull(_binding) {
             "Cannot access binding because it is null. Is the view visible?"
         }
-
-    private lateinit var imagePickerLauncher: ActivityResultLauncher<Intent>
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -98,6 +102,14 @@ class AddEventFragment : Fragment() {
                 }
             }
         }
+
+        cameraLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+            if (result.resultCode == Activity.RESULT_OK && photoUri != null) {
+                binding.imageViewEventPicture.setImageURI(photoUri)
+                event.eventPhoto = photoUri.toString()
+            }
+        }
+
         return binding.root
     }
 
@@ -149,6 +161,10 @@ class AddEventFragment : Fragment() {
         binding.selectImageButton.setOnClickListener {
             val intent = Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI)
             imagePickerLauncher.launch(intent)
+        }
+
+        binding.captureImageButton.setOnClickListener {
+            launchCamera()
         }
 
         val eventTypes = resources.getStringArray(R.array.event_types)
@@ -230,9 +246,8 @@ class AddEventFragment : Fragment() {
     }
 
     private fun uploadImageAndSaveEvent(imageUri: Uri) {
-        // Create a reference to the location in storage
-        val storageRef = storage.reference
-        val imageRef = storageRef.child("event_images/${System.currentTimeMillis()}.jpg")
+
+        val imageRef = storage.reference.child("event_images/${System.currentTimeMillis()}.jpg")
 
         binding.addEventButton.isEnabled = false
 
@@ -270,6 +285,32 @@ class AddEventFragment : Fragment() {
                 binding.editTextEventDateRange.text.toString().isNotEmpty() &&
                 binding.spinnerEventType.text.toString().isNotEmpty() &&
                 binding.editTextEventDescription.text.toString().isNotEmpty()
+    }
+
+    private fun launchCamera() {
+        val photoFile = createImageFile()
+        if (photoFile != null) {
+            photoUri = FileProvider.getUriForFile(
+                requireContext(),
+                "dk.itu.moapd.copenhagenbuzz.jing.fileprovider",
+                photoFile
+            )
+            val intent = Intent(MediaStore.ACTION_IMAGE_CAPTURE).apply {
+                putExtra(MediaStore.EXTRA_OUTPUT, photoUri)
+            }
+            cameraLauncher.launch(intent)
+        }
+    }
+
+    private fun createImageFile(): File? {
+        return try {
+            val timeStamp = SimpleDateFormat("yyyyMMdd_HHmmss", Locale.getDefault()).format(Date())
+            val storageDir = requireContext().cacheDir
+            File.createTempFile("JPEG_${timeStamp}_", ".jpg", storageDir)
+        } catch (e: Exception) {
+            Log.e("CameraIntent", "Error creating file: ${e.message}")
+            null
+        }
     }
 }
 

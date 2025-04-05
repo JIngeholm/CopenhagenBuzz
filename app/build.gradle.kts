@@ -5,6 +5,8 @@ plugins {
     alias(libs.plugins.secrets.gradle)
 }
 
+val dbUrl: String = project.findProperty("DATABASE_URL") as? String ?: ""
+
 android {
     namespace = "dk.itu.moapd.copenhagenbuzz.jing"
     compileSdk = 35
@@ -17,6 +19,8 @@ android {
         versionName = "1.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+
+        buildConfigField("String", "DATABASE_URL", "\"$dbUrl\"")
     }
 
     buildTypes {

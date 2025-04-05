@@ -45,17 +45,7 @@ class MyApplication: Application() {
         // Apply dynamic colors to activities if available
         DynamicColors.applyToActivitiesIfAvailable(this)
 
-        // Load environment variables
-        val dotenv = dotenv {
-            directory = "/"  // Directory for your .env file (root project directory)
-            ignoreIfMissing = true
-        }
-
-        // Retrieve DATABASE_URL from the .env file, or fallback to default value if not present
-        DATABASE_URL = dotenv["DATABASE_URL"]
-            ?: "https://copenhagenbuzz-7eb2a-default-rtdb.europe-west1.firebasedatabase.app/"
-
-        Log.d("MyApplication", "DB URL = $DATABASE_URL")
+        DATABASE_URL = BuildConfig.DATABASE_URL
 
         if (DATABASE_URL.isNullOrEmpty()) {
             throw IllegalArgumentException("DATABASE_URL is not set or is empty in the .env file!")

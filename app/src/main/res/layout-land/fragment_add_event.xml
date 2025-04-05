@@ -151,37 +151,68 @@
         </com.google.android.material.textfield.TextInputLayout>
 
 
-        <!-- Image selection button -->
-        <Button
-            android:id="@+id/select_image_button"
+        <LinearLayout
+            android:id="@+id/image_selection_layout"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="@dimen/_16dp"
-            android:textColor="?attr/colorOnSecondary"
             android:layout_marginStart="@dimen/_16dp"
             android:layout_marginEnd="@dimen/_16dp"
-            android:text="@string/select_image"
-            app:backgroundTint="?attr/colorAccent"
+            android:orientation="horizontal"
+            android:gravity="center"
             app:layout_constraintTop_toBottomOf="@id/text_field_event_description"
             app:layout_constraintStart_toStartOf="parent"
-            />
+            app:layout_constraintEnd_toEndOf="parent">
+
+            <!-- Image selection button -->
+            <Button
+                android:id="@+id/select_image_button"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textColor="?attr/colorOnSecondary"
+                android:text="@string/select_image"
+                android:drawableLeft="@drawable/baseline_image_24"
+                android:drawableTint="?attr/colorOnSecondary"
+                android:paddingStart="@dimen/_8dp"
+                android:paddingEnd="@dimen/_8dp"
+                app:backgroundTint="?attr/colorAccent"
+                app:layout_constraintTop_toBottomOf="@id/text_field_event_description"
+                app:layout_constraintStart_toStartOf="parent"
+                />
+
+            <Button
+                android:id="@+id/capture_image_button"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textColor="?attr/colorOnSecondary"
+                android:layout_marginStart="@dimen/_60dp"
+                android:text="@string/capture_image"
+                android:drawableLeft="@drawable/baseline_camera_alt_24"
+                android:drawableTint="?attr/colorOnSecondary"
+                android:paddingStart="@dimen/_8dp"
+                android:paddingEnd="@dimen/_8dp"
+                app:backgroundTint="?attr/colorAccent"
+                app:layout_constraintTop_toBottomOf="@id/text_field_event_description"
+                app:layout_constraintStart_toEndOf="@id/select_image_button"
+                />
+
+        </LinearLayout>
 
         <com.google.android.material.imageview.ShapeableImageView
             android:id="@+id/imageView_event_picture"
             android:layout_width="0dp"
             android:layout_height="0dp"
             android:layout_marginTop="@dimen/_16dp"
-            android:layout_marginStart="@dimen/_16dp"
             android:layout_marginBottom="@dimen/_16dp"
             android:scaleType="centerCrop"
             app:layout_constraintWidth_percent="0.5"
-            app:layout_constraintHeight_percent="0.2"
+            app:layout_constraintHeight_percent="0.3"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/select_image_button"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/image_selection_layout"
             app:strokeColor="?attr/colorAccent"
             app:strokeWidth="@dimen/_2dp"
             />
-
 
         <com.google.android.material.floatingactionbutton.FloatingActionButton
             android:id="@+id/addEventButton"
@@ -189,9 +220,11 @@
             android:layout_height="wrap_content"
             android:layout_margin="@dimen/_16dp"
             android:clickable="true"
+            android:contentDescription="@string/button_description"
             app:backgroundTint="?attr/colorAccent"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/imageView_event_picture"
             app:srcCompat="@drawable/baseline_add_24"
             app:tint="?attr/colorOnSecondary"
             />
