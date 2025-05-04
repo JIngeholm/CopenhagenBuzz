@@ -70,6 +70,20 @@
     <string name="capture_image">Capture Image</string>
 
 
+    <string name="previous_month">Previous Month</string>
+    <string name="next_month">Next Month</string>
+    <string name="sunday_short">Sun</string>
+    <string name="monday_short">Mon</string>
+    <string name="tuesday_short">Tue</string>
+    <string name="wednesday_short">Wed</string>
+    <string name="thursday_short">Thu</string>
+    <string name="friday_short">Fri</string>
+    <string name="saturday_short">Sat</string>
+    <string name="no_events">No events on this day</string>
+    <string name="events_for_day">Events for %1$s</string>
+    <string name="calendar">Calendar</string>
+    <string name="event_image">description for image</string>
+
     <string-array name="event_types">
         <item>Music</item>
         <item>Sport</item>

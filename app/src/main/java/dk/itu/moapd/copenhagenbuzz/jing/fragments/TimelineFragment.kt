@@ -127,8 +127,6 @@ class TimelineFragment : Fragment() {
             binding.listView.apply{
                 this.adapter = adapter
             }
-
-
         }
     }
 
